@@ -111,9 +111,6 @@ namespace FalconBMS.Launcher.Starter
                 mainWindow.VR_SteamVR.Visibility = Visibility.Hidden;
                 mainWindow.VR_OpenXR.Visibility = Visibility.Hidden;
                 mainWindow.VR_NoVR.Visibility = Visibility.Hidden;
-                mainWindow.VR_NoVR.IsChecked = true;
-                mainWindow.VR_SteamVR.IsChecked = false;
-                mainWindow.VR_OpenXR.IsChecked = false;
             }
         }
 
