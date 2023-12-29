@@ -32,7 +32,7 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+                //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
                 InitializeComponent();
             }
             catch (Exception ex)
