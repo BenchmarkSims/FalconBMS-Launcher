@@ -330,14 +330,14 @@ namespace FalconBMS.Launcher.Windows
 
             // Reset PhysicalAxis previously assigned to same axis
             // In case of axis has been unassigned and saved.
-            for (int i = 0; i < deviceControl.GetJoystickMappingsForAxes().Length; i++)
-                deviceControl.GetJoystickMappingsForAxes()[i].ResetPreviousAxis(whocalledwindow);
+            for (int i = 0; i < deviceControl.GetJoystickMappings().Length; i++)
+                deviceControl.GetJoystickMappings()[i].ResetPreviousAxis(whocalledwindow);
             //if (deviceControl.mouse.GetMouseAxis().GetAxisName() == whocalledwindow)
             //    deviceControl.mouse.LoadAx(new AxAssgn());
 
             // When axis has been assigned.
             if (axisAssign.GetDeviceNumber() > -1)
-                deviceControl.GetJoystickMappingsForAxes()[axisAssign.GetDeviceNumber()].axis[axisAssign.GetPhysicalNumber()]
+                deviceControl.GetJoystickMappings()[axisAssign.GetDeviceNumber()].axis[axisAssign.GetPhysicalNumber()]
                     = new AxAssgn(whocalledwindow, axisAssign);
             //if (axisAssign.GetDeviceNumber() == -2)
             //{
@@ -360,9 +360,9 @@ namespace FalconBMS.Launcher.Windows
         {
             foreach (AxisName nme in axisNameList)
                 inGameAxis[nme.ToString()] = new InGameAxAssgn();
-            for (int i = 0; i < deviceControl.GetJoystickMappingsForAxes().Length; i++)
+            for (int i = 0; i < deviceControl.GetJoystickMappings().Length; i++)
             {
-                JoyAssgn joy = deviceControl.GetJoystickMappingsForAxes()[i];
+                JoyAssgn joy = deviceControl.GetJoystickMappings()[i];
                 for (int ii = 0; ii <= 7; ii++)
                 {
                     string axisName = joy.axis[ii].GetAxisName();
@@ -406,28 +406,28 @@ namespace FalconBMS.Launcher.Windows
         /// </summary>
         public static void AquireAll()
         {
-            foreach (JoyAssgn joy in deviceControl.GetJoystickMappingsForAxes())
+            foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
                 joy.GetDevice().Acquire();
             return;
         }
 
         public static void UnaquireAll()
         {
-            foreach (JoyAssgn joy in deviceControl.GetJoystickMappingsForAxes())
+            foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
                 joy.GetDevice().Unacquire();
             return;
         }
 
         public int GetAB()
         {
-            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappingsForAxes();
+            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
             InGameAxAssgn axis = (InGameAxAssgn)inGameAxis[AxisName.Throttle.ToString()];
             return joyAssgns[axis.GetDeviceNumber()].detentPosition.GetAB();
         }
 
         public int GetIDLE()
         {
-            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappingsForAxes();
+            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
             InGameAxAssgn axis = (InGameAxAssgn)inGameAxis[AxisName.Throttle.ToString()];
             return joyAssgns[axis.GetDeviceNumber()].detentPosition.GetIDLE();
         }

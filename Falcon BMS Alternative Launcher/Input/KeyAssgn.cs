@@ -309,7 +309,7 @@ namespace FalconBMS.Launcher.Input
 
         public string ReadJoyAssignment(int joyId)
         {
-            JoyAssgn[] joyAssgns = MainWindow.deviceControl.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = MainWindow.deviceControl.GetJoystickMappings();
 
             if (joyId >= joyAssgns.Length)
                 return "";

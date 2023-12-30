@@ -46,16 +46,16 @@ namespace FalconBMS.Launcher.Input
 
         public int GetDeviceNumber() 
         {
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappingsForAxes().Length; i++)
-                if (MainWindow.deviceControl.GetJoystickMappingsForAxes()[i] == joy)
+            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
+                if (MainWindow.deviceControl.GetJoystickMappings()[i] == joy)
                     return i;
 
             return CommonConstants.JOYNUMUNASSIGNED;
         }
         public Device GetDevice()
         {
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappingsForAxes().Length; i++)
-                if (MainWindow.deviceControl.GetJoystickMappingsForAxes()[i] == joy)
+            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
+                if (MainWindow.deviceControl.GetJoystickMappings()[i] == joy)
                     return joy.GetDevice();
             return null;
         }

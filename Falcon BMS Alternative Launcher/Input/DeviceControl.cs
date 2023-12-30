@@ -18,21 +18,27 @@ namespace FalconBMS.Launcher.Input
         private KeyFile keyFileDefaultF16;
         private KeyFile keyFileF15ABCD;
 
-        private Device[] hwDevices;
-        private JoyAssgn[] joyAssign;
+        private List<Device> hwDevices;
+        private List<JoyAssgn> joyAssign;
+
+        private DeviceSuppressList suppressList;
 
         public static DeviceControl EnumerateAttachedDevicesAndLoadXml(AppRegInfo appReg)
         {
             return new DeviceControl(appReg);
         }
+
         private DeviceControl(AppRegInfo appReg)
         {
             this.appReg = appReg;
 
             // Make Joystick Instances.
             DeviceList devList = Manager.GetDevices(DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly);
-            hwDevices = new Device[devList.Count];
-            joyAssign = new JoyAssgn[devList.Count];
+
+            this.suppressList = new DeviceSuppressList();
+
+            hwDevices = new List<Device>(devList.Count);
+            joyAssign = new List<JoyAssgn>(devList.Count);
             
             string pathToUserXml;
             string pathToStockXml;
@@ -40,34 +46,40 @@ namespace FalconBMS.Launcher.Input
             int i = 0;
             foreach (DeviceInstance dev in devList)
             {
-                hwDevices[i] = new Device(dev.InstanceGuid);
-                joyAssign[i] = new JoyAssgn(hwDevices[i]);//sites product info, guids etc
+                if (suppressList.IsDeviceSuppressed(dev.InstanceGuid) ||
+                    suppressList.IsDeviceSuppressed(dev.ProductGuid))
+                    continue;
 
-                pathToUserXml = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joyAssign[i].GetProductFileName()
-                + " {" + joyAssign[i].GetInstanceGUID().ToString().ToUpper() + "}.xml";
+                Device hwdev = new Device(dev.InstanceGuid);
+                JoyAssgn joy = new JoyAssgn(hwdev);
+                hwDevices.Add(hwdev);
+                joyAssign.Add(joy);
+
+                pathToUserXml = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetProductFileName()
+                + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
 
                 // Load existing .xml files.
                 if (File.Exists(pathToUserXml))
                 {
-                    joyAssign[i].LoadAxesButtonsAndHatsFrom(pathToUserXml);
+                    joy.LoadAxesButtonsAndHatsFrom(pathToUserXml);
                 }
                 else
                 {
                     pathToStockXml = Directory.GetCurrentDirectory() 
                         + CommonConstants.STOCKFOLDER + CommonConstants.SETUPV100
-                        + joyAssign[i].GetProductFileName()
+                        + joy.GetProductFileName()
                         + CommonConstants.STOCKXML;
                     if (!File.Exists(pathToStockXml))
                     {
                         pathToStockXml = appReg.GetInstallDir() + CommonConstants.LAUNCHERFOLDER
                             + CommonConstants.STOCKFOLDER + CommonConstants.SETUPV100
-                            + joyAssign[i].GetProductFileName()
+                            + joy.GetProductFileName()
                             + CommonConstants.STOCKXML;
                     }
                     if (File.Exists(pathToStockXml))
                     {
                         File.Copy(pathToStockXml, pathToUserXml);
-                        joyAssign[i].LoadAxesButtonsAndHatsFrom(pathToUserXml);
+                        joy.LoadAxesButtonsAndHatsFrom(pathToUserXml);
                     }
                 }
 
@@ -76,6 +88,31 @@ namespace FalconBMS.Launcher.Input
             
             // Load key bindings from keyfiles.
             LoadKeyBindingsFromUserOrStockKeyfiles(appReg);
+        }
+
+        public bool DeviceListNeedsRefresh()
+        {
+            var tmpDevices = new List<Device>();
+            DeviceList devList = Manager.GetDevices(DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly);
+            foreach (DeviceInstance dev in devList)
+            {
+                if (suppressList.IsDeviceSuppressed(dev.InstanceGuid) ||
+                    suppressList.IsDeviceSuppressed(dev.ProductGuid))
+                    continue;
+
+                tmpDevices.Add(new Device(dev.InstanceGuid));
+            }
+
+            if (tmpDevices.Count != this.hwDevices.Count) return true;
+
+            for (int i = 0; i < tmpDevices.Count; ++i)
+            {
+                if (tmpDevices[i].DeviceInformation.InstanceGuid !=
+                    this.hwDevices[i].DeviceInformation.InstanceGuid)
+                    return true;
+            }
+
+            return false;
         }
 
         public void LoadKeyBindingsFromUserOrStockKeyfiles(AppRegInfo appReg)
@@ -116,7 +153,7 @@ namespace FalconBMS.Launcher.Input
 
         public Device[] GetHwDeviceList()
         {
-            return this.hwDevices;
+            return this.hwDevices.ToArray();
         }
 
         public Device GetHwDevice(int i)
@@ -137,14 +174,9 @@ namespace FalconBMS.Launcher.Input
             throw new ArgumentException("avionicsProfile");
         }
 
-        public JoyAssgn[] GetJoystickMappingsForAxes()
+        public JoyAssgn[] GetJoystickMappings()
         {
-            return joyAssign;
-        }
-
-        public JoyAssgn[] GetJoystickMappingsForButtonsAndHats()
-        {
-            return joyAssign;
+            return joyAssign.ToArray();
         }
 
         public void UpdateAvionicsProfile(string profile)
@@ -166,13 +198,13 @@ namespace FalconBMS.Launcher.Input
                 this.UpdateAvionicsProfile(null);//generic F16
 
                 XmlSerializer serializer = new XmlSerializer(typeof(JoyAssgn));
-                for (int i = 0; i < this.joyAssign.Length; i++)
+                foreach (JoyAssgn joy in this.joyAssign)
                 {
-                    string fileName = this.appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + this.joyAssign[i].GetProductFileName()
-                    + " {" + this.joyAssign[i].GetInstanceGUID().ToString().ToUpper() + "}.xml";
+                    string fileName = this.appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetProductFileName()
+                    + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
 
                     using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(fileName))
-                        serializer.Serialize(sw, this.joyAssign[i]);
+                        serializer.Serialize(sw, joy);
 
                     // QUICKFIX: Save a duplicate copy in a safe space, to guard against possibility of user (accidentally or
                     // purposefully) running an older AL against 4.37.3 or later install -- this will silently delete the
@@ -181,7 +213,7 @@ namespace FalconBMS.Launcher.Input
                         Directory.CreateDirectory(this.appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER);
 
                     string backupPath = this.appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + 
-                        CommonConstants.SETUPV100 + this.joyAssign[i].GetProductFileName() + " {" + this.joyAssign[i].GetInstanceGUID().ToString().ToUpper() + "}.xml";
+                        CommonConstants.SETUPV100 + joy.GetProductFileName() + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
                     File.Copy(fileName, backupPath, overwrite: true);
                 }
             }

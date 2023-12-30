@@ -167,7 +167,7 @@ namespace FalconBMS.Launcher.Override
         protected void SaveDeviceSorting(DeviceControl deviceControl)
         {
             StringBuilder sb = new StringBuilder(2000);
-            foreach (JoyAssgn joy in deviceControl.GetJoystickMappingsForButtonsAndHats())
+            foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
                 sb.AppendLine(joy.GetDeviceSortingLine());
 
             // BMS overwrites DeviceSorting.txt if was written in UTF-8.
@@ -201,11 +201,11 @@ namespace FalconBMS.Launcher.Override
                 deviceControl.UpdateAvionicsProfile(null);
                 WriteKeyLines(filename, inGameAxis,
                     deviceControl.GetKeyBindings(),
-                    deviceControl.GetJoystickMappingsForButtonsAndHats());
+                    deviceControl.GetJoystickMappings());
                 deviceControl.UpdateAvionicsProfile(CommonConstants.F15_TAG);
                 WriteKeyLines(filenameF15, inGameAxis,
                     deviceControl.GetKeyBindings(),
-                    deviceControl.GetJoystickMappingsForButtonsAndHats());
+                    deviceControl.GetJoystickMappings());
             }
             finally
             {
@@ -286,10 +286,10 @@ namespace FalconBMS.Launcher.Override
                 };
                 fs.Write(bs, 0, bs.Length);
 
-                bs = deviceControl.GetJoystickMappingsForAxes()[pitchAxis.GetDeviceNumber()].GetInstanceGUID().ToByteArray();
+                bs = deviceControl.GetJoystickMappings()[pitchAxis.GetDeviceNumber()].GetInstanceGUID().ToByteArray();
                 fs.Write(bs, 0, bs.Length);
 
-                bs = new byte[] { (byte)deviceControl.GetJoystickMappingsForAxes().Length, 0x00, 0x00, 0x00 };
+                bs = new byte[] { (byte)deviceControl.GetJoystickMappings().Length, 0x00, 0x00, 0x00 };
                 fs.Write(bs, 0, bs.Length);
             }
             else
@@ -300,7 +300,7 @@ namespace FalconBMS.Launcher.Override
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
                 };
-                bs[20] = (byte)deviceControl.GetJoystickMappingsForAxes().Length;
+                bs[20] = (byte)deviceControl.GetJoystickMappings().Length;
                 fs.Write(bs, 0, bs.Length);
             }
 
@@ -429,8 +429,8 @@ namespace FalconBMS.Launcher.Override
 
                     if (nme == AxisName.Throttle && currentAxis.IsJoyAssigned())
                     {
-                        double iAB = deviceControl.GetJoystickMappingsForAxes()[currentAxis.GetDeviceNumber()].detentPosition.GetAB();
-                        double iIdle = deviceControl.GetJoystickMappingsForAxes()[currentAxis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        double iAB = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetAB();
+                        double iIdle = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetIDLE();
 
                         iAB = iAB * CommonConstants.BINAXISMAX / CommonConstants.AXISMAX;
                         iIdle = iIdle * CommonConstants.BINAXISMAX / CommonConstants.AXISMAX;

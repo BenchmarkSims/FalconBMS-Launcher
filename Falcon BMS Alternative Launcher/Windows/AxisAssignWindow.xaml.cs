@@ -195,8 +195,8 @@ namespace FalconBMS.Launcher.Windows
 
                     if (axisAssign.GetDeviceNumber() >= 0)
                     {
-                        AB = MainWindow.deviceControl.GetJoystickMappingsForAxes()[axisAssign.GetDeviceNumber()].detentPosition.GetAB();
-                        IDLE = MainWindow.deviceControl.GetJoystickMappingsForAxes()[axisAssign.GetDeviceNumber()].detentPosition.GetIDLE();
+                        AB = MainWindow.deviceControl.GetJoystickMappings()[axisAssign.GetDeviceNumber()].detentPosition.GetAB();
+                        IDLE = MainWindow.deviceControl.GetJoystickMappings()[axisAssign.GetDeviceNumber()].detentPosition.GetIDLE();
                     }
                 }
             }
@@ -208,13 +208,13 @@ namespace FalconBMS.Launcher.Windows
             devNumTmp = axisAssign.GetDeviceNumber();
             phyAxNumTmp = axisAssign.GetPhysicalNumber();
 
-            Joynum = new JoyAxisNeutralValue[MainWindow.deviceControl.GetJoystickMappingsForAxes().Length];
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappingsForAxes().Length; i++)
+            Joynum = new JoyAxisNeutralValue[MainWindow.deviceControl.GetJoystickMappings().Length];
+            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
                 Joynum[i] = new JoyAxisNeutralValue();
 
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappingsForAxes().Length; i++)
+            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
                 for (int ii = 0; ii < 8; ii++)
-                    Joynum[i].NeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappingsForAxes()[i].JoyAxisState(ii);
+                    Joynum[i].NeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii);
         }
 
         private void GetNeutralPosition()
@@ -237,12 +237,12 @@ namespace FalconBMS.Launcher.Windows
                 TickCount_NextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
             }
 
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappingsForAxes().Length; i++)
+            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
                 for (int ii = 0; ii < 8; ii++)
                 {
-                    if (MainWindow.deviceControl.GetJoystickMappingsForAxes()[i].JoyAxisState(ii) < Joynum[i].NeutralValue[ii] + CommonConstants.AXISMAX / 4 &
-                        MainWindow.deviceControl.GetJoystickMappingsForAxes()[i].JoyAxisState(ii) > Joynum[i].NeutralValue[ii] - CommonConstants.AXISMAX / 4)
+                    if (MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) < Joynum[i].NeutralValue[ii] + CommonConstants.AXISMAX / 4 &
+                        MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) > Joynum[i].NeutralValue[ii] - CommonConstants.AXISMAX / 4)
                         continue;
                     devNumTmp = i;
                     phyAxNumTmp = ii;
@@ -258,8 +258,8 @@ namespace FalconBMS.Launcher.Windows
                     InGameAxAssgn axis = (InGameAxAssgn)MainWindow.inGameAxis[whoCalledWindow];
                     if (axis.GetDeviceNumber() >= 0)
                     {
-                        AB = MainWindow.deviceControl.GetJoystickMappingsForAxes()[axis.GetDeviceNumber()].detentPosition.GetAB();
-                        IDLE = MainWindow.deviceControl.GetJoystickMappingsForAxes()[axis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        AB = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetAB();
+                        IDLE = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetIDLE();
                     }
                 }
             }
@@ -317,7 +317,7 @@ namespace FalconBMS.Launcher.Windows
 
             int output = MainWindow.ApplyDeadZone
                             (
-                                MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp].JoyAxisState(phyAxNumTmp),
+                                MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp),
                                 (AxCurve)DeadZone.SelectedIndex,
                                 (AxCurve)Saturation.SelectedIndex
                             );
@@ -399,14 +399,14 @@ namespace FalconBMS.Launcher.Windows
                 if (devNumTmp > CommonConstants.JOYNUMUNASSIGNED)
                 {
                     axisAssign = new InGameAxAssgn(
-                            MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp],
+                            MainWindow.deviceControl.GetJoystickMappings()[devNumTmp],
                             phyAxNumTmp,
                             (bool)Invert.IsChecked,
                             (AxCurve)DeadZone.SelectedIndex,
                             (AxCurve)Saturation.SelectedIndex
                         );
                     if (whoCalledWindow == AxisName.Throttle.ToString())
-                        MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp].detentPosition = new DetentPosition(AB, IDLE);
+                        MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].detentPosition = new DetentPosition(AB, IDLE);
                 }
             }
 
@@ -459,9 +459,9 @@ namespace FalconBMS.Launcher.Windows
                 return;
             
             if (Invert.IsChecked == true)
-                AB = CommonConstants.AXISMIN + MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp].JoyAxisState(phyAxNumTmp);
+                AB = CommonConstants.AXISMIN + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
             else
-                AB = CommonConstants.AXISMAX - MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp].JoyAxisState(phyAxNumTmp);
+                AB = CommonConstants.AXISMAX - MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
 
             if (AB > CommonConstants.AXISMAX)
                 AB = CommonConstants.AXISMAX;
@@ -475,9 +475,9 @@ namespace FalconBMS.Launcher.Windows
                 return;
 
             if (Invert.IsChecked == true)
-                IDLE = CommonConstants.AXISMIN + MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp].JoyAxisState(phyAxNumTmp);
+                IDLE = CommonConstants.AXISMIN + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
             else
-                IDLE = CommonConstants.AXISMAX - MainWindow.deviceControl.GetJoystickMappingsForAxes()[devNumTmp].JoyAxisState(phyAxNumTmp);
+                IDLE = CommonConstants.AXISMAX - MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
 
             if (IDLE > CommonConstants.AXISMAX)
                 IDLE = CommonConstants.AXISMAX;

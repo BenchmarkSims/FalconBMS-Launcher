@@ -19,7 +19,7 @@ namespace FalconBMS.Launcher.Override
         {
             cfg.Write(
                 "set g_nHotasPinkyShiftMagnitude "
-                + deviceControl.GetJoystickMappingsForButtonsAndHats().Length * CommonConstants.DX_MAX_BUTTONS
+                + deviceControl.GetJoystickMappings().Length * CommonConstants.DX_MAX_BUTTONS
                 + " " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
         }
 
