@@ -12,13 +12,6 @@ using FalconBMS.Launcher.Input;
 
 using MahApps.Metro.Controls;
 
-//using AutoUpdaterDotNET;
-//using System.Reflection;
-//using System.Xml;
-//using System.Threading.Tasks;
-//using System.Collections.ObjectModel;
-//using System.Linq;
-
 namespace FalconBMS.Launcher.Windows
 {
     /// <summary>
@@ -32,7 +25,7 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+                //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
                 InitializeComponent();
             }
             catch (Exception ex)
@@ -220,10 +213,9 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                // Get Devices //REVIEW: doesn't this throw away unsaved changes / risk data loss?
                 deviceControl = DeviceControl.EnumerateAttachedDevicesAndLoadXml(appReg);
 
-                neutralButtons = new NeutralButtons[deviceControl.GetJoystickMappingsForButtonsAndHats().Length];
+                neutralButtons = new NeutralButtons[deviceControl.GetJoystickMappings().Length];
 
                 // Aquire joySticks
                 AquireAll();
@@ -321,24 +313,9 @@ namespace FalconBMS.Launcher.Windows
 
         void ScanForNewDevices()
         {
-            Microsoft.DirectX.DirectInput.DeviceList devList = null;
             try
             {
-                devList = Microsoft.DirectX.DirectInput.Manager.GetDevices(
-                        Microsoft.DirectX.DirectInput.DeviceClass.GameControl,
-                        Microsoft.DirectX.DirectInput.EnumDevicesFlags.AttachedOnly
-                        );
-            }
-            catch (Exception ex)
-            {
-                // need this as sometimes error might happen when detected a new device.
-                Diagnostics.Log(ex);
-                return;
-            }
-
-            try
-            {
-                if (deviceControl.GetHwDeviceList().Length != devList.Count)
+                if (deviceControl.DeviceListNeedsRefresh())
                 {
                     ReloadDevicesAndXmlMappings();
 

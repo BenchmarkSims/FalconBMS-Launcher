@@ -63,16 +63,16 @@ namespace FalconBMS.Launcher.Override
                     if ((nme == AxisName.Throttle || nme == AxisName.Throttle_Right) && currentAxis.IsJoyAssigned())
                     {
                         // Scale: [0,65535] logical (0==fully-idle; 65536==max-burner; regardless of normal vs reverse)
-                        double fAB = deviceControl.GetJoystickMappingsForAxes()[currentAxis.GetDeviceNumber()].detentPosition.GetAB();
-                        double fIdle = deviceControl.GetJoystickMappingsForAxes()[currentAxis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        double fAB = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetAB();
+                        double fIdle = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetIDLE();
 
                         //BUGFIX: right-throttle needs to mirror the identical idle/ab detents, from primary throttle.
                         if (nme == AxisName.Throttle_Right)
                         {
                             InGameAxAssgn leftThrottleAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Throttle.ToString()];
 
-                            fAB = deviceControl.GetJoystickMappingsForAxes()[leftThrottleAxis.GetDeviceNumber()].detentPosition.GetAB();
-                            fIdle = deviceControl.GetJoystickMappingsForAxes()[leftThrottleAxis.GetDeviceNumber()].detentPosition.GetIDLE();
+                            fAB = deviceControl.GetJoystickMappings()[leftThrottleAxis.GetDeviceNumber()].detentPosition.GetAB();
+                            fIdle = deviceControl.GetJoystickMappings()[leftThrottleAxis.GetDeviceNumber()].detentPosition.GetIDLE();
                         }
 
                         // Adjust logical scale to [0,15000]

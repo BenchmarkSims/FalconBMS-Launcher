@@ -187,8 +187,6 @@ namespace FalconBMS.Launcher.Input
                 { "@MinusSymbol", @"\x2D" },
                 { "@CallbackIdentifier", "[A-Za-z0-9_]+" },
                 { "@HexIdentifier", "0([xX][0-9A-Fa-f]{1,8})?" },
-                { "@DQDelimitedText", "bar" },
-                { "@TrailingComment", "bar" },
             };
 
             public static Regex LineComment = Create(@"(?nsx) #ExplicitCapture, Singleline, IgnorePatternWhitespace

@@ -98,7 +98,7 @@ namespace FalconBMS.Launcher.Windows
             if (!e.PropertyName.Contains("Z_Joy_"))
                 return;
             int target = int.Parse(e.PropertyName.Replace("Z_Joy_", ""));
-            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
             if (target >= joyAssgns.Length)
             {
                 e.Cancel = true;
@@ -189,7 +189,7 @@ namespace FalconBMS.Launcher.Windows
         /// </summary>
         public void JumptoAssignedKey()
         {
-            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
 
             string target = "";
             switch (statusAssign)

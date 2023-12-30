@@ -122,6 +122,7 @@
     <Compile Include="Input\AxAssgn.cs" />
     <Compile Include="Input\AxisName.cs" />
     <Compile Include="Input\CommonConstants.cs" />
+    <Compile Include="Input\DeviceSuppressList.cs" />
     <Compile Include="Input\DeviceControl.cs" />
     <Compile Include="Diagnostics.cs" />
     <Compile Include="Input\DxAssgn.cs" />

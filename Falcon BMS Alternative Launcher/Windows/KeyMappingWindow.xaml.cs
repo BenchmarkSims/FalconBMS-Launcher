@@ -70,14 +70,14 @@ namespace FalconBMS.Launcher.Windows
 
         private void getNeutralPosition()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             for (int i = 0; i < joyAssgns.Length; i++)
                 neutralButtons[i] = new NeutralButtons(joyAssgns[i]);
         }
         private void Reset()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             neutralButtons = new NeutralButtons[joyAssgns.Length];
 
@@ -105,7 +105,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void ShowAssignedStatus()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             var sb = new StringBuilder(500);
             sb.Append(tmpKeyboard.GetKeyAssignmentStatus());
@@ -139,7 +139,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void JoystickButtonMonitor()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             byte[] buttons;
             int[] povs;
@@ -378,7 +378,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void ClearDX_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             for (int i = 0; i < joyAssgns.Length; i++)
             {
@@ -435,7 +435,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappingsForButtonsAndHats();
+            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             for (int i = 0; i < tmpJoyStick.Length; i++)
             {
