@@ -233,7 +233,9 @@ namespace FalconBMS.Launcher.Input
             string productName = GetProductName();
 
             const char dq = '\x22'; //doublequote char
-            return $"{productGuid} {dq}{productName}{dq}";
+            const char oc = '\x7B'; //open curlybrace
+            const char cc = '\x7D'; //close curlybrace
+            return $"{oc}{productGuid}{cc} {dq}{productName}{dq}";
         }
 
         /// <summary>
