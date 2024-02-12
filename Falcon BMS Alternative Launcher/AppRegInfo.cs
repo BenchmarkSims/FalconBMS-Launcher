@@ -146,8 +146,8 @@ namespace FalconBMS.Launcher
         {
             try
             {
-                RegistryKey regkeyCFG = Registry.CurrentUser.OpenSubKey("SOFTWARE\\F4Patch\\Settings", writable:true);
-                regkeyCFG.SetValue("F4Exe", installDir + "\\Launcher.exe");
+                RegistryKey regkeyCFG = Registry.CurrentUser.CreateSubKey("SOFTWARE\\F4Patch\\Settings", writable:true);
+                regkeyCFG.SetValue("F4Exe", Path.Combine(installDir, "Launcher.exe"));
                 regkeyCFG.Close();
             }
             catch (Exception exCFG)
