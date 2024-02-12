@@ -57,7 +57,6 @@ namespace FalconBMS.Launcher.Override
 
             using (StreamWriter cfgUser = OverwriteCfg(CommonConstants.USERCFGFILE))
             {
-                cfgUser.WriteLine();
                 cfgUser.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
 
                 OverrideButtonsPerDevice(cfgUser, deviceControl);
