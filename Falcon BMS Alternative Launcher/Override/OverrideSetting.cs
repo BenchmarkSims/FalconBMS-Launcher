@@ -180,7 +180,12 @@ namespace FalconBMS.Launcher.Override
                 File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
             using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(filename))
-                sw.Write(sb.ToString());
+            {
+                sw.NewLine = Environment.NewLine;
+
+                foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
+                    sw.WriteLine(joy.GetDeviceSortingLine());
+            }
         }
 
         public virtual void SaveKeyMapping(Hashtable inGameAxis, DeviceControl deviceControl)
