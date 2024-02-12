@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
 
 using FalconBMS.Launcher.Input;
 using FalconBMS.Launcher.Windows;
@@ -104,47 +104,60 @@ namespace FalconBMS.Launcher.Override
         /// </summary>
         protected virtual void SaveConfigfile(Hashtable inGameAxis, DeviceControl deviceControl)
         {
-            StreamWriter cfgo = OverwriteCfg(CommonConstants.CFGFILE);
-            cfgo.Close();
+            StreamWriter cfgBase = OverwriteCfg(CommonConstants.CFGFILE);
+            cfgBase.Close();
 
-            StreamWriter cfg = OverwriteCfg(CommonConstants.USERCFGFILE);
+            using (StreamWriter cfgUser = OverwriteCfg(CommonConstants.USERCFGFILE))
+            {
+                cfgUser.WriteLine();
+                cfgUser.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
 
-            OverrideButtonsPerDevice(cfg, deviceControl);
-            OverrideHotasPinkyShiftMagnitude(cfg, deviceControl);
-            OverrideVRHMD(cfg);
-
-            OverridePovDeviceIDs(cfg, inGameAxis);
-
-            cfg.Close();
+                OverrideButtonsPerDevice(cfgUser, deviceControl);
+                OverrideHotasPinkyShiftMagnitude(cfgUser, deviceControl);
+                OverridePovDeviceIDs(cfgUser, inGameAxis);
+                OverrideVRHMD(cfgUser);
+            }
         }
 
         private StreamWriter OverwriteCfg(string fname)
         {
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + fname;
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + fname;
+
             if (!File.Exists(fbackupname) & File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
                 File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
-            StreamReader cReader = new StreamReader
-                (filename, Encoding.Default);
-            string stResult = "";
-            while (cReader.Peek() >= 0)
+            // Read existing contents, modulo the lines we've added in the past.
+            List<string> lines = new List<string>(500);
+            using (StreamReader reader = new StreamReader(filename, Encoding.UTF8))
             {
-                string stBuffer = cReader.ReadLine();
-                if (stBuffer.Contains(CommonConstants.CFGOVERRIDECOMMENT))
-                    continue;
-                stResult += stBuffer + "\r\n";
+                while (true)
+                {
+                    string line = reader.ReadLine();
+                    if (line == null) break;
+
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT))
+                        continue;
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT2))
+                        continue;
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
+                        break; // read no more below this cutoff line
+
+                    lines.Add(line);
+                }
             }
-            cReader.Close();
 
-            StreamWriter cfg = new StreamWriter
-                (filename, false, Encoding.GetEncoding("shift_jis"));
-            cfg.Write(stResult);
+            // Recreate file contents; keep handle open.
+            StreamWriter writer = Utils.CreateUtf8TextWihoutBom(filename);
+            writer.NewLine = Environment.NewLine;
 
-            return cfg;
+            foreach (string line in lines)
+                writer.WriteLine(line);
+
+            return writer;
         }
 
         protected virtual void OverridePovDeviceIDs(StreamWriter cfg, Hashtable inGameAxis) { }
@@ -166,10 +179,6 @@ namespace FalconBMS.Launcher.Override
         /// </summary>
         protected void SaveDeviceSorting(DeviceControl deviceControl)
         {
-            StringBuilder sb = new StringBuilder(2000);
-            foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
-                sb.AppendLine(joy.GetDeviceSortingLine());
-
             // BMS overwrites DeviceSorting.txt if was written in UTF-8.
             string filename = appReg.GetInstallDir() + "/User/Config/DeviceSorting.txt";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "DeviceSorting.txt";
