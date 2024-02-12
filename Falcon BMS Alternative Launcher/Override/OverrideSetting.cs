@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
 
 using FalconBMS.Launcher.Input;
 using FalconBMS.Launcher.Windows;
@@ -48,103 +48,63 @@ namespace FalconBMS.Launcher.Override
             SaveKeyMapping(inGameAxis, deviceControl);
             //SavePlcLbk();
             SavePop();
-            SaveWindowConfig();
         }
 
-        protected void SaveWindowConfig()
-        {
-            string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "windowconfig.dat";
-            string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "windowconfig.dat";
-            if (!File.Exists(fbackupname) & File.Exists(filename))
-                File.Copy(filename, fbackupname, true);
-            if (File.Exists(filename))
-                File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
-
-            if (!File.Exists(filename))
-            {
-                byte[] nbs = {
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x70, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x30, 0x02, 0x00, 0x00, 0x30, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0xEC, 0x00, 0x00, 0x00, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0xC2, 0x01, 0x00, 0x00, 0xC2, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0xC2, 0x01, 0x00, 0x00, 0xC2, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x90, 0x01, 0x00, 0x00, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x90, 0x01, 0x00, 0x00, 0x8C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                };
-                FileStream nfs = new FileStream(filename, FileMode.Create, FileAccess.Write);
-                nfs.Write(nbs, 0, nbs.Length);
-                nfs.Close();
-            }
-
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-
-            byte[] bs = new byte[fs.Length];
-            fs.Read(bs, 0, bs.Length);
-
-            fs.Close();
-
-            bs[4] = 0x00;
-
-            FileStream nfs2 = new FileStream(filename, FileMode.Create, FileAccess.Write);
-            nfs2.Write(bs, 0, bs.Length);
-            nfs2.Close();
-        }
-
-        /// <summary>
-        /// As the name implies...
-        /// </summary>
         protected virtual void SaveConfigfile(Hashtable inGameAxis, DeviceControl deviceControl)
         {
-            StreamWriter cfgo = OverwriteCfg(CommonConstants.CFGFILE);
-            cfgo.Close();
+            StreamWriter cfgBase = OverwriteCfg(CommonConstants.CFGFILE);
+            cfgBase.Close();
 
-            StreamWriter cfg = OverwriteCfg(CommonConstants.USERCFGFILE);
+            using (StreamWriter cfgUser = OverwriteCfg(CommonConstants.USERCFGFILE))
+            {
+                cfgUser.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
 
-            OverrideButtonsPerDevice(cfg, deviceControl);
-            OverrideHotasPinkyShiftMagnitude(cfg, deviceControl);
-            OverrideVRHMD(cfg);
-
-            OverridePovDeviceIDs(cfg, inGameAxis);
-
-            cfg.Close();
+                OverrideButtonsPerDevice(cfgUser, deviceControl);
+                OverrideHotasPinkyShiftMagnitude(cfgUser, deviceControl);
+                OverridePovDeviceIDs(cfgUser, inGameAxis);
+                OverrideVRHMD(cfgUser);
+            }
         }
 
         private StreamWriter OverwriteCfg(string fname)
         {
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + fname;
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + fname;
+
             if (!File.Exists(fbackupname) & File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
                 File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
-            StreamReader cReader = new StreamReader
-                (filename, Encoding.Default);
-            string stResult = "";
-            while (cReader.Peek() >= 0)
+            // Read existing contents, modulo the lines we've added in the past.
+            List<string> lines = new List<string>(500);
+            using (StreamReader reader = new StreamReader(filename, Encoding.UTF8))
             {
-                string stBuffer = cReader.ReadLine();
-                if (stBuffer.Contains(CommonConstants.CFGOVERRIDECOMMENT))
-                    continue;
-                stResult += stBuffer + "\r\n";
+                while (true)
+                {
+                    string line = reader.ReadLine();
+                    if (line == null) break;
+
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT))
+                        continue;
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT2))
+                        continue;
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
+                        break; // read no more below this cutoff line
+
+                    lines.Add(line);
+                }
             }
-            cReader.Close();
 
-            StreamWriter cfg = new StreamWriter
-                (filename, false, Encoding.GetEncoding("shift_jis"));
-            cfg.Write(stResult);
+            // Recreate file contents; keep handle open.
+            StreamWriter writer = Utils.CreateUtf8TextWihoutBom(filename);
+            writer.NewLine = Environment.NewLine;
 
-            return cfg;
+            foreach (string line in lines)
+                writer.WriteLine(line);
+
+            return writer;
         }
 
         protected virtual void OverridePovDeviceIDs(StreamWriter cfg, Hashtable inGameAxis) { }
@@ -166,10 +126,6 @@ namespace FalconBMS.Launcher.Override
         /// </summary>
         protected void SaveDeviceSorting(DeviceControl deviceControl)
         {
-            StringBuilder sb = new StringBuilder(2000);
-            foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
-                sb.AppendLine(joy.GetDeviceSortingLine());
-
             // BMS overwrites DeviceSorting.txt if was written in UTF-8.
             string filename = appReg.GetInstallDir() + "/User/Config/DeviceSorting.txt";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "DeviceSorting.txt";
@@ -180,7 +136,12 @@ namespace FalconBMS.Launcher.Override
                 File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
             using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(filename))
-                sw.Write(sb.ToString());
+            {
+                sw.NewLine = Environment.NewLine;
+
+                foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
+                    sw.WriteLine(joy.GetDeviceSortingLine());
+            }
         }
 
         public virtual void SaveKeyMapping(Hashtable inGameAxis, DeviceControl deviceControl)

@@ -229,10 +229,13 @@ namespace FalconBMS.Launcher.Input
         /// </summary>
         public string GetDeviceSortingLine()
         {
-            Guid guid = GetProductGUID();
-            string str = guid.ToString().ToUpper();
-            str = "{" + str + "} \"" + GetProductName() + "\"\r\n";
-            return str;
+            string productGuid = GetProductGUID().ToString().ToUpperInvariant();
+            string productName = GetProductName();
+
+            const char dq = '\x22'; //doublequote char
+            const char oc = '\x7B'; //open curlybrace
+            const char cc = '\x7D'; //close curlybrace
+            return $"{oc}{productGuid}{cc} {dq}{productName}{dq}";
         }
 
         /// <summary>
