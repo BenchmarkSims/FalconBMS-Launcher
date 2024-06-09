@@ -22,6 +22,11 @@ namespace FalconBMS.Launcher.Windows
 
         public static void Read(string url, string top)
         {
+            //Self-test to assert we're NOT running on the main UI thread.
+            int currentThreadId = Thread.CurrentThread.ManagedThreadId;
+            int mainwinThreadId = Program.mainWin.Dispatcher.Thread.ManagedThreadId;
+            System.Diagnostics.Debug.Assert(currentThreadId != mainwinThreadId);
+
             try
             {
                 XmlReader rdr = XmlReader.Create(url);

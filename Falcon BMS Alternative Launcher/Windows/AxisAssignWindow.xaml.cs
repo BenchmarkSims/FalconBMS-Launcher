@@ -324,7 +324,7 @@ namespace FalconBMS.Launcher.Windows
             AxisValueProgress.Value = output * invertNum;
             AssignedJoystick.Content = "   "
                 + ((AxisNumName)phyAxNumTmp).ToString().Replace('_', ' ') + " : "
-                + MainWindow.deviceControl.GetHwDevice(devNumTmp).DeviceInformation.ProductName;
+                + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].GetProductName();
 
             if (whoCalledWindow != AxisName.Throttle.ToString() & whoCalledWindow != AxisName.Throttle_Right.ToString())
                 return;
