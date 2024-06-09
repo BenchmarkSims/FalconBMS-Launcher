@@ -20,6 +20,12 @@ namespace FalconBMS.Launcher
         [STAThread]
         public static void Main()
         {
+            if (SingleInstanceApp.IsAlreadyRunning())
+            {
+                MessageBox.Show("Falcon BMS Launcher is already running", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             try
             {
                 // Set cwd to the EXE location.
