@@ -118,8 +118,8 @@ namespace FalconBMS.Launcher.Input
         }
         void SetDeviceInstance(DeviceInstance deviceInstance)
         {
-            productName = deviceInstance.ProductName;
-            productName = Regex.Replace(productName, "[^A-Z|a-z|0-9|~|`|\\[|\\]|\\{|\\}|\\-|_|\\=|\\'|\\s]", String.Empty);
+            // Bugfix note: some device product-name strings have newlines and other unwelcome chars
+            productName = Regex.Replace(deviceInstance.ProductName, "[^A-Z|a-z|0-9|~|`|\\[|\\]|\\{|\\}|\\-|_|\\=|\\'|\x20]", String.Empty);
 
             productGUID = deviceInstance.ProductGuid;
             instanceGUID = deviceInstance.InstanceGuid;
@@ -229,13 +229,13 @@ namespace FalconBMS.Launcher.Input
         /// </summary>
         public string GetDeviceSortingLine()
         {
-            string productGuid = GetProductGUID().ToString().ToUpperInvariant();
-            string productName = GetProductName();
+            string guid = GetProductGUID().ToString().ToUpperInvariant();
+            string name = GetProductName();
 
             const char dq = '\x22'; //doublequote char
             const char oc = '\x7B'; //open curlybrace
             const char cc = '\x7D'; //close curlybrace
-            return $"{oc}{productGuid}{cc} {dq}{productName}{dq}";
+            return $"{oc}{guid}{cc} {dq}{name}{dq}";
         }
 
         /// <summary>
