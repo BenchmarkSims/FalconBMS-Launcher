@@ -273,11 +273,9 @@ namespace FalconBMS.Launcher.Windows
 
         private void MainTimer_Tick(object sender, EventArgs e)
         {
-            // Don't burn CPU displaying input events, if our window is inactive.
-            Window activeWin = Program.activeWin;
-            if (!activeWin.IsActive) return;
-
             // Route event to the currently active window (dialog/popups).
+            Window activeWin = Program.activeWin;
+
             ITimerSink timerSink = activeWin as ITimerSink;
             if (timerSink == null) return;
 

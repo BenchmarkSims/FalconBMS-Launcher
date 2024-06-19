@@ -169,6 +169,10 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         internal void MainWindowKeyMapping_HandleTimerTick()
         {
+            // Don't burn CPU displaying input events, if our window is inactive.
+            Window activeWin = Program.activeWin;
+            if (!activeWin.IsActive) return;
+
             try
             {
                 directInputDevice.GetCurrentKeyboardState();
