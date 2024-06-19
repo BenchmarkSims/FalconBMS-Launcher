@@ -93,6 +93,17 @@ namespace FalconBMS.Launcher.Override
                     if (line.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
                         break; // read no more below this cutoff line
 
+                    // Trim leading/trailing whitespace, collapse consecutive whitespace chars, and replace unicode smart-doublequotes.
+                    string lineTrimmed = line.Trim();
+                    if (lineTrimmed.StartsWith("set"))
+                    {
+                        line = lineTrimmed;
+                        while (line.Contains("  "))
+                            line = line.Replace("  ", " "); //consecutive spaces break BMS parser (as of 4.37)
+                        while (line.Contains("\x201C") || line.Contains("\x201D")) //unicode smart-doublequotes
+                            line = line.Replace("\x201C", "\x0022").Replace("\x201D", "\x0022");
+                    }
+
                     lines.Add(line);
                 }
             }
