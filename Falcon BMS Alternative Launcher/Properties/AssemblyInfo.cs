@@ -48,5 +48,10 @@ using System.Windows;
 //
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 既定値にすることができます:
-[assembly: AssemblyVersion("2.4.1.9")]
-[assembly: AssemblyFileVersion("2.4.1.9")]
+#if DEBUG
+[assembly: AssemblyVersion("2.4.1.999")]
+[assembly: AssemblyFileVersion("2.4.1.999")]
+#else
+[assembly: AssemblyVersion("2.4.1.10")]
+[assembly: AssemblyFileVersion("2.4.1.10")]
+#endif

@@ -16,7 +16,10 @@ Skips the movie during the opening splash screen sequence.  Equivalent to `set g
 Launch the 2D menu screen in borderless-window mode -- can help workaround or avoid compatibility problems launching directly into fullscreen-exclusive mode.
 
 -vr
-Launch BMS in VR mode.  See also `g_nVRHMD` config parameter.
+Launch BMS in Steam-VR mode.  (Overrides the `g_nVRHMD` config parameter.)
+
+-xr
+Launch BMS in OpenXR mode.  (Overrides the `g_nVRHMD` config parameter.)
 
 -novr
-Launch BMS in normal flatscreen (non-VR) mode.  (Overrides the `g_nVRHMD` config parameter.)
+Launch BMS in flatscreen (non-VR) mode.  (Overrides the `g_nVRHMD` config parameter.)

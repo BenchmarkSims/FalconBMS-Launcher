@@ -16,23 +16,6 @@ namespace FalconBMS.Launcher.Override
         {
         }
 
-        protected override void OverrideVRHMD(StreamWriter cfg)
-        {
-            if((bool)mainWindow.VR_SteamVR.IsChecked)
-            {
-                cfg.Write(
-                    "set g_nVRHMD 1"
-                    + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
-            }
-
-            if ((bool)mainWindow.VR_OpenXR.IsChecked)
-            {
-                cfg.Write(
-                    "set g_nVRHMD 2"
-                    + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
-            }
-        }
-
         protected override void SaveJoystickCal(Hashtable inGameAxis, DeviceControl deviceControl)
         {
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "joystick.cal";
