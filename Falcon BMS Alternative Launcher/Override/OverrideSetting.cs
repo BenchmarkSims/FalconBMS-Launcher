@@ -52,9 +52,6 @@ namespace FalconBMS.Launcher.Override
 
         protected virtual void SaveConfigfile(Hashtable inGameAxis, DeviceControl deviceControl)
         {
-            StreamWriter cfgBase = OverwriteCfg(CommonConstants.CFGFILE);
-            cfgBase.Close();
-
             using (StreamWriter cfgUser = OverwriteCfg(CommonConstants.USERCFGFILE))
             {
                 cfgUser.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
@@ -62,7 +59,8 @@ namespace FalconBMS.Launcher.Override
                 OverrideButtonsPerDevice(cfgUser, deviceControl);
                 OverrideHotasPinkyShiftMagnitude(cfgUser, deviceControl);
                 OverridePovDeviceIDs(cfgUser, inGameAxis);
-                OverrideVRHMD(cfgUser);
+
+                ApplyVROverrides(cfgUser);
             }
         }
 
@@ -130,11 +128,45 @@ namespace FalconBMS.Launcher.Override
                 + " " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
         }
 
-        protected virtual void OverrideVRHMD(StreamWriter cfg) { }
+        protected virtual void ApplyVROverrides(StreamWriter cfg)
+        {
+            bool isVR = false;
+            if (mainWindow.VR_SteamVR.IsVisible && mainWindow.VR_SteamVR.IsChecked == true)
+                isVR = true;
+            if (mainWindow.VR_OpenXR.IsVisible && mainWindow.VR_OpenXR.IsChecked == true)
+                isVR = true;
 
-        /// <summary>
-        /// As the name implies...
-        /// </summary>
+            if (!isVR) return;
+
+            string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.VRCFGFILE;
+            if (!File.Exists(filename)) return;
+
+            using (StreamReader reader = new StreamReader(filename, Encoding.UTF8))
+            {
+                while (true)
+                {
+                    string line = reader.ReadLine();
+                    if (line == null) break;
+
+                    //TODO: refactor to remove duplicated code .. actually this whole VR-override feature should be ported over to native BMS.
+                    string lineTrimmed = line.Trim();
+                    if (lineTrimmed.Length == 0) continue;
+
+                    if (lineTrimmed.StartsWith("set"))
+                    {
+                        line = lineTrimmed;
+                        while (line.Contains("  "))
+                            line = line.Replace("  ", " "); //consecutive spaces break BMS parser (as of 4.37)
+                        while (line.Contains("\x201C") || line.Contains("\x201D")) //unicode smart-doublequotes
+                            line = line.Replace("\x201C", "\x0022").Replace("\x201D", "\x0022");
+                    }
+
+                    cfg.WriteLine(line + CommonConstants.CFGOVERRIDECOMMENT);
+                }
+            }
+            return;
+        }
+
         protected void SaveDeviceSorting(DeviceControl deviceControl)
         {
             // BMS overwrites DeviceSorting.txt if was written in UTF-8.
