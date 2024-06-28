@@ -9,7 +9,7 @@
     GlowBrush="Black" BorderThickness="0"
     Title="CallsignWindow" Height="256" Width="512" 
     WindowStartupLocation="CenterScreen"
-    Loaded="AssignWindow_Loaded" Closed="AssignWindow_Closed" MouseDown="MetroWindow_MouseDown"
+    Loaded="AssignWindow_Loaded" Closed="AssignWindow_Closed"
     ResizeMode="NoResize" SizeToContent="Width" Topmost="True" 
     AllowDrop="False" ShowTitleBar="False" IsWindowDraggable="False" WindowStyle="None" Background="#bfc7cf">
     <Window.Resources>

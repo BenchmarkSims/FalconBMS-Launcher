@@ -279,7 +279,14 @@ namespace FalconBMS.Launcher.Windows
             ITimerSink timerSink = activeWin as ITimerSink;
             if (timerSink == null) return;
 
-            timerSink.HandleTimerTick();
+            try
+            {
+                timerSink.HandleTimerTick();
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.Log(ex); 
+            }
 
             return;
         }
@@ -771,14 +778,10 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         private void MetroWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            try
+            if (e.ChangedButton == MouseButton.Left &&
+                e.LeftButton == MouseButtonState.Pressed)
             {
-                if (e.ChangedButton == MouseButton.Left)
-                    DragMove();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
+                DragMove();
             }
         }
 

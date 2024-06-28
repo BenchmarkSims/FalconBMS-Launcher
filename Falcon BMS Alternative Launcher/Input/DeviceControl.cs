@@ -39,7 +39,7 @@ namespace FalconBMS.Launcher.Input
 
             hwDevices = new List<Device>(devList.Count);
             joyAssign = new List<JoyAssgn>(devList.Count);
-            
+
             string pathToUserXml;
             string pathToStockXml;
 
@@ -52,6 +52,7 @@ namespace FalconBMS.Launcher.Input
 
                 Device hwdev = new Device(dev.InstanceGuid);
                 JoyAssgn joy = new JoyAssgn(hwdev);
+
                 hwDevices.Add(hwdev);
                 joyAssign.Add(joy);
 

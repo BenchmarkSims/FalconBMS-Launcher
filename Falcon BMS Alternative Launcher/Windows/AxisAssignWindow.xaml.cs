@@ -484,18 +484,5 @@ namespace FalconBMS.Launcher.Windows
             if (IDLE < CommonConstants.AXISMIN)
                 IDLE = CommonConstants.AXISMIN;
         }
-        
-        private void MetroWindow_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                if (e.ChangedButton == MouseButton.Left)
-                    DragMove();
-            }
-            catch
-            {
-                // Don't write anything here.
-            }
-        }
     }
 }

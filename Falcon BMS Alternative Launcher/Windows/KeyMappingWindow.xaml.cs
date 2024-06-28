@@ -363,19 +363,6 @@ namespace FalconBMS.Launcher.Windows
             }
         }
 
-        private void WindowMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                if (e.ChangedButton == MouseButton.Left && System.Windows.Input.Mouse.LeftButton == MouseButtonState.Pressed)
-                    DragMove();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log("DragMove call failed.", Diagnostics.LogLevels.Exception);
-            }
-        }
-
         private void ClearDX_Click(object sender, RoutedEventArgs e)
         {
             JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
@@ -392,28 +379,6 @@ namespace FalconBMS.Launcher.Windows
         private void ClearKey_Click(object sender, RoutedEventArgs e)
         {
             tmpKeyboard.UnassignKeyboard();
-        }
-
-        private void Select_Invoke_Click(object sender, RoutedEventArgs e)
-        {
-            switch (invokeStatus)
-            {
-                case Invoke.Default:
-                    invokeStatus = Invoke.Down;
-                    Select_Invoke.Content = "INVOKE KEYDN";
-                    Select_Invoke.Background = CommonConstants.GREYBLUE;
-                    break;
-                case Invoke.Down:
-                    invokeStatus = Invoke.Up;
-                    Select_Invoke.Content = "INVOKE KEYUP";
-                    Select_Invoke.Background = CommonConstants.GREYBLUE;
-                    break;
-                case Invoke.Up:
-                    invokeStatus = Invoke.Default;
-                    Select_Invoke.Content = "INVOKE BOTH";
-                    Select_Invoke.Background = CommonConstants.WHITEILUM;
-                    break;
-            }
         }
 
         private class DirectInputKeyboard
