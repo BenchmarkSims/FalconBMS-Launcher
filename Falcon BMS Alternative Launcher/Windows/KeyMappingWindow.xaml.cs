@@ -20,28 +20,28 @@ namespace FalconBMS.Launcher.Windows
     /// </summary>
     public partial class KeyMappingWindow : ITimerSink
     {
-        private DeviceControl deviceControlRef;
+        private DeviceControl _deviceControlRef;
 
-        private KeyFile       keyFile;
-        private KeyAssgn      selectedCallback;
+        private KeyFile _keyFile;
+        private KeyAssgn _selectedCallback;
 
-        private KeyAssgn   tmpKeyboard;
-        private JoyAssgn[] tmpJoyStick;
+        private KeyAssgn _tmpKeyboard;
+        private JoyAssgn[] _tmpJoyAssgns;
         private List<ButtonStateTracker> _buttonTrackers = new List<ButtonStateTracker>();
 
-        private DirectInputKeyboard directInputDevice = new DirectInputKeyboard();
+        private DirectInputKeyboard _directInputDevice = new DirectInputKeyboard();
 
-        private int TickCount_NextUIFlush1;
-        private int TickCount_NextUIFlush2;
+        private int _tickNextUIFlush1 = Environment.TickCount;
+        private int _tickNextUIFlush2 = Environment.TickCount;
 
         public KeyMappingWindow(DeviceControl deviceControl, KeyAssgn selectedCallback)
         {
             InitializeComponent();
 
-            this.selectedCallback = selectedCallback;
+            this._selectedCallback = selectedCallback;
 
-            this.deviceControlRef = deviceControl;
-            this.keyFile = deviceControl.GetKeyBindings();
+            this._deviceControlRef = deviceControl;
+            this._keyFile = deviceControl.GetKeyBindings();
 
             CallbackName.Content = selectedCallback.GetKeyDescription();
 
@@ -62,17 +62,17 @@ namespace FalconBMS.Launcher.Windows
 
         private void CloneTempDialogData()
         {
-            tmpKeyboard = selectedCallback.Clone();
+            _tmpKeyboard = _selectedCallback.Clone();
 
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            JoyAssgn[] joyAssgns = _deviceControlRef.GetJoystickMappings();
 
-            tmpJoyStick = new JoyAssgn[joyAssgns.Length];
+            _tmpJoyAssgns = new JoyAssgn[joyAssgns.Length];
             _buttonTrackers = new List<ButtonStateTracker>(joyAssgns.Length);
 
             for (int i = 0; i < joyAssgns.Length; i++)
             {
                 JoyAssgn tmpjoy = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
-                tmpJoyStick[i] = tmpjoy;
+                _tmpJoyAssgns[i] = tmpjoy;
                 _buttonTrackers.Add(new ButtonStateTracker(tmpjoy, _onButtonChanged, _onPovHatChanged));
             }
             return;
@@ -94,28 +94,28 @@ namespace FalconBMS.Launcher.Windows
 
         private void ShowAssignedStatus()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            //JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             var sb = new StringBuilder(500);
-            sb.Append(tmpKeyboard.GetKeyAssignmentStatus());
+            sb.Append(_tmpKeyboard.GetKeyAssignmentStatus());
             if (sb.Length > 0) sb.Append("; ");
 
-            for (int i = 0; i < joyAssgns.Length; i++)
-                sb.Append(tmpKeyboard.ReadJoyAssignment(i, tmpJoyStick));
+            for (int i = 0; i < _tmpJoyAssgns.Length; i++)
+                sb.Append(_tmpKeyboard.ReadJoyAssignment(i, _tmpJoyAssgns));
 
             string currentKeyAndButtons = sb.ToString();
             MappedButton.Content = currentKeyAndButtons;
 
             if (currentKeyAndButtons.Length == 0)
             {
-                if (Environment.TickCount > TickCount_NextUIFlush1)
+                if (Environment.TickCount > _tickNextUIFlush1)
                     AwaitingInputs.Content = "";
-                if (Environment.TickCount > TickCount_NextUIFlush2)
+                if (Environment.TickCount > _tickNextUIFlush2)
                 {
                     AwaitingInputs.Content = "   AWAITING INPUTS";
 
-                    TickCount_NextUIFlush1 = Environment.TickCount + CommonConstants.FLUSHTIME1;
-                    TickCount_NextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
+                    _tickNextUIFlush1 = Environment.TickCount + CommonConstants.FLUSHTIME1;
+                    _tickNextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
                 }
             }
             else
@@ -128,8 +128,6 @@ namespace FalconBMS.Launcher.Windows
 
         private void JoystickButtonMonitor()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
-
             // Invoke _onButtonChanged, _onPovHatChanged callbacks, below.
             foreach (ButtonStateTracker tracker in _buttonTrackers)
                 tracker.PollUpdate();
@@ -141,7 +139,7 @@ namespace FalconBMS.Launcher.Windows
         {
             System.Diagnostics.Debug.WriteLine($"KMW::_onButtonChanged({tmpjoy.GetProductName()}, {buttonId}, {newState})");
 
-            string selectedCallbackName = selectedCallback.GetCallback();
+            string selectedCallbackName = _selectedCallback.GetCallback();
 
             // First, determine if button is mapped to a dx-shift callback; auto-set togglebutton accordingly.
             string currCallback0 = tmpjoy.dx[buttonId].assign[0].GetCallback();
@@ -171,7 +169,7 @@ namespace FalconBMS.Launcher.Windows
             }
             else
             {
-                KeyAssgn row = keyFile.LookupCallback(currCallback);
+                KeyAssgn row = _keyFile.LookupCallback(currCallback);
                 string currCallbackDescr = row != null ? row.GetKeyDescription() : currCallback;
 
                 string pressOrRelease = (this.Select_DX_Release.IsChecked == true) ? "release" : "press";
@@ -180,11 +178,11 @@ namespace FalconBMS.Launcher.Windows
             }
 
             // Construct provisional DX button assignment.
-            tmpjoy.dx[buttonId].Assign(selectedCallbackName, pinky, behaviour, Invoke.Default, selectedCallback.GetSoundID());
+            tmpjoy.dx[buttonId].Assign(selectedCallbackName, pinky, behaviour, action, _selectedCallback.GetSoundID());
 
             // Special-case for dx-shift: also assign shift layer to same callback.
             if (selectedCallbackName == "SimHotasPinkyShift" || selectedCallbackName == "SimHotasShift")
-                tmpjoy.dx[buttonId].Assign(selectedCallbackName, Pinky.Shift, Behaviour.Press, Invoke.Default, selectedCallback.GetSoundID());
+                tmpjoy.dx[buttonId].Assign(selectedCallbackName, Pinky.Shift, Behaviour.Press, Invoke.Default, _selectedCallback.GetSoundID());
 
             return;
         }
@@ -193,7 +191,7 @@ namespace FalconBMS.Launcher.Windows
         {
             System.Diagnostics.Debug.WriteLine($"KMW::_onPovHatChanged({tmpjoy.GetProductName()}, {povhatId}, {newDirection})");
 
-            string selectedCallbackName = selectedCallback.GetCallback();
+            string selectedCallbackName = _selectedCallback.GetCallback();
 
             // Nothing to do, if this is a release.
             if (newDirection < 0) return;
@@ -211,7 +209,7 @@ namespace FalconBMS.Launcher.Windows
             }
             else
             {
-                KeyAssgn row = keyFile.LookupCallback(currCallback);
+                KeyAssgn row = _keyFile.LookupCallback(currCallback);
                 string currCallbackDescr = row != null ? row.GetKeyDescription() : currCallback;
 
                 this.CurrentlyMapped.Text = $"POV-hat direction currently bound to:\r\n" + currCallbackDescr;
@@ -220,16 +218,16 @@ namespace FalconBMS.Launcher.Windows
 
             // Construct provisional POV-direction assignment.
             System.Diagnostics.Debug.WriteLine("Assigning pov hat");
-            tmpjoy.pov[povhatId].Assign(newDirection, selectedCallbackName, pinky, selectedCallback.GetSoundID());
+            tmpjoy.pov[povhatId].Assign(newDirection, selectedCallbackName, pinky, _selectedCallback.GetSoundID());
 
             return;
         }
 
         private void KeyboardButtonMonitor()
         {
-            directInputDevice.GetCurrentKeyboardState();
+            _directInputDevice.GetCurrentKeyboardState();
             for (int i = 1; i < CommonConstants.KEYBOARD_KEYLENGTH; i++)
-                if (directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
+                if (_directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
                     HandleKeyDown();
         }
 
@@ -239,10 +237,10 @@ namespace FalconBMS.Launcher.Windows
             bool Ctrl = false;
             bool Alt = false;
             int catchedScanCode = 0;
-            directInputDevice.GetCurrentKeyboardState();
+            _directInputDevice.GetCurrentKeyboardState();
             for (int i = 1; i < 238; i++)
             {
-                if (directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
+                if (_directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
                 {
                     if (i == (int)Microsoft.DirectX.DirectInput.Key.LeftShift |
                         i == (int)Microsoft.DirectX.DirectInput.Key.RightShift)
@@ -300,39 +298,27 @@ namespace FalconBMS.Launcher.Windows
 
             // Assign to temp model.
             if (pinkyStatus == Pinky.UnShift)
-                tmpKeyboard.SetKeyboard(catchedScanCode, Shift, Ctrl, Alt);
+                _tmpKeyboard.SetKeyboard(catchedScanCode, Shift, Ctrl, Alt);
             if (pinkyStatus == Pinky.Shift)
-                tmpKeyboard.Setkeycombo(catchedScanCode, Shift, Ctrl, Alt);
-        }
-
-        private class NeutralButtons
-        {
-            public byte[] buttons { get; set; }
-            public int[] povs { get; set; }
-
-            public NeutralButtons(JoyAssgn joyStick)
-            {
-                buttons = joyStick.GetButtons();
-                povs = joyStick.GetPointOfView();
-            }
+                _tmpKeyboard.Setkeycombo(catchedScanCode, Shift, Ctrl, Alt);
         }
 
         private void ClearDX_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            JoyAssgn[] joyAssgns = _deviceControlRef.GetJoystickMappings();
 
             for (int i = 0; i < joyAssgns.Length; i++)
             {
-                tmpJoyStick[i] = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
+                _tmpJoyAssgns[i] = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
             }
-            string target = tmpKeyboard.GetCallback();
-            foreach (JoyAssgn joy in tmpJoyStick)
+            string target = _tmpKeyboard.GetCallback();
+            foreach (JoyAssgn joy in _tmpJoyAssgns)
                 joy.UnassigntargetCallback(target);
         }
 
         private void ClearKey_Click(object sender, RoutedEventArgs e)
         {
-            tmpKeyboard.UnassignKeyboard();
+            _tmpKeyboard.UnassignKeyboard();
         }
 
         private class DirectInputKeyboard
@@ -354,24 +340,24 @@ namespace FalconBMS.Launcher.Windows
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            JoyAssgn[] joyAssgns = _deviceControlRef.GetJoystickMappings();
 
-            for (int i = 0; i < tmpJoyStick.Length; i++)
+            for (int i = 0; i < _tmpJoyAssgns.Length; i++)
             {
-                joyAssgns[i].CopyButtonsAndHatsFromCurrentProfile(tmpJoyStick[i]);
+                joyAssgns[i].CopyButtonsAndHatsFromCurrentProfile(_tmpJoyAssgns[i]);
             }
-            selectedCallback.CopyOtherKeyAssgn(tmpKeyboard);
+            _selectedCallback.CopyOtherKeyAssgn(_tmpKeyboard);
 
             // Unassign the previous mapping that was assigned to this key/key combo.
-            KeyAssgn oldKey = keyFile.keyAssign.FirstOrDefault(x => x != selectedCallback && x.GetKeyAssignmentStatus() == selectedCallback.GetKeyAssignmentStatus());
+            KeyAssgn oldKey = _keyFile.keyAssign.FirstOrDefault(x => x != _selectedCallback && x.GetKeyAssignmentStatus() == _selectedCallback.GetKeyAssignmentStatus());
             if (oldKey != null)
             {
                 oldKey.UnassignKeyboard();
             }
 
             // Save the XML and Key files, after each change user makes.
-            deviceControlRef.SaveXml();
-            Program.mainWin.appReg.getOverrideWriter().SaveKeyMapping(MainWindow.inGameAxis, deviceControlRef);
+            _deviceControlRef.SaveXml();
+            Program.mainWin.appReg.getOverrideWriter().SaveKeyMapping(MainWindow.inGameAxis, _deviceControlRef);
 
             Close();
         }
