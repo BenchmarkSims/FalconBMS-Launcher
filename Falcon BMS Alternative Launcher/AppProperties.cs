@@ -51,8 +51,6 @@ namespace FalconBMS.Launcher
                 mainWindow.VR_SteamVR.IsChecked = false;
                 mainWindow.VR_OpenXR.IsChecked = false;
             }
-            mainWindow.Select_DX_Release.IsChecked  = true;
-            mainWindow.Select_PinkyShift.IsChecked  = true;
             mainWindow.CMD_BW.Content               = "BW : " + bandWidthDefault;
             mainWindow.AB_Throttle.Visibility       = Visibility.Hidden;
             mainWindow.AB_Throttle_Right.Visibility = Visibility.Hidden;

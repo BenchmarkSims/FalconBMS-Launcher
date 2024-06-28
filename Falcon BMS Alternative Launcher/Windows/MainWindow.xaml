@@ -581,9 +581,6 @@
                     <Label Content="ASSIGNMENT " VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="10,0,0,32.334" VerticalAlignment="Bottom" RenderTransformOrigin="-4.878,1.143" FontWeight="Bold" Height="26" Width="89"/>
                     <Label x:Name="Label_AssgnStatus" Content="KEYSEARCH MODE" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="114,0,0,32.334" VerticalAlignment="Bottom" RenderTransformOrigin="-4.878,1.143" FontStyle="Italic" Height="26" Width="886" Grid.ColumnSpan="2"/>
 
-                    <ToggleButton x:Name="Select_PinkyShift" Visibility="Hidden" Content="KEYCOMBO / PINKYSHIFT" HorizontalAlignment="Right" Margin="0,12,252.666,0" VerticalAlignment="Top" Width="160" Height="27" Click="Select_PinkyShift_Click" Grid.Column="1"/>
-                    <ToggleButton x:Name="Select_DX_Release" Visibility="Hidden" Content="RELEASE" HorizontalAlignment="Right" Margin="0,12,163.666,0" VerticalAlignment="Top" Width="64" Height="27" Grid.Column="1"/>
-
                     <Label Content="Filter:" HorizontalAlignment="Left" Margin="227.167,-43,0,0" VerticalAlignment="Top" Width="43" HorizontalContentAlignment="Right" Foreground="White" Grid.Column="1"/>
                     <TextBox x:Name="SearchBox" HorizontalAlignment="Left" Height="23" Margin="282.167,-41,0,0" VerticalAlignment="Top" Width="384" Background="#80F0F0F0" Foreground="#FF191919" Controls:TextBoxHelper.ClearTextButton="True" TextChanged="SearchBox_TextChanged" Grid.Column="1"/>
 

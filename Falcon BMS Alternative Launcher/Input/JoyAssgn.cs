@@ -391,7 +391,7 @@ namespace FalconBMS.Launcher.Input
             {
                 for (int ii = 0; ii < pov[i].direction.Length; ii++)
                 {
-                    string direction = pov[i].GetDirectionLabel(ii);
+                    string direction = PovAssgn.GetDirectionLabel(ii);
                     for (int iii = 0; iii < 2; iii++)
                     {
                         if (pov[i].direction[ii].GetCallback((Pinky)iii) == CommonConstants.SIMDONOTHING)
@@ -508,6 +508,11 @@ namespace FalconBMS.Launcher.Input
             JoyAssgn joy = new JoyAssgn();
             joy.CopyButtonsAndHatsFromCurrentProfile(this);
             joy.currentProfile = "temp";
+
+            joy.hwDevice = this.hwDevice;
+            joy.productName = this.productName;
+            joy.productGUID = this.productGUID;
+
             return joy;
         }
 

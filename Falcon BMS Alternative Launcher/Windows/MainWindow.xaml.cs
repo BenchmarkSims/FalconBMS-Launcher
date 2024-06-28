@@ -184,10 +184,6 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                statusAssign = Status.GetNeutralPos;
-
-                LargeTab.SelectedIndex = 0;
-
                 // Read Theater List
                 TheaterList.PopulateAndSave(appReg, Dropdown_TheaterList);
 
@@ -216,32 +212,10 @@ namespace FalconBMS.Launcher.Windows
             {
                 deviceControl = DeviceControl.EnumerateAttachedDevicesAndLoadXml(appReg);
 
-                neutralButtons = new NeutralButtons[deviceControl.GetJoystickMappings().Length];
-
                 // Aquire joySticks
                 AquireAll();
 
-                ResortDevices();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-                Diagnostics.ShowErrorMsgbox(ex);
-                Close();
-            }
-        }
-
-        public void ResortDevices()
-        {
-            try
-            {
-                // Reset All Axis Settings
-                foreach (AxisName nme in axisNameList)
-                    inGameAxis[nme.ToString()] = new InGameAxAssgn();
-
-                joyAssign_2_inGameAxis();
-                ResetAssgnWindow();
-                ResetJoystickColumn();
+                RefreshDevices();
             }
             catch (Exception ex)
             {
@@ -818,18 +792,6 @@ namespace FalconBMS.Launcher.Windows
         private void CMD_WINDOW_Click(object sender, RoutedEventArgs e)
         {
             return;
-            if (CMD_WINDOW.IsChecked == true)
-                MessageBox.Show(Program.mainWin, "Falcon BMS crashes when using Alt+Tab in FullScreen Mode. Recommend Enabling Window Mode.\n(WINDOW button turning on light)", "WARNING", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private bool pressedByHand;
-
-        private void Select_PinkyShift_Click(object sender, RoutedEventArgs e)
-        {
-            if (Select_PinkyShift.IsChecked == false)
-                pressedByHand = true;
-            else
-                pressedByHand = false;
         }
 
         private void ListBox_BMS_SelectionChanged(object sender, SelectionChangedEventArgs e)
