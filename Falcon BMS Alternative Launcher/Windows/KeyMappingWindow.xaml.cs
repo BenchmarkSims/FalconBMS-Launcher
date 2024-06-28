@@ -158,6 +158,7 @@ namespace FalconBMS.Launcher.Windows
             // Show UI feedback, and currently mapped callback, if any -- incl consideration for shift- and release-modes.
             Pinky pinky = (this.Select_PinkyShift.IsChecked == true ? Pinky.Shift : Pinky.UnShift);
             Behaviour behaviour = (this.Select_DX_Release.IsChecked == true ? Behaviour.Release : Behaviour.Press);
+            Invoke action = (this.Select_DX_Release.IsChecked == true ? Invoke.Down : Invoke.Default);
 
             int mappingBehavior = (int)pinky + (int)behaviour;
             string currCallback = tmpjoy.dx[buttonId].assign[mappingBehavior].GetCallback();
@@ -281,12 +282,10 @@ namespace FalconBMS.Launcher.Windows
             if ((Microsoft.DirectX.DirectInput.Key)catchedScanCode == Microsoft.DirectX.DirectInput.Key.Y && !Shift && !Ctrl && !Alt)
                 return;
 
-            Pinky pinkyStatus = Pinky.UnShift;
-            if (Select_PinkyShift.IsChecked == false)
-                pinkyStatus = Pinky.Shift;
+            Pinky pinkyStatus = (Select_PinkyShift.IsChecked == true) ? Pinky.Shift : Pinky.UnShift;
 
             // Determine if this input is already mapped to another callback, and display warning/hint if so.
-            KeyAssgn currCallbackAssgn = keyFile.ReverseLookupKeyboardInput(catchedScanCode, Shift, Ctrl, Alt);
+            KeyAssgn currCallbackAssgn = _keyFile.ReverseLookupKeyboardInput(catchedScanCode, Shift, Ctrl, Alt);
             if (currCallbackAssgn == null || currCallbackAssgn.GetCallback() == "SimDoNothing")
             {
                 this.CurrentlyMapped.Visibility = Visibility.Hidden;
