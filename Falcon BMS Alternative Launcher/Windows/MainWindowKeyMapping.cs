@@ -140,11 +140,17 @@ namespace FalconBMS.Launcher.Windows
         /// </summary>
         public void JumptoAssignedKey()
         {
-            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
-
             // Invoke _onButtonChanged, _onPovHatChanged callbacks, below.
-            foreach (ButtonStateTracker tracker in _buttonTrackers)
-                tracker.PollUpdate();
+            try
+            {
+                foreach (ButtonStateTracker tracker in _buttonTrackers)
+                    tracker.PollUpdate();
+            }
+            catch (Exception ex)
+            {
+                // Typically, InputLostException from DirectInput.
+                Diagnostics.Log(ex);
+            }
 
             return;
         }
