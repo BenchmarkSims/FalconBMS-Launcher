@@ -305,15 +305,14 @@ namespace FalconBMS.Launcher.Windows
 
         private void ClearDX_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = _deviceControlRef.GetJoystickMappings();
+            // Make fresh clones, and button-trackers.
+            CloneTempDialogData();
 
-            for (int i = 0; i < joyAssgns.Length; i++)
-            {
-                _tmpJoyAssgns[i] = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
-            }
-            string target = _tmpKeyboard.GetCallback();
-            foreach (JoyAssgn joy in _tmpJoyAssgns)
-                joy.UnassigntargetCallback(target);
+            // Remove the current DX button/povhat bindings.
+            string targetCallback = _selectedCallback.GetCallback();
+
+            foreach (JoyAssgn tmpjoy in _tmpJoyAssgns)
+                tmpjoy.UnassigntargetCallback(targetCallback);
         }
 
         private void ClearKey_Click(object sender, RoutedEventArgs e)
