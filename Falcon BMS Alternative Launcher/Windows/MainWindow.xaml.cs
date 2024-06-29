@@ -193,7 +193,7 @@ namespace FalconBMS.Launcher.Windows
                 deviceControl.LoadKeyBindingsFromUserOrStockKeyfiles(appReg);
 
                 // Write Data Grid
-                WriteDataGrid();
+                UpdateDataGridBindingSource();
 
                 // Update category headers.
                 UpdateCategoryHeaders();
@@ -235,7 +235,8 @@ namespace FalconBMS.Launcher.Windows
 
                 joyAssign_2_inGameAxis();
                 ResetAssgnWindow();
-                RefreshJoystickColumn();
+
+                UpdateDataGridBindingSource();
             }
             catch (Exception ex)
             {
@@ -874,7 +875,7 @@ namespace FalconBMS.Launcher.Windows
 
             deviceControl.ImportKeyfileIntoCurrentProfile(newKeyfilePath);
             UpdateCategoryHeaders();
-            WriteDataGrid();
+            UpdateDataGridBindingSource();
             return;
         }
 

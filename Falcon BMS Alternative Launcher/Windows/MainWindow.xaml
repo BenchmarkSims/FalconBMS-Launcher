@@ -264,8 +264,6 @@
 
                         <Label Content="Command Line :" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" Margin="0,96,0,-27" />
 
-
-                        <Controls:ToggleSwitch x:Name="Misc_Platform" OnLabel="64bit" OffLabel="32bit" HorizontalAlignment="Left" Margin="191,60,0,0" VerticalAlignment="Top" Background="#80FFFFFF" FontSize="12"/>
                         <Label x:Name="Label_Platform" Content="Platform :" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.672,0.628" />
 
                         <Label x:Name="Label_VR" Content="Virtual Reality:" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" />
@@ -280,7 +278,8 @@
                         <ToggleButton x:Name="CMD_NOMOVIE" Content="NOMOVIE" HorizontalAlignment="Left" Margin="342,96,0,0" VerticalAlignment="Top" Width="64"/>
                         <ToggleButton x:Name="CMD_EF" Content="EYEFLY" HorizontalAlignment="Left" Margin="425,96,0,0" VerticalAlignment="Top" Width="64"/>
                         <ToggleButton x:Name="CMD_MONO" Content="DEBUG" HorizontalAlignment="Left" Margin="507,96,0,0" VerticalAlignment="Top" Width="64"/>
-                        <Button x:Name="CMD_BW" Content="BW : 1024" HorizontalAlignment="Left" Margin="593,96,0,0" VerticalAlignment="Top" Width="64" Click="CMD_BW_Click"/>
+                        <Button x:Name="CMD_BW" Content="BW : 1024" HorizontalAlignment="Left" Margin="591,96,0,0" VerticalAlignment="Top" Width="64" Click="CMD_BW_Click"/>
+                        <Controls:ToggleSwitch x:Name="AB_Test" Visibility="Hidden" OffLabel="A" OnLabel="B" Margin="700,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Height="36" />
                     </Grid>
                     <ScrollViewer x:Name ="LogTextScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="48,57,563.667,349.333" Background="#54000000">
                         <TextBlock x:Name="News" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="350" Margin="20,20,0,0" />

@@ -34,19 +34,12 @@ namespace FalconBMS.Launcher.Windows
             return;
         }
 
-        /// <summary>
-        /// Let's write DataGrid cells at KeyMapping page a keyfile informarion.
-        /// </summary>
-        public void WriteDataGrid()
+        public void UpdateDataGridBindingSource()
         {
             foreach (KeyAssgn Assgn in deviceControl.GetKeyBindings().keyAssign)
                 Assgn.Visibility = Assgn.GetVisibility();
 
             KeyMappingGrid.ItemsSource = deviceControl.GetKeyBindings().keyAssign;
-        }
-        public void RefreshJoystickColumn()
-        {
-            KeyMappingGrid.Items.Refresh();
 
             ResetButtonTrackers();
         }
@@ -118,7 +111,6 @@ namespace FalconBMS.Launcher.Windows
                 return;
 
             KeyMappingWindow.ShowKeyMappingWindow(this, deviceControl, selectedItem);
-            RefreshJoystickColumn();
 
             KeyMappingGrid.Items.Refresh();
             KeyMappingGrid.UnselectAllCells();
@@ -441,7 +433,7 @@ namespace FalconBMS.Launcher.Windows
 
             UpdateCategoryHeaders();
 
-            WriteDataGrid();
+            UpdateDataGridBindingSource();
             return;
         }
 

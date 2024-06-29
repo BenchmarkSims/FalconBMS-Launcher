@@ -16,7 +16,6 @@ namespace FalconBMS.Launcher
             this.mainWindow = mainWindow;
 
             // Load Buttons
-            mainWindow.Misc_Platform.IsChecked             = Properties.Settings.Default.Platform;
             mainWindow.CMD_ACMI.IsChecked                  = Properties.Settings.Default.CMD_ACMI;
             mainWindow.CMD_WINDOW.IsChecked                = Properties.Settings.Default.CMD_WINDOW;
             mainWindow.CMD_NOMOVIE.IsChecked               = Properties.Settings.Default.CMD_NOMOVIE;
@@ -60,7 +59,6 @@ namespace FalconBMS.Launcher
 
         public void SaveUISetup()
         {
-            Properties.Settings.Default.Platform                  = (bool)mainWindow.Misc_Platform.IsChecked;
             Properties.Settings.Default.CMD_ACMI                  = (bool)mainWindow.CMD_ACMI.IsChecked;
             Properties.Settings.Default.CMD_WINDOW                = (bool)mainWindow.CMD_WINDOW.IsChecked;
             Properties.Settings.Default.CMD_NOMOVIE               = (bool)mainWindow.CMD_NOMOVIE.IsChecked;

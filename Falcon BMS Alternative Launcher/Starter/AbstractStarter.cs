@@ -176,36 +176,5 @@ namespace FalconBMS.Launcher.Starter
             }
         }
 
-        public void PlatformChangeSince433(AvailablePlatform mode)
-        {
-            switch (mode)
-            {
-                case AvailablePlatform.X86:
-                    mainWindow.Misc_Platform.IsChecked   = false;
-                    mainWindow.Misc_Platform.Visibility  = Visibility.Hidden;
-                    mainWindow.Label_Platform.Visibility = Visibility.Hidden;
-                    break;
-                case AvailablePlatform.X64:
-                    mainWindow.Misc_Platform.IsChecked   = true;
-                    mainWindow.Misc_Platform.Visibility  = Visibility.Hidden;
-                    mainWindow.Label_Platform.Visibility = Visibility.Hidden;
-                    break;
-                case AvailablePlatform.BOTH:
-                    mainWindow.Misc_Platform.IsChecked   = Properties.Settings.Default.Platform;
-                    mainWindow.Misc_Platform.Visibility  = Visibility.Visible;
-                    mainWindow.Label_Platform.Visibility = Visibility.Visible;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public enum AvailablePlatform
-        {
-            X86 = 0,
-            X64 = 1,
-            BOTH = 2
-        }
     }
-
 }
