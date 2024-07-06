@@ -1,4 +1,6 @@
-﻿namespace FalconBMS.Launcher.Input
+﻿using System;
+
+namespace FalconBMS.Launcher.Input
 {
     /// <summary>
     /// Means each actual POV switches on a joystick.
@@ -37,39 +39,35 @@
             return this.direction[povDir].GetCallback(pinky);
         }
 
-        public string GetDirectionLabel(int povDir)
+        public static string GetDirectionLabel(int povDir)
         {
-            string direction = "";
-            if (povDir > 7)
-                povDir /= 4500;
-            switch (povDir)
+            // If no direction (hat is centered) the value is -1.
+            if (povDir < 0)
+                return String.Empty;
+
+            // DirectInput transmits pov-hat direction in compass-degrees x100 -- we divide by 4500 to get [0-7].
+            int pov0to7 = (povDir <= 7 ? povDir : povDir / CommonConstants.POV45);
+            switch (pov0to7)
             {
                 case 0:
-                    direction = "UP";
-                    break;
+                    return "UP";
                 case 1:
-                    direction = "UPRIGHT";
-                    break;
+                    return "UPRIGHT";
                 case 2:
-                    direction = "RIGHT";
-                    break;
+                    return "RIGHT";
                 case 3:
-                    direction = "DOWNRIGHT";
-                    break;
+                    return "DOWNRIGHT";
                 case 4:
-                    direction = "DOWN";
-                    break;
+                    return "DOWN";
                 case 5:
-                    direction = "DOWNLEFT";
-                    break;
+                    return "DOWNLEFT";
                 case 6:
-                    direction = "LEFT";
-                    break;
+                    return "LEFT";
                 case 7:
-                    direction = "UPLEFT";
-                    break;
+                    return "UPLEFT";
+                default:
+                    throw new ApplicationException("Unexpected pov-hat direction from DirectInput: " + povDir);
             }
-            return direction;
         }
 
         public PovAssgn Clone()

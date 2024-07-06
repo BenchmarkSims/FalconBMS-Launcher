@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -19,42 +20,38 @@ namespace FalconBMS.Launcher.Windows
     /// </summary>
     public partial class KeyMappingWindow : ITimerSink
     {
-        private DeviceControl deviceControlRef;
+        private DeviceControl _deviceControlRef;
 
-        private KeyFile       keyFile;
-        private KeyAssgn      selectedCallback;
+        private KeyFile _keyFile;
+        private KeyAssgn _selectedCallback;
 
-        private JoyAssgn[] tmpJoyStick;
-        private KeyAssgn   tmpKeyboard;
+        private KeyAssgn _tmpKeyboard;
+        private JoyAssgn[] _tmpJoyAssgns;
+        private List<ButtonStateTracker> _buttonTrackers = new List<ButtonStateTracker>();
 
-        private DirectInputKeyboard directInputDevice = new DirectInputKeyboard();
+        private DirectInputKeyboard _directInputDevice = new DirectInputKeyboard();
 
-        private int TickCount_NextUIFlush1;
-        private int TickCount_NextUIFlush2;
-
-        private NeutralButtons[] neutralButtons;
-
-        private Invoke invokeStatus = Invoke.Default;
-
-        private bool pressedByHand;
+        private int _tickNextUIFlush1 = Environment.TickCount;
+        private int _tickNextUIFlush2 = Environment.TickCount;
 
         public KeyMappingWindow(DeviceControl deviceControl, KeyAssgn selectedCallback)
         {
             InitializeComponent();
 
-            this.selectedCallback = selectedCallback;
+            this._selectedCallback = selectedCallback;
 
-            this.deviceControlRef = deviceControl;
-            this.keyFile = deviceControl.GetKeyBindings();
+            this._deviceControlRef = deviceControl;
+            this._keyFile = deviceControl.GetKeyBindings();
 
             CallbackName.Content = selectedCallback.GetKeyDescription();
 
-            Select_PinkyShift.IsChecked = true;
-            Select_DX_Release.IsChecked = true;
-
             CurrentlyMapped.Visibility = Visibility.Hidden;
 
-            Reset();
+            string selectedCallbackName = selectedCallback.GetCallback();
+            this.Select_PinkyShift.IsEnabled = !(selectedCallbackName == "SimHotasPinkyShift" || selectedCallbackName == "SimHotasShift");
+            this.Select_DX_Release.IsEnabled = !(selectedCallbackName == "SimHotasPinkyShift" || selectedCallbackName == "SimHotasShift");
+
+            CloneTempDialogData();
         }
 
         public static void ShowKeyMappingWindow(Window owner, DeviceControl deviceControl, KeyAssgn selectedCallback)
@@ -63,30 +60,22 @@ namespace FalconBMS.Launcher.Windows
             Program.ShowDialogAndMakeActive(ownWindow);
         }
 
-        private void WindowLoaded(object sender, RoutedEventArgs e)
+        private void CloneTempDialogData()
         {
-            getNeutralPosition();
-        }
+            _tmpKeyboard = _selectedCallback.Clone();
 
-        private void getNeutralPosition()
-        {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            JoyAssgn[] joyAssgns = _deviceControlRef.GetJoystickMappings();
 
-            for (int i = 0; i < joyAssgns.Length; i++)
-                neutralButtons[i] = new NeutralButtons(joyAssgns[i]);
-        }
-        private void Reset()
-        {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            _tmpJoyAssgns = new JoyAssgn[joyAssgns.Length];
+            _buttonTrackers = new List<ButtonStateTracker>(joyAssgns.Length);
 
-            neutralButtons = new NeutralButtons[joyAssgns.Length];
-
-            tmpJoyStick = new JoyAssgn[joyAssgns.Length];
             for (int i = 0; i < joyAssgns.Length; i++)
             {
-                tmpJoyStick[i] = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
+                JoyAssgn tmpjoy = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
+                _tmpJoyAssgns[i] = tmpjoy;
+                _buttonTrackers.Add(new ButtonStateTracker(tmpjoy, _onButtonChanged, _onPovHatChanged));
             }
-            tmpKeyboard = selectedCallback.Clone();
+            return;
         }
 
         void ITimerSink.HandleTimerTick()
@@ -105,28 +94,28 @@ namespace FalconBMS.Launcher.Windows
 
         private void ShowAssignedStatus()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            //JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
 
             var sb = new StringBuilder(500);
-            sb.Append(tmpKeyboard.GetKeyAssignmentStatus());
+            sb.Append(_tmpKeyboard.GetKeyAssignmentStatus());
             if (sb.Length > 0) sb.Append("; ");
 
-            for (int i = 0; i < joyAssgns.Length; i++)
-                sb.Append(tmpKeyboard.ReadJoyAssignment(i, tmpJoyStick));
+            for (int i = 0; i < _tmpJoyAssgns.Length; i++)
+                sb.Append(_tmpKeyboard.ReadJoyAssignment(i, _tmpJoyAssgns));
 
             string currentKeyAndButtons = sb.ToString();
             MappedButton.Content = currentKeyAndButtons;
 
             if (currentKeyAndButtons.Length == 0)
             {
-                if (Environment.TickCount > TickCount_NextUIFlush1)
+                if (Environment.TickCount > _tickNextUIFlush1)
                     AwaitingInputs.Content = "";
-                if (Environment.TickCount > TickCount_NextUIFlush2)
+                if (Environment.TickCount > _tickNextUIFlush2)
                 {
                     AwaitingInputs.Content = "   AWAITING INPUTS";
 
-                    TickCount_NextUIFlush1 = Environment.TickCount + CommonConstants.FLUSHTIME1;
-                    TickCount_NextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
+                    _tickNextUIFlush1 = Environment.TickCount + CommonConstants.FLUSHTIME1;
+                    _tickNextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
                 }
             }
             else
@@ -139,141 +128,106 @@ namespace FalconBMS.Launcher.Windows
 
         private void JoystickButtonMonitor()
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            // Invoke _onButtonChanged, _onPovHatChanged callbacks, below.
+            foreach (ButtonStateTracker tracker in _buttonTrackers)
+                tracker.PollUpdate();
 
-            byte[] buttons;
-            int[] povs;
+            return;
+        }
 
-            bool EitherOneOfShiftPressed = false;
+        private void _onButtonChanged(JoyAssgn tmpjoy, int buttonId, bool newState)
+        {
+            System.Diagnostics.Debug.WriteLine($"KMW::_onButtonChanged({tmpjoy.GetProductName()}, {buttonId}, {newState})");
 
-            for (int i = 0; i < joyAssgns.Length; i++)
+            string selectedCallbackName = _selectedCallback.GetCallback();
+
+            // First, determine if button is mapped to a dx-shift callback; auto-set togglebutton accordingly.
+            string currCallback0 = tmpjoy.dx[buttonId].assign[0].GetCallback();
+            if (currCallback0 == "SimHotasPinkyShift" || currCallback0 == "SimHotasShift")
             {
-                buttons = joyAssgns[i].GetButtons();
-
-                for (int ii = 0; ii < CommonConstants.DX_MAX_BUTTONS; ii++)
-                {
-                    if (buttons[ii] == CommonConstants.PRS128 && joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasPinkyShift" && pressedByHand == false ||
-                        buttons[ii] == CommonConstants.PRS128 && joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasShift"      && pressedByHand == false)
-                    {
-                        EitherOneOfShiftPressed = true;
-                    }
-                }
+                this.Select_PinkyShift.IsChecked = newState;
+                return;
             }
 
-            for (int i = 0; i < joyAssgns.Length; i++)
+            // Nothing else to do, if this is a release.
+            if (newState == false)
+                return;
+
+            // Show UI feedback, and currently mapped callback, if any -- incl consideration for shift- and release-modes.
+            Pinky pinky = (this.Select_PinkyShift.IsChecked == true ? Pinky.Shift : Pinky.UnShift);
+            Behaviour behaviour = (this.Select_DX_Release.IsChecked == true ? Behaviour.Release : Behaviour.Press);
+            Invoke action = (this.Select_DX_Release.IsChecked == true ? Invoke.Down : Invoke.Default);
+
+            int mappingBehavior = (int)pinky + (int)behaviour;
+            string currCallback = tmpjoy.dx[buttonId].assign[mappingBehavior].GetCallback();
+
+            if (String.IsNullOrEmpty(currCallback) || 
+                currCallback == CommonConstants.SIMDONOTHING || 
+                currCallback == selectedCallbackName)
             {
-                buttons = joyAssgns[i].GetButtons();
-
-                for (int ii = 0; ii < CommonConstants.DX_MAX_BUTTONS; ii++)
-                {
-                    if (EitherOneOfShiftPressed)
-                        Select_PinkyShift.IsChecked = false;
-                    else
-                        Select_PinkyShift.IsChecked = true;
-
-                    if (buttons[ii] == neutralButtons[i].buttons[ii])
-                        continue;
-
-                    if (buttons[ii] == CommonConstants.PRS0)
-                    {
-                        if (ii + 1 < CommonConstants.DX_MAX_BUTTONS && buttons[ii + 1] == CommonConstants.PRS0)
-                        {
-                            getNeutralPosition();
-                            continue;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasPinkyShift" && pressedByHand == false ||
-                        joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasShift"      && pressedByHand == false)
-                    {
-                        continue;
-                    }
-
-                    Pinky pinkyStatus = Pinky.UnShift;
-                    Behaviour behaviourStatus = Behaviour.Press;
-                    if (Select_PinkyShift.IsChecked == false)
-                        pinkyStatus = Pinky.Shift;
-                    if (Select_DX_Release.IsChecked == false)
-                        behaviourStatus = Behaviour.Release;
-
-                    // Determine if this input is already mapped to another callback, and display warning/hint if so.
-                    string currCallbackAssgn = joyAssgns[i].dx[ii].GetCurrentCallback(pinkyStatus, behaviourStatus);
-                    if (String.IsNullOrEmpty(currCallbackAssgn) || currCallbackAssgn == "SimDoNothing")
-                    {
-                        this.CurrentlyMapped.Visibility = Visibility.Hidden;
-                    }
-                    else
-                    {
-                        KeyAssgn currCallback = keyFile.LookupCallback(currCallbackAssgn);
-                        string currCallbackDescr = "Button currently bound to:\r\n" + currCallback.GetKeyDescription();
-
-                        this.CurrentlyMapped.Text = currCallbackDescr;
-                        this.CurrentlyMapped.Visibility = Visibility.Visible;
-                    }
-
-                    // Construct DX button instance.
-                    if (tmpKeyboard.GetCallback() == "SimHotasPinkyShift" || tmpKeyboard.GetCallback() == "SimHotasShift")
-                    {
-                        tmpJoyStick[i].dx[ii].Assign(tmpKeyboard.GetCallback(), Pinky.UnShift, Behaviour.Press, Invoke.Default, tmpKeyboard.GetSoundID());
-                        tmpJoyStick[i].dx[ii].Assign(tmpKeyboard.GetCallback(), Pinky.Shift, Behaviour.Press, Invoke.Default, tmpKeyboard.GetSoundID());
-                    }
-                    else
-                    {
-                        tmpJoyStick[i].dx[ii].Assign(tmpKeyboard.GetCallback(), pinkyStatus, behaviourStatus, invokeStatus, tmpKeyboard.GetSoundID());
-                    }
-
-                    getNeutralPosition();
-                    return;
-                }
-
-                povs = joyAssgns[i].GetPointOfView();
-                for (int ii = 0; ii < tmpJoyStick[i].pov.Length; ii++)
-                {
-                    if (povs[ii] == neutralButtons[i].povs[ii])
-                        continue;
-                    if (povs[ii] == -1)
-                    {
-                        getNeutralPosition();
-                        continue;
-                    }
-
-                    Pinky pinkyStatus = Pinky.UnShift;
-                    if (Select_PinkyShift.IsChecked == false)
-                        pinkyStatus = Pinky.Shift;
-
-                    // Determine if this input is already mapped to another callback, and display warning/hint if so.
-                    string currCallbackAssgn = joyAssgns[i].pov[ii].GetCurrentCallback(povs[ii], pinkyStatus);
-                    if (String.IsNullOrEmpty(currCallbackAssgn) || currCallbackAssgn == "SimDoNothing")
-                    {
-                        this.CurrentlyMapped.Visibility = Visibility.Hidden;
-                    }
-                    else
-                    {
-                        KeyAssgn currCallback = keyFile.LookupCallback(currCallbackAssgn);
-                        string currCallbackDescr = "POV-hat input currently bound to:\r\n" + currCallback.GetKeyDescription();
-
-                        this.CurrentlyMapped.Text = currCallbackDescr;
-                        this.CurrentlyMapped.Visibility = Visibility.Visible;
-                    }
-
-                    // Construct POV button instance.
-                    tmpJoyStick[i].pov[ii].Assign(povs[ii], tmpKeyboard.GetCallback(), pinkyStatus, 0);
-
-                    getNeutralPosition();
-                    return;
-                }
+                this.CurrentlyMapped.Visibility = Visibility.Hidden;
             }
+            else
+            {
+                KeyAssgn row = _keyFile.LookupCallback(currCallback);
+                string currCallbackDescr = row != null ? row.GetKeyDescription() : currCallback;
+
+                string pressOrRelease = (this.Select_DX_Release.IsChecked == true) ? "release" : "press";
+                this.CurrentlyMapped.Text = $"Button {pressOrRelease} currently bound to:\r\n" + currCallbackDescr;
+                this.CurrentlyMapped.Visibility = Visibility.Visible;
+            }
+
+            // Construct provisional DX button assignment.
+            tmpjoy.dx[buttonId].Assign(selectedCallbackName, pinky, behaviour, action, _selectedCallback.GetSoundID());
+
+            // Special-case for dx-shift: also assign shift layer to same callback.
+            if (selectedCallbackName == "SimHotasPinkyShift" || selectedCallbackName == "SimHotasShift")
+                tmpjoy.dx[buttonId].Assign(selectedCallbackName, Pinky.Shift, Behaviour.Press, Invoke.Default, _selectedCallback.GetSoundID());
+
+            return;
+        }
+
+        private void _onPovHatChanged(JoyAssgn tmpjoy, int povhatId, int newDirection)
+        {
+            System.Diagnostics.Debug.WriteLine($"KMW::_onPovHatChanged({tmpjoy.GetProductName()}, {povhatId}, {newDirection})");
+
+            string selectedCallbackName = _selectedCallback.GetCallback();
+
+            // Nothing to do, if this is a release.
+            if (newDirection < 0) return;
+
+            // Show UI feedback, and currently mapped callback, if any -- incl support for dx-shift mappings.
+            Pinky pinky = (this.Select_PinkyShift.IsChecked == true ? Pinky.Shift : Pinky.UnShift);
+
+            string currCallback = tmpjoy.pov[povhatId].GetCurrentCallback(newDirection, pinky);
+
+            if (String.IsNullOrEmpty(currCallback) || 
+                currCallback == CommonConstants.SIMDONOTHING || 
+                currCallback == selectedCallbackName)
+            {
+                this.CurrentlyMapped.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                KeyAssgn row = _keyFile.LookupCallback(currCallback);
+                string currCallbackDescr = row != null ? row.GetKeyDescription() : currCallback;
+
+                this.CurrentlyMapped.Text = $"POV-hat direction currently bound to:\r\n" + currCallbackDescr;
+                this.CurrentlyMapped.Visibility = Visibility.Visible;
+            }
+
+            // Construct provisional POV-direction assignment.
+            System.Diagnostics.Debug.WriteLine("Assigning pov hat");
+            tmpjoy.pov[povhatId].Assign(newDirection, selectedCallbackName, pinky, _selectedCallback.GetSoundID());
+
+            return;
         }
 
         private void KeyboardButtonMonitor()
         {
-            directInputDevice.GetCurrentKeyboardState();
+            _directInputDevice.GetCurrentKeyboardState();
             for (int i = 1; i < CommonConstants.KEYBOARD_KEYLENGTH; i++)
-                if (directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
+                if (_directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
                     HandleKeyDown();
         }
 
@@ -283,10 +237,10 @@ namespace FalconBMS.Launcher.Windows
             bool Ctrl = false;
             bool Alt = false;
             int catchedScanCode = 0;
-            directInputDevice.GetCurrentKeyboardState();
+            _directInputDevice.GetCurrentKeyboardState();
             for (int i = 1; i < 238; i++)
             {
-                if (directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
+                if (_directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
                 {
                     if (i == (int)Microsoft.DirectX.DirectInput.Key.LeftShift |
                         i == (int)Microsoft.DirectX.DirectInput.Key.RightShift)
@@ -326,12 +280,10 @@ namespace FalconBMS.Launcher.Windows
             if ((Microsoft.DirectX.DirectInput.Key)catchedScanCode == Microsoft.DirectX.DirectInput.Key.Y && !Shift && !Ctrl && !Alt)
                 return;
 
-            Pinky pinkyStatus = Pinky.UnShift;
-            if (Select_PinkyShift.IsChecked == false)
-                pinkyStatus = Pinky.Shift;
+            Pinky pinkyStatus = (Select_PinkyShift.IsChecked == true) ? Pinky.Shift : Pinky.UnShift;
 
             // Determine if this input is already mapped to another callback, and display warning/hint if so.
-            KeyAssgn currCallbackAssgn = keyFile.ReverseLookupKeyboardInput(catchedScanCode, Shift, Ctrl, Alt);
+            KeyAssgn currCallbackAssgn = _keyFile.ReverseLookupKeyboardInput(catchedScanCode, Shift, Ctrl, Alt);
             if (currCallbackAssgn == null || currCallbackAssgn.GetCallback() == "SimDoNothing")
             {
                 this.CurrentlyMapped.Visibility = Visibility.Hidden;
@@ -346,74 +298,26 @@ namespace FalconBMS.Launcher.Windows
 
             // Assign to temp model.
             if (pinkyStatus == Pinky.UnShift)
-                tmpKeyboard.SetKeyboard(catchedScanCode, Shift, Ctrl, Alt);
+                _tmpKeyboard.SetKeyboard(catchedScanCode, Shift, Ctrl, Alt);
             if (pinkyStatus == Pinky.Shift)
-                tmpKeyboard.Setkeycombo(catchedScanCode, Shift, Ctrl, Alt);
-        }
-
-        private class NeutralButtons
-        {
-            public byte[] buttons { get; set; }
-            public int[] povs { get; set; }
-
-            public NeutralButtons(JoyAssgn joyStick)
-            {
-                buttons = joyStick.GetButtons();
-                povs = joyStick.GetPointOfView();
-            }
-        }
-
-        private void WindowMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                if (e.ChangedButton == MouseButton.Left && System.Windows.Input.Mouse.LeftButton == MouseButtonState.Pressed)
-                    DragMove();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log("DragMove call failed.", Diagnostics.LogLevels.Exception);
-            }
+                _tmpKeyboard.Setkeycombo(catchedScanCode, Shift, Ctrl, Alt);
         }
 
         private void ClearDX_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            // Make fresh clones, and button-trackers.
+            CloneTempDialogData();
 
-            for (int i = 0; i < joyAssgns.Length; i++)
-            {
-                tmpJoyStick[i] = joyAssgns[i].MakeTempCloneForKeyMappingDialog();
-            }
-            string target = tmpKeyboard.GetCallback();
-            foreach (JoyAssgn joy in tmpJoyStick)
-                joy.UnassigntargetCallback(target);
+            // Remove the current DX button/povhat bindings.
+            string targetCallback = _selectedCallback.GetCallback();
+
+            foreach (JoyAssgn tmpjoy in _tmpJoyAssgns)
+                tmpjoy.UnassigntargetCallback(targetCallback);
         }
 
         private void ClearKey_Click(object sender, RoutedEventArgs e)
         {
-            tmpKeyboard.UnassignKeyboard();
-        }
-
-        private void Select_Invoke_Click(object sender, RoutedEventArgs e)
-        {
-            switch (invokeStatus)
-            {
-                case Invoke.Default:
-                    invokeStatus = Invoke.Down;
-                    Select_Invoke.Content = "INVOKE KEYDN";
-                    Select_Invoke.Background = CommonConstants.GREYBLUE;
-                    break;
-                case Invoke.Down:
-                    invokeStatus = Invoke.Up;
-                    Select_Invoke.Content = "INVOKE KEYUP";
-                    Select_Invoke.Background = CommonConstants.GREYBLUE;
-                    break;
-                case Invoke.Up:
-                    invokeStatus = Invoke.Default;
-                    Select_Invoke.Content = "INVOKE BOTH";
-                    Select_Invoke.Background = CommonConstants.WHITEILUM;
-                    break;
-            }
+            _tmpKeyboard.UnassignKeyboard();
         }
 
         private class DirectInputKeyboard
@@ -435,63 +339,27 @@ namespace FalconBMS.Launcher.Windows
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            JoyAssgn[] joyAssgns = deviceControlRef.GetJoystickMappings();
+            JoyAssgn[] joyAssgns = _deviceControlRef.GetJoystickMappings();
 
-            for (int i = 0; i < tmpJoyStick.Length; i++)
+            for (int i = 0; i < _tmpJoyAssgns.Length; i++)
             {
-                joyAssgns[i].CopyButtonsAndHatsFromCurrentProfile(tmpJoyStick[i]);
+                joyAssgns[i].CopyButtonsAndHatsFromCurrentProfile(_tmpJoyAssgns[i]);
             }
-            selectedCallback.CopyOtherKeyAssgn(tmpKeyboard);
+            _selectedCallback.CopyOtherKeyAssgn(_tmpKeyboard);
 
             // Unassign the previous mapping that was assigned to this key/key combo.
-            KeyAssgn oldKey = keyFile.keyAssign.FirstOrDefault(x => x != selectedCallback && x.GetKeyAssignmentStatus() == selectedCallback.GetKeyAssignmentStatus());
+            KeyAssgn oldKey = _keyFile.keyAssign.FirstOrDefault(x => x != _selectedCallback && x.GetKeyAssignmentStatus() == _selectedCallback.GetKeyAssignmentStatus());
             if (oldKey != null)
             {
                 oldKey.UnassignKeyboard();
             }
 
             // Save the XML and Key files, after each change user makes.
-            deviceControlRef.SaveXml();
-            Program.mainWin.appReg.getOverrideWriter().SaveKeyMapping(MainWindow.inGameAxis, deviceControlRef);
+            _deviceControlRef.SaveXml();
+            Program.mainWin.appReg.getOverrideWriter().SaveKeyMapping(MainWindow.inGameAxis, _deviceControlRef);
 
             Close();
         }
 
-        private void Select_PinkyShift_Click(object sender, RoutedEventArgs e)
-        {
-            if (Select_PinkyShift.IsChecked == false)
-                pressedByHand = true;
-            else
-                pressedByHand = false;
-        }
-
-        private Press pressStatus = Press.Press;
-        public enum Press
-        {
-            Press,
-            Hold,
-            Release
-        }
-
-        private void Select_Press_Click(object sender, RoutedEventArgs e)
-        {
-            switch (pressStatus)
-            {
-                case Press.Press:
-                    pressStatus = Press.Release;
-                    Select_Press.Content = "RELEASE";
-                    Select_Press.Background = CommonConstants.GREYBLUE;
-                    invokeStatus = Invoke.Down;
-                    Select_DX_Release.IsChecked = false;
-                    break;
-                case Press.Release:
-                    pressStatus = Press.Press;
-                    Select_Press.Content = "PRESS";
-                    Select_Press.Background = CommonConstants.WHITEILUM;
-                    invokeStatus = Invoke.Default;
-                    Select_DX_Release.IsChecked = true;
-                    break;
-            }
-        }
     }
 }

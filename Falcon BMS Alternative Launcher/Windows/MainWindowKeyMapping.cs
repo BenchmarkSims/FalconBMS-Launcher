@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interactivity;
 using System.Windows.Media;
 
 using FalconBMS.Launcher.Input;
@@ -20,6 +21,9 @@ namespace FalconBMS.Launcher.Windows
     /// </summary>
     public partial class MainWindow
     {
+        private List<ButtonStateTracker> _buttonTrackers;
+        private bool _isShiftButtonPressed = false;
+
         public void UpdateCategoryHeaders()
         {
             List<string> categoryHeaders = new List<string>(12) { "TOP" };
@@ -30,45 +34,25 @@ namespace FalconBMS.Launcher.Windows
             return;
         }
 
-        /// <summary>
-        /// Let's write DataGrid cells at KeyMapping page a keyfile informarion.
-        /// </summary>
-        public void WriteDataGrid()
+        public void UpdateDataGridBindingSource()
         {
             foreach (KeyAssgn Assgn in deviceControl.GetKeyBindings().keyAssign)
                 Assgn.Visibility = Assgn.GetVisibility();
 
-            //string target = "MFD";
-
-            //foreach (KeyAssgn Assgn in keyFile.keyAssign)
-            //{
-            //    if (Assgn.Mapping.Trim().Contains(target))
-            //        Assgn.Visibility = Assgn.GetVisibility();
-            //    else
-            //    {
-            //        Assgn.Visibility = "Hidden";
-            //    }
-            //}
-
             KeyMappingGrid.ItemsSource = deviceControl.GetKeyBindings().keyAssign;
-        }
-        public void RefreshJoystickColumn()
-        {
-            KeyMappingGrid.Items.Refresh();
 
-            statusAssign = Status.GetNeutralPos;
+            ResetButtonTrackers();
         }
-        public void ResetJoystickColumn()
-        {
-            ResetKeyMappingGrid();
 
-            statusAssign = Status.GetNeutralPos;
-        }
-        public void ResetKeyMappingGrid()
+        public void ResetButtonTrackers()
         {
-            var temp = KeyMappingGrid.ItemsSource;
-            KeyMappingGrid.ItemsSource = null;
-            KeyMappingGrid.ItemsSource = temp;
+            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
+
+            _buttonTrackers = new List<ButtonStateTracker>(joyAssgns.Length);
+            foreach (JoyAssgn joy in joyAssgns)
+                _buttonTrackers.Add(new ButtonStateTracker(joy, _onButtonChanged, _onPovHatChanged));
+
+            return;
         }
 
         /// <summary>
@@ -127,39 +111,9 @@ namespace FalconBMS.Launcher.Windows
                 return;
 
             KeyMappingWindow.ShowKeyMappingWindow(this, deviceControl, selectedItem);
-            RefreshJoystickColumn();
 
             KeyMappingGrid.Items.Refresh();
             KeyMappingGrid.UnselectAllCells();
-        }
-
-        private byte[] buttons;
-        private int[] povs;
-        private NeutralButtons[] neutralButtons;
-
-        /// <summary>
-        /// What was your joystick buttons were like when you clicked somewhere? Are they pressed or released?
-        /// </summary>
-        public class NeutralButtons
-        {
-            public byte[] buttons { get; set; }
-            public int[] povs { get; set; }
-
-            public NeutralButtons(JoyAssgn joyStick)
-            {
-                buttons = joyStick.GetButtons();
-                povs = joyStick.GetPointOfView();
-            }
-        }
-
-        /// <summary>
-        /// Is KeyMapping page currently trying to get neutral button positions? or waiting for your input?
-        /// </summary>
-        private Status statusAssign = Status.GetNeutralPos;
-        private enum Status
-        {
-            GetNeutralPos = 0,
-            WaitingforInput = 1
         }
 
         /// <summary>
@@ -173,19 +127,12 @@ namespace FalconBMS.Launcher.Windows
             Window activeWin = Program.activeWin;
             if (!activeWin.IsActive) return;
 
-            try
-            {
-                directInputDevice.GetCurrentKeyboardState();
-                for (int i = 1; i < 238; i++)
-                    if (directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
-                        KeyMappingGrid_KeyDown();
-                JumptoAssignedKey();
-            }
-            catch (FileNotFoundException ex)
-            {
-                Diagnostics.Log(ex);
-                Close();
-            }
+            directInputDevice.GetCurrentKeyboardState();
+            for (int i = 1; i < 238; i++)
+                if (directInputDevice.KeyboardState[(Microsoft.DirectX.DirectInput.Key)i])
+                    KeyMappingGrid_KeyDown();
+            
+            JumptoAssignedKey();
         }
 
         /// <summary>
@@ -193,106 +140,129 @@ namespace FalconBMS.Launcher.Windows
         /// </summary>
         public void JumptoAssignedKey()
         {
-            JoyAssgn[] joyAssgns = deviceControl.GetJoystickMappings();
-
-            string target = "";
-            switch (statusAssign)
+            // Invoke _onButtonChanged, _onPovHatChanged callbacks, below.
+            try
             {
-                case Status.GetNeutralPos:
-                    for (int i = 0; i < joyAssgns.Length; i++)
-                        neutralButtons[i] = new NeutralButtons(joyAssgns[i]);
-                    statusAssign = Status.WaitingforInput;
-                    break;
-                case Status.WaitingforInput:
-
-                    bool EitherOneOfShiftPressed = false;
-
-                    for (int i = 0; i < joyAssgns.Length; i++)
-                    {
-                        buttons = joyAssgns[i].GetButtons();
-                        for (int ii = 0; ii < CommonConstants.DX_MAX_BUTTONS; ii++)
-                        {
-                            if (buttons[ii] == CommonConstants.PRS128 && joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasPinkyShift" && pressedByHand == false ||
-                                buttons[ii] == CommonConstants.PRS128 && joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasShift" && pressedByHand == false)
-                                EitherOneOfShiftPressed = true;
-                        }
-                    }
-
-                    for (int i = 0; i < joyAssgns.Length; i++)
-                    {
-                        buttons = joyAssgns[i].GetButtons();
-                        for (int ii = 0; ii < CommonConstants.DX_MAX_BUTTONS; ii++)
-                        {
-                            if (EitherOneOfShiftPressed)
-                                Select_PinkyShift.IsChecked = false;
-                            else
-                                Select_PinkyShift.IsChecked = true;
-
-                            if (neutralButtons[i] == null)
-                                break; // KEY SEARCH WILL NOT WORK IF ENTER HERE
-                            if (buttons[ii] == neutralButtons[i].buttons[ii])
-                                continue;
-                            statusAssign = Status.GetNeutralPos;
-                            if (buttons[ii] == CommonConstants.PRS0) // RELEASE SHIFT
-                                Select_DX_Release.IsChecked = false;
-                            else
-                                Select_DX_Release.IsChecked = true;
-
-                            if (joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasPinkyShift" && pressedByHand == false ||
-                                joyAssgns[i].dx[ii].assign[CommonConstants.DX_PRESS].GetCallback() == "SimHotasShift" && pressedByHand == false)
-                                continue;
-
-                            Pinky pinkyStatus = Pinky.UnShift;
-                            Behaviour behaviourStatus = Behaviour.Press;
-                            if (Select_PinkyShift.IsChecked == false)
-                                pinkyStatus = Pinky.Shift;
-                            if (Select_DX_Release.IsChecked == false)
-                                behaviourStatus = Behaviour.Release;
-
-                            target = joyAssgns[i].dx[ii].assign[(int)pinkyStatus + (int)behaviourStatus].GetCallback();
-                            if (target == CommonConstants.SIMDONOTHING && behaviourStatus == Behaviour.Release)
-                            { }
-                            else
-                            {
-                                Label_AssgnStatus.Content = "DX" + (ii + 1) + "\t: " + joyAssgns[i].GetProductName();
-                            }
-                        }
-                        povs = joyAssgns[i].GetPointOfView();
-                        for (int ii = 0; ii < joyAssgns[i].pov.Length; ii++)
-                        {
-                            if (neutralButtons[i] == null)
-                                break; // KEY SEARCH WILL NOT WORK IF ENTER HERE
-                            if (povs[ii] == neutralButtons[i].povs[ii])
-                                continue;
-                            statusAssign = Status.GetNeutralPos;
-                            if (povs[ii] == -1)
-                                continue;
-
-                            Pinky pinkyStatus = Pinky.UnShift;
-                            if (Select_PinkyShift.IsChecked == false)
-                                pinkyStatus = Pinky.Shift;
-
-                            target = joyAssgns[i].pov[ii].direction[povs[ii] / CommonConstants.POV45].GetCallback(pinkyStatus);
-
-                            string direction = joyAssgns[i].pov[ii].GetDirectionLabel(povs[ii]);
-                            Label_AssgnStatus.Content = "POV" + (ii + 1) + "." + direction + "\t: " + joyAssgns[i].GetProductName();
-                        }
-                    }
-                    break;
+                foreach (ButtonStateTracker tracker in _buttonTrackers)
+                    tracker.PollUpdate();
             }
-            if (target == "")
-                return;
-            if (target == CommonConstants.SIMDONOTHING)
-                return;
-            // If the key assignment was found, jump to the mapping for it and highlight it.
-            KeyAssgn key = deviceControl.GetKeyBindings().keyAssign.FirstOrDefault(x => x.GetCallback() == target);
-            if (key != null)
+            catch (Exception ex)
             {
-                Label_AssgnStatus.Content += "   / " + key.Mapping;
-
-                KeyMappingGrid.ScrollIntoView(key);
-                KeyMappingGrid.SelectedIndex = KeyMappingGrid.Items.IndexOf(key);
+                // Typically, InputLostException from DirectInput.
+                Diagnostics.Log(ex);
             }
+
+            return;
+        }
+
+        private void _onButtonChanged(JoyAssgn joy, int buttonId, bool newState)
+        {
+            System.Diagnostics.Debug.WriteLine($"_onButtonChanged({joy.GetProductName()}, {buttonId}, {newState})");
+
+            if (newState == true) // button pressed
+            {
+                // Lookup callback - perhaps shifted.
+                int mappingBehavior = (int)Behaviour.Press;
+                if (_isShiftButtonPressed) mappingBehavior += (int)Pinky.Shift;
+
+                string target = joy.dx[buttonId].assign[mappingBehavior].GetCallback();
+
+                // If target is dx-shift callback, set flag for subsequent button presses.
+                if (target == "SimHotasPinkyShift" || target == "SimHotasShift")
+                    _isShiftButtonPressed = true;
+
+                // Update UI.
+                if (String.IsNullOrEmpty(target) || target == CommonConstants.SIMDONOTHING)
+                {
+                    Label_AssgnStatus.Content =
+                        "DX" + (buttonId + 1) +
+                        " (" + joy.GetProductName() + ")";
+                }
+                else
+                {
+                    // If we have a row for this mapping, jump to it and highlight it.
+                    KeyAssgn row = deviceControl.GetKeyBindings().keyAssign.FirstOrDefault(x => x.GetCallback() == target);
+
+                    Label_AssgnStatus.Content =
+                        "DX" + (buttonId + 1) +
+                        " (" + joy.GetProductName() + ")" + " / " +
+                        ((row != null) ? row.Mapping : target);
+
+                    if (row != null)
+                    {
+                        KeyMappingGrid.ScrollIntoView(row);
+                        KeyMappingGrid.SelectedIndex = KeyMappingGrid.Items.IndexOf(row);
+                    }
+                }
+            }
+            else // button released
+            {
+                // Look for a release-behavior callback - perhaps shifted.
+                int mappingBehavior = (int)Behaviour.Release;
+                if (_isShiftButtonPressed) mappingBehavior += (int)Pinky.Shift;
+
+                string target = joy.dx[buttonId].assign[mappingBehavior].GetCallback();
+
+                if (!String.IsNullOrEmpty(target) && target != CommonConstants.SIMDONOTHING)
+                {
+                    // If we have a row for this mapping, jump to it and highlight it.
+                    KeyAssgn row = deviceControl.GetKeyBindings().keyAssign.FirstOrDefault(x => x.GetCallback() == target);
+
+                    Label_AssgnStatus.Content =
+                        "DX" + (buttonId + 1) + ".RELEASE" +
+                        " (" + joy.GetProductName() + ")" + " / " +
+                        ((row != null) ? row.Mapping : target);
+
+                    if (row != null)
+                    {
+                        KeyMappingGrid.ScrollIntoView(row);
+                        KeyMappingGrid.SelectedIndex = KeyMappingGrid.Items.IndexOf(row);
+                    }
+                }
+
+                // If the press-mode callback is dx-shift, clear the shift-flag.
+                string target0 = joy.dx[buttonId].assign[0].GetCallback();
+                if (target0 == "SimHotasPinkyShift" || target0 == "SimHotasShift")
+                    _isShiftButtonPressed = false;
+            }
+
+            return;
+        }
+
+        private void _onPovHatChanged(JoyAssgn joy, int povhatId, int newDirection)
+        {
+            System.Diagnostics.Debug.WriteLine($"_onPovHatChanged({joy.GetProductName()}, {povhatId}, {newDirection})");
+
+            if (newDirection < 0) return;
+
+            // Show UI feedback, and currently mapped callback, if any -- including support for dx-shift mapping.
+            string target = joy.pov[povhatId].direction[newDirection].GetCallback(_isShiftButtonPressed ? Pinky.Shift : Pinky.UnShift);
+
+            string dirlabel = PovAssgn.GetDirectionLabel(newDirection);
+
+            if (String.IsNullOrEmpty(target) || target == CommonConstants.SIMDONOTHING)
+            {
+                Label_AssgnStatus.Content =
+                    "POV" + (povhatId + 1) + "." + dirlabel +
+                    " (" + joy.GetProductName() + ")";
+                return;
+            }
+
+            // If we have a row for this mapping, jump to it and highlight it.
+            KeyAssgn row = deviceControl.GetKeyBindings().keyAssign.FirstOrDefault(x => x.GetCallback() == target);
+
+            Label_AssgnStatus.Content =
+                "POV" + (povhatId + 1) + "." + dirlabel + 
+                " (" + joy.GetProductName() + ")" + " / " +
+                ((row != null) ? row.Mapping : target);
+
+            if (row != null)
+            {
+                KeyMappingGrid.ScrollIntoView(row);
+                KeyMappingGrid.SelectedIndex = KeyMappingGrid.Items.IndexOf(row);
+            }
+
+            return;
         }
 
         /// <summary>
@@ -341,8 +311,6 @@ namespace FalconBMS.Launcher.Windows
                 }
             }
             if (catchedScanCode == 0)
-                return;
-            if (Select_PinkyShift.IsChecked == false)
                 return;
 
             KeyAssgn keytmp = KeyFile.ParseKeyfileLine(@"SimDoNothing -1 0 0xFFFFFFFF 0 0 0 -1 ""nothing""");
@@ -471,7 +439,7 @@ namespace FalconBMS.Launcher.Windows
 
             UpdateCategoryHeaders();
 
-            WriteDataGrid();
+            UpdateDataGridBindingSource();
             return;
         }
 

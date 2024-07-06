@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Threading;
@@ -43,8 +44,8 @@ namespace FalconBMS.Launcher.Windows
 
         internal static bool bmsHasBeenLaunched = false;
 
-        private DispatcherTimer MainTimer;
-        private int TickCount_NextScanForNewDevices;
+        private DispatcherTimer InputPollingTimer;
+        private DispatcherTimer DeviceScanTimer;
 
         protected override void OnInitialized(EventArgs e)
         {
@@ -114,6 +115,40 @@ namespace FalconBMS.Launcher.Windows
             Diagnostics.Log("Post_OnInitialized complete.");
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(_WndProc);
+        }
+
+        private IntPtr _WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            handled = false;
+
+            // Handle WM_DEVICECHANGED notification.
+            const int WM_DEVICECHANGED = 0x0219;
+            const int DBT_DEVNODES_CHANGED = 7;
+
+            switch (msg)
+            {
+                case WM_DEVICECHANGED:
+                    Diagnostics.Log($"WM_DEVICECHANGE: {wParam}, {lParam}", Diagnostics.LogLevels.Info);
+                    if ((int)wParam == DBT_DEVNODES_CHANGED)
+                    {
+                        // This WM notif tends to arrive in bursts -- use a one-shot timer to rescan devices after 500ms timeout.
+                        if (DeviceScanTimer != null)
+                            DeviceScanTimer.Stop();
+
+                        DeviceScanTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, DeviceScanTimer_Tick, this.Dispatcher);
+                    }
+                break;
+            }
+
+            return (IntPtr)1;//TRUE
+        }
+
         private void _ThreadPool_UpdateRss(object state)
         {
             //NB: We are on a background threadpool thread -- no interaction with UI elements allowed!
@@ -146,10 +181,10 @@ namespace FalconBMS.Launcher.Windows
         {
             Diagnostics.Log("Starting timer.");
 
-            TickCount_NextScanForNewDevices = Environment.TickCount + 5000;
+            InputPollingTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(20), DispatcherPriority.Input, MainTimer_Tick, this.Dispatcher);
+            InputPollingTimer.Start();
 
-            MainTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(20), DispatcherPriority.Input, MainTimer_Tick, this.Dispatcher);
-            MainTimer.Start();
+            DeviceScanTimer = null; //initiated via WM_DEVICECHANGE notification
         }
 
         private void StartVR()
@@ -184,10 +219,6 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                statusAssign = Status.GetNeutralPos;
-
-                LargeTab.SelectedIndex = 0;
-
                 // Read Theater List
                 TheaterList.PopulateAndSave(appReg, Dropdown_TheaterList);
 
@@ -197,7 +228,7 @@ namespace FalconBMS.Launcher.Windows
                 deviceControl.LoadKeyBindingsFromUserOrStockKeyfiles(appReg);
 
                 // Write Data Grid
-                WriteDataGrid();
+                UpdateDataGridBindingSource();
 
                 // Update category headers.
                 UpdateCategoryHeaders();
@@ -216,32 +247,10 @@ namespace FalconBMS.Launcher.Windows
             {
                 deviceControl = DeviceControl.EnumerateAttachedDevicesAndLoadXml(appReg);
 
-                neutralButtons = new NeutralButtons[deviceControl.GetJoystickMappings().Length];
-
                 // Aquire joySticks
                 AquireAll();
 
-                ResortDevices();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-                Diagnostics.ShowErrorMsgbox(ex);
-                Close();
-            }
-        }
-
-        public void ResortDevices()
-        {
-            try
-            {
-                // Reset All Axis Settings
-                foreach (AxisName nme in axisNameList)
-                    inGameAxis[nme.ToString()] = new InGameAxAssgn();
-
-                joyAssign_2_inGameAxis();
-                ResetAssgnWindow();
-                ResetJoystickColumn();
+                RefreshDevices();
             }
             catch (Exception ex)
             {
@@ -261,7 +270,8 @@ namespace FalconBMS.Launcher.Windows
 
                 joyAssign_2_inGameAxis();
                 ResetAssgnWindow();
-                RefreshJoystickColumn();
+
+                UpdateDataGridBindingSource();
             }
             catch (Exception ex)
             {
@@ -279,22 +289,29 @@ namespace FalconBMS.Launcher.Windows
             ITimerSink timerSink = activeWin as ITimerSink;
             if (timerSink == null) return;
 
-            timerSink.HandleTimerTick();
+            try
+            {
+                timerSink.HandleTimerTick();
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.Log(ex); 
+            }
 
             return;
         }
 
+        private void DeviceScanTimer_Tick(object sender, EventArgs e)
+        {
+            this.DeviceScanTimer.Stop();
+            this.DeviceScanTimer = null;
+
+            Diagnostics.Log("Scanning for new/removed devices..");
+            ScanForNewDevices();
+        }
+
         void ITimerSink.HandleTimerTick()
         {
-            if (Environment.TickCount > TickCount_NextScanForNewDevices)
-            {
-                // Scan for newly connected devices, every few seconds.
-                TickCount_NextScanForNewDevices = Environment.TickCount + 3000;
-
-                ScanForNewDevices();
-                return;
-            }
-
             switch (LargeTab.SelectedIndex)
             {
                 case 0:
@@ -316,6 +333,7 @@ namespace FalconBMS.Launcher.Windows
             {
                 if (deviceControl.DeviceListNeedsRefresh())
                 {
+                    Diagnostics.Log("Device list needs refresh - RELOADING", Diagnostics.LogLevels.Info);
                     ReloadDevicesAndXmlMappings();
 
                     if (LargeTab.SelectedIndex == 2)
@@ -339,7 +357,7 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e)
         {
-            MainTimer.Stop();
+            InputPollingTimer.Stop();
 
             try
             {
@@ -771,14 +789,10 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         private void MetroWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            try
+            if (e.ChangedButton == MouseButton.Left &&
+                e.LeftButton == MouseButtonState.Pressed)
             {
-                if (e.ChangedButton == MouseButton.Left)
-                    DragMove();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
+                DragMove();
             }
         }
 
@@ -815,18 +829,6 @@ namespace FalconBMS.Launcher.Windows
         private void CMD_WINDOW_Click(object sender, RoutedEventArgs e)
         {
             return;
-            if (CMD_WINDOW.IsChecked == true)
-                MessageBox.Show(Program.mainWin, "Falcon BMS crashes when using Alt+Tab in FullScreen Mode. Recommend Enabling Window Mode.\n(WINDOW button turning on light)", "WARNING", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private bool pressedByHand;
-
-        private void Select_PinkyShift_Click(object sender, RoutedEventArgs e)
-        {
-            if (Select_PinkyShift.IsChecked == false)
-                pressedByHand = true;
-            else
-                pressedByHand = false;
         }
 
         private void ListBox_BMS_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -909,7 +911,7 @@ namespace FalconBMS.Launcher.Windows
 
             deviceControl.ImportKeyfileIntoCurrentProfile(newKeyfilePath);
             UpdateCategoryHeaders();
-            WriteDataGrid();
+            UpdateDataGridBindingSource();
             return;
         }
 

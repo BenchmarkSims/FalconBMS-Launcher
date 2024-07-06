@@ -205,7 +205,6 @@ namespace FalconBMS.Launcher
                     bms_Version = BMS_Version.UNDEFINED;
                     Properties.Settings.Default.BMS_Version = null;
                     throw new ArgumentOutOfRangeException(); // Just to be explicit.
-                    break;
             }
         }
 

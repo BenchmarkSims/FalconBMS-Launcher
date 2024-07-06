@@ -76,10 +76,6 @@ namespace FalconBMS.Launcher.Windows
         {
         }
 
-        private void MetroWindow_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-        }
-
         private void AssignWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Label_Error_Callsign.Visibility = Visibility.Collapsed;

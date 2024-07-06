@@ -16,7 +16,6 @@ namespace FalconBMS.Launcher
             this.mainWindow = mainWindow;
 
             // Load Buttons
-            mainWindow.Misc_Platform.IsChecked             = Properties.Settings.Default.Platform;
             mainWindow.CMD_ACMI.IsChecked                  = Properties.Settings.Default.CMD_ACMI;
             mainWindow.CMD_WINDOW.IsChecked                = Properties.Settings.Default.CMD_WINDOW;
             mainWindow.CMD_NOMOVIE.IsChecked               = Properties.Settings.Default.CMD_NOMOVIE;
@@ -51,8 +50,6 @@ namespace FalconBMS.Launcher
                 mainWindow.VR_SteamVR.IsChecked = false;
                 mainWindow.VR_OpenXR.IsChecked = false;
             }
-            mainWindow.Select_DX_Release.IsChecked  = true;
-            mainWindow.Select_PinkyShift.IsChecked  = true;
             mainWindow.CMD_BW.Content               = "BW : " + bandWidthDefault;
             mainWindow.AB_Throttle.Visibility       = Visibility.Hidden;
             mainWindow.AB_Throttle_Right.Visibility = Visibility.Hidden;
@@ -62,7 +59,6 @@ namespace FalconBMS.Launcher
 
         public void SaveUISetup()
         {
-            Properties.Settings.Default.Platform                  = (bool)mainWindow.Misc_Platform.IsChecked;
             Properties.Settings.Default.CMD_ACMI                  = (bool)mainWindow.CMD_ACMI.IsChecked;
             Properties.Settings.Default.CMD_WINDOW                = (bool)mainWindow.CMD_WINDOW.IsChecked;
             Properties.Settings.Default.CMD_NOMOVIE               = (bool)mainWindow.CMD_NOMOVIE.IsChecked;

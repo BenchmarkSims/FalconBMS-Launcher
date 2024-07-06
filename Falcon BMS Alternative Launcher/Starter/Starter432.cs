@@ -13,7 +13,6 @@ namespace FalconBMS.Launcher.Starter
         {
             Bandwidth(false);
             NewAxisFrom433(false);
-            PlatformChangeSince433(AvailablePlatform.X86);
             AVCSince433(false);
             DISXuntil434(true);
             RTTsince435(false);

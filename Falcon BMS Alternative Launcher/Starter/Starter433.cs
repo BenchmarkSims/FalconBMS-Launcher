@@ -13,7 +13,6 @@ namespace FalconBMS.Launcher.Starter
         {
             Bandwidth(false);
             NewAxisFrom433(true);
-            PlatformChangeSince433(AvailablePlatform.BOTH);
             AVCSince433(true);
             DISXuntil434(true);
             RTTsince435(false);
@@ -38,19 +37,10 @@ namespace FalconBMS.Launcher.Starter
                     // OVERRIDE SETTINGS.
                     mainWindow.executeOverride();
 
-                    string appPlatform = "";
-                    if (mainWindow.Misc_Platform.IsChecked == true)
-                        appPlatform = appReg.GetInstallDir() + "/Bin/x64/Falcon BMS.exe";
-                    else
-                        appPlatform = appReg.GetInstallDir() + "/Bin/x86/Falcon BMS.exe";
-                    if (File.Exists(appPlatform) == false)
-                    {
-                        mainWindow.Misc_Platform.IsChecked = false;
-                        appPlatform = appReg.GetInstallDir() + "/Bin/x86/Falcon BMS.exe";
-                        return;
-                    }
+                    string appPlatform = appReg.GetInstallDir() + "/Bin/x64/Falcon BMS.exe";
                     if (File.Exists(appPlatform) == false)
                         return;
+
                     process = System.Diagnostics.Process.Start(appPlatform, strCmdText);
                     MainWindow.bmsHasBeenLaunched = true;
                     mainWindow.Close();
