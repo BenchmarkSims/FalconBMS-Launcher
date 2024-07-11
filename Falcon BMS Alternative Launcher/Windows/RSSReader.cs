@@ -128,12 +128,12 @@ namespace FalconBMS.Launcher.Windows
 
             private void Try_RequestNavigate(object sender, RequestNavigateEventArgs e)
             {
-                System.Diagnostics.Process.Start(link);
+                Utils.LaunchAppOrBrowserUrl(link);
             }
 
             private void Try_RequestNavigateTop(object sender, RequestNavigateEventArgs e)
             {
-                System.Diagnostics.Process.Start(webSite);
+                Utils.LaunchAppOrBrowserUrl(webSite);
             }
 
             int IComparable<Article>.CompareTo(Article other)

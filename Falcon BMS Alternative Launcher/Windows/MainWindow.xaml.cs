@@ -440,7 +440,7 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                System.Diagnostics.Process.Start(appReg.theaterOwnConfig);
+                Utils.LaunchProcess(appReg.theaterOwnConfig);
             }
             catch (Exception ex)
             {
@@ -478,7 +478,7 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Docs");
+                Utils.LaunchAppOrBrowserUrl(appReg.GetInstallDir() + "/Docs");
             }
             catch (Exception ex)
             {
@@ -600,11 +600,11 @@ namespace FalconBMS.Launcher.Windows
                                 Properties.Settings.Default.Third_WDP = fbd.SelectedPath;
                             else
                             {
-                                System.Diagnostics.Process.Start(downloadlink);
+                                Utils.LaunchAppOrBrowserUrl(downloadlink);
                                 return;
                             }
                         }
-                        System.Diagnostics.Process.Start(installexe);
+                        Utils.LaunchProcess(installexe);
                         break;
                     case "Launch_MC":
                         target = "\\Mission Commander.exe";
@@ -624,11 +624,11 @@ namespace FalconBMS.Launcher.Windows
                                 Properties.Settings.Default.Third_MC = fbd.SelectedPath;
                             else
                             {
-                                System.Diagnostics.Process.Start(downloadlink);
+                                Utils.LaunchAppOrBrowserUrl(downloadlink);
                                 return;
                             }
                         }
-                        System.Diagnostics.Process.Start(installexe);
+                        Utils.LaunchProcess(installexe);
                         break;
                     case "Launch_WC":
                         target = "\\Weather Commander.exe";
@@ -648,11 +648,11 @@ namespace FalconBMS.Launcher.Windows
                                 Properties.Settings.Default.Third_WC = fbd.SelectedPath;
                             else
                             {
-                                System.Diagnostics.Process.Start(downloadlink);
+                                Utils.LaunchAppOrBrowserUrl(downloadlink);
                                 return;
                             }
                         }
-                        System.Diagnostics.Process.Start(installexe);
+                        Utils.LaunchProcess(installexe);
                         break;
                     case "Launch_F4WX":
                         target = "\\F4Wx.exe";
@@ -674,11 +674,11 @@ namespace FalconBMS.Launcher.Windows
                                 Properties.Settings.Default.Third_F4WX = fbd.SelectedPath;
                             else
                             {
-                                System.Diagnostics.Process.Start(downloadlink);
+                                Utils.LaunchAppOrBrowserUrl(downloadlink);
                                 return;
                             }
                         }
-                        System.Diagnostics.Process.Start(installexe);
+                        Utils.LaunchProcess(installexe);
                         break;
                     case "Launch_F4RADAR":
                         downloadlink = "https://forum.falcon-bms.com/topic/18356/f4radar-lightweight-standalone-radar-application";
@@ -699,11 +699,11 @@ namespace FalconBMS.Launcher.Windows
                                 Properties.Settings.Default.Third_F4WX = fbd.SelectedPath;
                             else
                             {
-                                System.Diagnostics.Process.Start(downloadlink);
+                                Utils.LaunchAppOrBrowserUrl(downloadlink);
                                 return;
                             }
                         }
-                        System.Diagnostics.Process.Start(installexe);
+                        Utils.LaunchProcess(installexe);
                         break;
                 }
             }
@@ -806,7 +806,7 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                System.Diagnostics.Process.Start("http://www.weapondeliveryplanner.nl/");
+                Utils.LaunchAppOrBrowserUrl("http://www.weapondeliveryplanner.nl/");
             }
             catch (Exception ex)
             {
@@ -818,7 +818,7 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
-                System.Diagnostics.Process.Start("https://apps.dtic.mil/docs/citations/ADA414893");
+                Utils.LaunchAppOrBrowserUrl("https://apps.dtic.mil/docs/citations/ADA414893");
             }
             catch (Exception ex)
             {

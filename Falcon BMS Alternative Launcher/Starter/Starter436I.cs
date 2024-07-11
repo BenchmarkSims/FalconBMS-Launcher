@@ -28,7 +28,7 @@ namespace FalconBMS.Launcher.Starter
             switch (((System.Windows.Controls.Button)sender).Name)
             {
                 case "Launch_UPD":
-                    process = System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Updater.exe");
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Updater.exe");
                     mainWindow.Close();
                     break;
                 case "Launch_BMS_Large":
@@ -37,37 +37,35 @@ namespace FalconBMS.Launcher.Starter
                     // OVERRIDE SETTINGS.
                     mainWindow.executeOverride();
 
-                    string appPlatform = appReg.GetInstallDir() + "/Bin/x86//Hub.exe";
-                    process = System.Diagnostics.Process.Start(appPlatform, strCmdText);
+                    string bmsExe = appReg.GetInstallDir() + "/Bin/x64/Falcon BMS.exe";
+                    process = Utils.LaunchProcess(bmsExe, strCmdText);
                     MainWindow.bmsHasBeenLaunched = true;
                     mainWindow.Close();
                     break;
                 case "Launch_CFG":
-                    process = System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Config.exe");
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Config.exe");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_RTTC":
-                    Directory.SetCurrentDirectory(appReg.GetInstallDir() + "/Tools/RTTRemote/");
-                    System.Diagnostics.Process.Start("RTTClient64.exe");
+                    Utils.LaunchProcess("RTTClient64.exe", args: null, cwd: appReg.GetInstallDir() + "/Tools/RTTRemote/");
                     break;
                 case "Launch_RTTS":
-                    Directory.SetCurrentDirectory(appReg.GetInstallDir() + "/Tools/RTTRemote/");
-                    System.Diagnostics.Process.Start("RTTServer64.exe");
+                    Utils.LaunchProcess("RTTServer64.exe", args: null, cwd: appReg.GetInstallDir() + "/Tools/RTTRemote/");
                     break;
                 case "Launch_IVCC":
-                    Directory.SetCurrentDirectory(appReg.GetInstallDir() + "/Bin/x64/IVC/");
-                    System.Diagnostics.Process.Start("IVC Client.exe");
+                    string ivcClientCmd = appReg.GetInstallDir() + "/Bin/x64/IVC/IVC Client.exe";
+                    string ivcClientCwd = appReg.GetInstallDir() + "/Bin/x64/IVC";
+                    Utils.LaunchProcess(ivcClientCmd, args: null, ivcClientCwd);
                     break;
                 case "Launch_IVCS":
-                    System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Bin/x64/IVC/IVC Server.exe");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x64/IVC/IVC Server.exe");
                     break;
                 case "Launch_AVC":
-                    Directory.SetCurrentDirectory(appReg.GetInstallDir() + "/Bin/x86/");
-                    process = System.Diagnostics.Process.Start("Avionics Configurator.exe");
+                    process = Utils.LaunchProcess("Avionics Configurator.exe", args: null, cwd: appReg.GetInstallDir() + "/Bin/x86/");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_EDIT":
-                    System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Bin/x64/Editor.exe");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x64/Editor.exe");
                     break;
             }
         }
