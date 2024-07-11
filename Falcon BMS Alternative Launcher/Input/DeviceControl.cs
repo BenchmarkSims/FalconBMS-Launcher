@@ -48,7 +48,12 @@ namespace FalconBMS.Launcher.Input
             {
                 if (suppressList.IsDeviceSuppressed(dev.InstanceGuid) ||
                     suppressList.IsDeviceSuppressed(dev.ProductGuid))
+                {
+                    Diagnostics.Log($"Ignoring suppressed device: pidvid {dev.ProductGuid} instance {dev.InstanceGuid}", Diagnostics.LogLevels.Info);
                     continue;
+                }
+
+                Diagnostics.Log($"Found device: pidvid {dev.ProductGuid} instance {dev.InstanceGuid}", Diagnostics.LogLevels.Info);
 
                 Device hwdev = new Device(dev.InstanceGuid);
                 JoyAssgn joy = new JoyAssgn(hwdev);
