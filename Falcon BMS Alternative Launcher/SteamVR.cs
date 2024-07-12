@@ -110,7 +110,7 @@ namespace FalconBMS.Launcher
         {
             if (File.Exists(installPath))
             {
-                process = Process.Start(installPath);
+                process = Utils.LaunchProcess(installPath);
             }
         }
         public void Stop()

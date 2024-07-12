@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 
 using FalconBMS.Launcher.Input;
@@ -124,18 +115,7 @@ namespace FalconBMS.Launcher.Windows
                 return;
             }
 
-            string command = $"-o {lbkPathDQ} write-default --name {pilotNameDQ} --callsign {pilotCallsignDQ}";
-            //string command = 
-            //    "-o \"" 
-            //    + appReg.GetInstallDir() 
-            //    + CommonConstants.CONFIGFOLDERBACKSLASH 
-            //    + TextBox_Callsign.Text 
-            //    + ".lbk\" write-default --name \"" 
-            //    + TextBox_PilotName.Text 
-            //    + "\" --callsign \"" 
-            //    + TextBox_Callsign.Text 
-            //    + "\"";
-            Diagnostics.Log(command);
+            string logcatArgs = $"-o {lbkPathDQ} write-default --name {pilotNameDQ} --callsign {pilotCallsignDQ}";
 
             string thisExeDirectory = System.IO.Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             string logcatExePath = System.IO.Path.Combine(thisExeDirectory, CommonConstants.LOGCAT);
@@ -147,7 +127,7 @@ namespace FalconBMS.Launcher.Windows
                 return;
             }
 
-            Process logcatExe = Process.Start(CommonConstants.LOGCAT, command);
+            Process logcatExe = Utils.LaunchProcess(CommonConstants.LOGCAT, logcatArgs);
             logcatExe.WaitForExit();
 
             if (logcatExe.ExitCode != 0)

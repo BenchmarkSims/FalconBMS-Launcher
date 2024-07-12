@@ -34,7 +34,7 @@ namespace FalconBMS.Launcher.Input
         {
             // Init button buffer with current button-states -- this is important for "stateful" knobs, dials and switches, where 
             // one of a group of buttons is always in a signalled (on) state.
-            if (true)
+            try
             {
                 byte[] buttonState = _hwDevice.CurrentJoystickState.GetButtons();
 
@@ -43,9 +43,16 @@ namespace FalconBMS.Launcher.Input
                 if (buttonState.Length < _lastButtons.Length)
                     Array.Clear(_lastButtons, buttonState.Length, (_lastButtons.Length - buttonState.Length));
             }
+            catch (Exception ex)
+            {
+                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
+                Diagnostics.Log(ex);
+
+                Array.Clear(_lastButtons, 0, _lastButtons.Length);
+            }
 
             // Init povhat buffer, in same way.
-            if (true)
+            try
             {
                 //NB: the values returned by DirectInput are in compass-direction x100. (eg. "right" == 9_000)
                 int[] povhatState = _hwDevice.CurrentJoystickState.GetPointOfView();
@@ -55,6 +62,13 @@ namespace FalconBMS.Launcher.Input
                 if (povhatState.Length < _lastPovHats.Length)
                     Array.Clear(_lastPovHats, povhatState.Length, (_lastPovHats.Length - povhatState.Length));
             }
+            catch (Exception ex)
+            {
+                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
+                Diagnostics.Log(ex);
+
+                Array.Clear(_lastPovHats, 0, _lastPovHats.Length);
+            }
 
             return;
         }
@@ -62,7 +76,7 @@ namespace FalconBMS.Launcher.Input
         public void PollUpdate()
         {
             // Poll and scan button states.
-            if (true)
+            try
             {
                 byte[] buttonState = _hwDevice.CurrentJoystickState.GetButtons();
 
@@ -80,9 +94,14 @@ namespace FalconBMS.Launcher.Input
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
+                Diagnostics.Log(ex);
+            }
 
             // Poll and scan povhat states.
-            if (true)
+            try
             {
                 int[] povhatState = _hwDevice.CurrentJoystickState.GetPointOfView();
 
@@ -100,6 +119,11 @@ namespace FalconBMS.Launcher.Input
                         _lastPovHats[i] = iCurr;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
+                Diagnostics.Log(ex);
             }
 
             return;

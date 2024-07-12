@@ -28,7 +28,7 @@ namespace FalconBMS.Launcher.Starter
             switch (((System.Windows.Controls.Button)sender).Name)
             {
                 case "Launch_UPD":
-                    process = System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Updater.exe");
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Updater.exe");
                     mainWindow.Close();
                     break;
                 case "Launch_BMS_Large":
@@ -37,35 +37,35 @@ namespace FalconBMS.Launcher.Starter
                     // OVERRIDE SETTINGS.
                     mainWindow.executeOverride();
 
-                    string appPlatform = appReg.GetInstallDir() + "/Bin/x64/Falcon BMS.exe";
-                    if (File.Exists(appPlatform) == false)
+                    string bmsExe = appReg.GetInstallDir() + "/Bin/x64/Falcon BMS.exe";
+                    if (File.Exists(bmsExe) == false)
                         return;
 
-                    process = System.Diagnostics.Process.Start(appPlatform, strCmdText);
+                    process = Utils.LaunchProcess(bmsExe, strCmdText);
                     MainWindow.bmsHasBeenLaunched = true;
                     mainWindow.Close();
                     break;
                 case "Launch_CFG":
-                    process = System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Config.exe");
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Config.exe");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_DISX":
-                    System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Bin/x86/Display Extraction.exe");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/Display Extraction.exe");
                     break;
                 case "Launch_IVCC":
-                    Directory.SetCurrentDirectory(appReg.GetInstallDir() + "/Bin/x86/IVC/");
-                    System.Diagnostics.Process.Start("IVC Client.exe");
+                    string ivcClientCmd = appReg.GetInstallDir() + "/Bin/x86/IVC/IVC Client.exe";
+                    string ivcClientCwd = appReg.GetInstallDir() + "/Bin/x86/IVC";
+                    Utils.LaunchProcess(ivcClientCmd, args: null, ivcClientCwd);
                     break;
                 case "Launch_IVCS":
-                    System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Bin/x86/IVC/IVC Server.exe");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/IVC/IVC Server.exe");
                     break;
                 case "Launch_AVC":
-                    Directory.SetCurrentDirectory(appReg.GetInstallDir() + "/Bin/x86/");
-                    process = System.Diagnostics.Process.Start("Avionics Configurator.exe");
+                    process = Utils.LaunchProcess("Avionics Configurator.exe", args:null, cwd: appReg.GetInstallDir() + "/Bin/x86/");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_EDIT":
-                    System.Diagnostics.Process.Start(appReg.GetInstallDir() + "/Bin/x86/Editor.exe");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/Editor.exe");
                     break;
             }
         }

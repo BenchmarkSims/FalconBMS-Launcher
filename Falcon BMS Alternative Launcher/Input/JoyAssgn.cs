@@ -194,9 +194,9 @@ namespace FalconBMS.Launcher.Input
                 }
                 return input;
             }
-            catch
+            catch (Exception ex)
             {
-                Diagnostics.Log("JoyAssgn: catching exception from hwDevice.CurrentJoystickState.");
+                Diagnostics.Log(ex);
                 return 0;
             }
         }
@@ -527,8 +527,10 @@ namespace FalconBMS.Launcher.Input
             {
                 return hwDevice.CurrentJoystickState;
             }
-            catch 
+            catch (Exception ex)
             {
+                Diagnostics.Log(ex);
+
                 return new JoystickState();
             }
         }
@@ -544,9 +546,12 @@ namespace FalconBMS.Launcher.Input
                 Array.Copy(buttonStates, buttonStates128, Math.Min(buttonStates.Length, buttonStates128.Length));
                 return buttonStates128;
             }
-            catch 
+            catch (Exception ex)
             {
-                return new byte[128];
+                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
+                Diagnostics.Log(ex);
+
+                return new byte[CommonConstants.DX_MAX_BUTTONS];
             }
         }
 
@@ -557,13 +562,16 @@ namespace FalconBMS.Launcher.Input
                 int[] hatStates = hwDevice.CurrentJoystickState.GetPointOfView();
                 if (hatStates.Length == CommonConstants.DX_MAX_HATS) return hatStates;
 
-                int[] hatStates8 = new int[CommonConstants.DX_MAX_HATS];
-                Array.Copy(hatStates, hatStates8, Math.Min(hatStates.Length, hatStates8.Length));
-                return hatStates8;
+                int[] hatStates4 = new int[CommonConstants.DX_MAX_HATS];
+                Array.Copy(hatStates, hatStates4, Math.Min(hatStates.Length, hatStates4.Length));
+                return hatStates4;
             }
-            catch
+            catch (Exception ex)
             {
-                return new int[8];
+                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
+                Diagnostics.Log(ex);
+
+                return new int[CommonConstants.DX_MAX_HATS];
             }
         }
 
