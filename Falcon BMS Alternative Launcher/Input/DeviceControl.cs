@@ -73,13 +73,13 @@ namespace FalconBMS.Launcher.Input
                 {
                     pathToStockXml = Directory.GetCurrentDirectory() 
                         + CommonConstants.STOCKFOLDER + CommonConstants.SETUPV100
-                        + joy.GetProductFileName()
+                        + joy.GetSanitizedProductName()
                         + CommonConstants.STOCKXML;
                     if (!File.Exists(pathToStockXml))
                     {
                         pathToStockXml = appReg.GetInstallDir() + CommonConstants.LAUNCHERFOLDER
                             + CommonConstants.STOCKFOLDER + CommonConstants.SETUPV100
-                            + joy.GetProductFileName()
+                            + joy.GetSanitizedProductName()
                             + CommonConstants.STOCKXML;
                     }
                     if (File.Exists(pathToStockXml))
@@ -206,7 +206,7 @@ namespace FalconBMS.Launcher.Input
                 XmlSerializer serializer = new XmlSerializer(typeof(JoyAssgn));
                 foreach (JoyAssgn joy in this.joyAssign)
                 {
-                    string fileName = this.appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetProductFileName()
+                    string fileName = this.appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetSanitizedProductName()
                     + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
 
                     using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(fileName))
@@ -219,7 +219,7 @@ namespace FalconBMS.Launcher.Input
                         Directory.CreateDirectory(this.appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER);
 
                     string backupPath = this.appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + 
-                        CommonConstants.SETUPV100 + joy.GetProductFileName() + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
+                        CommonConstants.SETUPV100 + joy.GetSanitizedProductName() + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
                     File.Copy(fileName, backupPath, overwrite: true);
                 }
             }

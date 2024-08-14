@@ -88,7 +88,7 @@ namespace FalconBMS.Launcher.Windows
                 e.Cancel = true;
                 return;
             }
-            e.Column.Header = joyAssgns[target].GetProductName();
+            e.Column.Header = joyAssgns[target].GetSanitizedProductName();
             //e.Column.Width = 128;
             e.Column.DisplayIndex = 3 + target;
         }
@@ -157,7 +157,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void _onButtonChanged(JoyAssgn joy, int buttonId, bool newState)
         {
-            System.Diagnostics.Debug.WriteLine($"_onButtonChanged({joy.GetProductName()}, {buttonId}, {newState})");
+            System.Diagnostics.Debug.WriteLine($"_onButtonChanged({joy.GetSanitizedProductName()}, {buttonId}, {newState})");
 
             if (newState == true) // button pressed
             {
@@ -176,7 +176,7 @@ namespace FalconBMS.Launcher.Windows
                 {
                     Label_AssgnStatus.Content =
                         "DX" + (buttonId + 1) +
-                        " (" + joy.GetProductName() + ")";
+                        " (" + joy.GetSanitizedProductName() + ")";
                 }
                 else
                 {
@@ -185,7 +185,7 @@ namespace FalconBMS.Launcher.Windows
 
                     Label_AssgnStatus.Content =
                         "DX" + (buttonId + 1) +
-                        " (" + joy.GetProductName() + ")" + " / " +
+                        " (" + joy.GetSanitizedProductName() + ")" + " / " +
                         ((row != null) ? row.Mapping : target);
 
                     if (row != null)
@@ -210,7 +210,7 @@ namespace FalconBMS.Launcher.Windows
 
                     Label_AssgnStatus.Content =
                         "DX" + (buttonId + 1) + ".RELEASE" +
-                        " (" + joy.GetProductName() + ")" + " / " +
+                        " (" + joy.GetSanitizedProductName() + ")" + " / " +
                         ((row != null) ? row.Mapping : target);
 
                     if (row != null)
@@ -231,7 +231,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void _onPovHatChanged(JoyAssgn joy, int povhatId, int newDirection)
         {
-            System.Diagnostics.Debug.WriteLine($"_onPovHatChanged({joy.GetProductName()}, {povhatId}, {newDirection})");
+            System.Diagnostics.Debug.WriteLine($"_onPovHatChanged({joy.GetSanitizedProductName()}, {povhatId}, {newDirection})");
 
             if (newDirection < 0) return;
 
@@ -244,7 +244,7 @@ namespace FalconBMS.Launcher.Windows
             {
                 Label_AssgnStatus.Content =
                     "POV" + (povhatId + 1) + "." + dirlabel +
-                    " (" + joy.GetProductName() + ")";
+                    " (" + joy.GetSanitizedProductName() + ")";
                 return;
             }
 
@@ -253,7 +253,7 @@ namespace FalconBMS.Launcher.Windows
 
             Label_AssgnStatus.Content =
                 "POV" + (povhatId + 1) + "." + dirlabel + 
-                " (" + joy.GetProductName() + ")" + " / " +
+                " (" + joy.GetSanitizedProductName() + ")" + " / " +
                 ((row != null) ? row.Mapping : target);
 
             if (row != null)
