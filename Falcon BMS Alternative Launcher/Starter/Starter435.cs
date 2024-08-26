@@ -56,10 +56,10 @@ namespace FalconBMS.Launcher.Starter
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_RTTC":
-                    Utils.LaunchProcess("RTTClient64.exe", args: null, cwd: appReg.GetInstallDir() + "/Tools/RTTRemote/");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Tools/RTTRemote/RTTClient64.exe", args: null, cwd: appReg.GetInstallDir() + "/Tools/RTTRemote/");
                     break;
                 case "Launch_RTTS":
-                    Utils.LaunchProcess("RTTServer64.exe", args: null, cwd: appReg.GetInstallDir() + "/Tools/RTTRemote/");
+                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Tools/RTTRemote/RTTServer64.exe", args: null, cwd: appReg.GetInstallDir() + "/Tools/RTTRemote/");
                     break;
                 case "Launch_IVCC":
                     string ivcClientCmd = appReg.GetInstallDir() + "/Bin/x64/IVC/IVC Client.exe";
@@ -70,7 +70,7 @@ namespace FalconBMS.Launcher.Starter
                     Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x64/IVC/IVC Server.exe");
                     break;
                 case "Launch_AVC":
-                    process = Utils.LaunchProcess("Avionics Configurator.exe", args: null, cwd: appReg.GetInstallDir() + "/Bin/x86/");
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/Avionics Configurator.exe", args: null, cwd: appReg.GetInstallDir() + "/Bin/x86/");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_EDIT":
