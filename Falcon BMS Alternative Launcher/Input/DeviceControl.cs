@@ -61,7 +61,7 @@ namespace FalconBMS.Launcher.Input
                 hwDevices.Add(hwdev);
                 joyAssign.Add(joy);
 
-                pathToUserXml = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetProductFileName()
+                pathToUserXml = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetSanitizedProductName()
                 + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
 
                 // Load existing .xml files.
