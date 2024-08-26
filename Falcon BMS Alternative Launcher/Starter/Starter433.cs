@@ -61,7 +61,7 @@ namespace FalconBMS.Launcher.Starter
                     Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/IVC/IVC Server.exe");
                     break;
                 case "Launch_AVC":
-                    process = Utils.LaunchProcess("Avionics Configurator.exe", args:null, cwd: appReg.GetInstallDir() + "/Bin/x86/");
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/Avionics Configurator.exe", args:null, cwd: appReg.GetInstallDir() + "/Bin/x86/");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_EDIT":

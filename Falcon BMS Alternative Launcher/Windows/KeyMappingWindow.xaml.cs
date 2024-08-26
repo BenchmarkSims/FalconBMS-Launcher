@@ -137,7 +137,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void _onButtonChanged(JoyAssgn tmpjoy, int buttonId, bool newState)
         {
-            System.Diagnostics.Debug.WriteLine($"KMW::_onButtonChanged({tmpjoy.GetProductName()}, {buttonId}, {newState})");
+            System.Diagnostics.Debug.WriteLine($"KMW::_onButtonChanged({tmpjoy.GetSanitizedProductName()}, {buttonId}, {newState})");
 
             string selectedCallbackName = _selectedCallback.GetCallback();
 
@@ -189,7 +189,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void _onPovHatChanged(JoyAssgn tmpjoy, int povhatId, int newDirection)
         {
-            System.Diagnostics.Debug.WriteLine($"KMW::_onPovHatChanged({tmpjoy.GetProductName()}, {povhatId}, {newDirection})");
+            System.Diagnostics.Debug.WriteLine($"KMW::_onPovHatChanged({tmpjoy.GetSanitizedProductName()}, {povhatId}, {newDirection})");
 
             string selectedCallbackName = _selectedCallback.GetCallback();
 

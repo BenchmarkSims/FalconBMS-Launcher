@@ -20,8 +20,7 @@ namespace FalconBMS.Launcher.Input
         protected Guid instanceGUID = Guid.Empty;
 
         // Method
-        public string GetProductName() { return productName ?? throw new NullReferenceException(); }
-        public string GetProductFileName() { return GetProductName().Replace("/", "-"); }
+        public string GetSanitizedProductName() { return productName ?? throw new NullReferenceException(); }
         public Guid GetProductGUID() { return productGUID; }
         public Guid GetInstanceGUID() { return instanceGUID; }
 
@@ -114,12 +113,10 @@ namespace FalconBMS.Launcher.Input
         public JoyAssgn(Device device) : this(allocStorage:true)
         {
             this.hwDevice = device;
-            this.SetDeviceInstance(device.DeviceInformation);
-        }
-        void SetDeviceInstance(DeviceInstance deviceInstance)
-        {
+
             // Bugfix note: some device product-name strings have newlines and other unwelcome chars
-            productName = Regex.Replace(deviceInstance.ProductName, "[^A-Z|a-z|0-9|~|`|\\[|\\]|\\{|\\}|\\-|_|\\=|\\'|\x20]", String.Empty);
+            DeviceInstance deviceInstance = device.DeviceInformation;
+            productName = Regex.Replace(deviceInstance.ProductName, @"[^A-Za-z0-9\~\`\[\]\{\}\-_\=\'\x20]", String.Empty);
 
             productGUID = deviceInstance.ProductGuid;
             instanceGUID = deviceInstance.InstanceGuid;
@@ -230,7 +227,7 @@ namespace FalconBMS.Launcher.Input
         public string GetDeviceSortingLine()
         {
             string guid = GetProductGUID().ToString().ToUpperInvariant();
-            string name = GetProductName();
+            string name = GetSanitizedProductName();
 
             const char dq = '\x22'; //doublequote char
             const char oc = '\x7B'; //open curlybrace
@@ -249,7 +246,7 @@ namespace FalconBMS.Launcher.Input
             const int DXnumber = CommonConstants.DX_MAX_BUTTONS;
 
             string assign = "";
-            assign += "\n#======== " + GetProductName() + " ========\n";
+            assign += "\n#======== " + GetSanitizedProductName() + " ========\n";
             for (int i = 0; i < dx.Length; i++)
             {
                 for (int ii = 0; ii < dx[i].assign.Length; ii++)
@@ -311,7 +308,7 @@ namespace FalconBMS.Launcher.Input
 
             StringBuilder povBlock = new StringBuilder(2000);
             povBlock.AppendLine("\n");
-            povBlock.AppendLine($"#======== {GetProductName()} : POV #{povBase} ========");
+            povBlock.AppendLine($"#======== {GetSanitizedProductName()} : POV #{povBase} ========");
 
             for (int dirId = 0; dirId < pov[hatId].direction.Length; dirId++)
             {
