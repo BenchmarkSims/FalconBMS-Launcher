@@ -52,6 +52,8 @@ namespace FalconBMS.Launcher.Override
 
         protected virtual void SaveConfigfile(Hashtable inGameAxis, DeviceControl deviceControl)
         {
+            Diagnostics.Log("Ammending Falcon BMS User.cfg..", Diagnostics.LogLevels.Info);
+
             using (StreamWriter cfgUser = OverwriteCfg(CommonConstants.USERCFGFILE))
             {
                 cfgUser.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
@@ -169,6 +171,8 @@ namespace FalconBMS.Launcher.Override
 
         protected void SaveDeviceSorting(DeviceControl deviceControl)
         {
+            Diagnostics.Log("Overwriting DeviceSorting.txt..", Diagnostics.LogLevels.Info);
+
             // BMS overwrites DeviceSorting.txt if was written in UTF-8.
             string filename = appReg.GetInstallDir() + "/User/Config/DeviceSorting.txt";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "DeviceSorting.txt";
@@ -189,6 +193,8 @@ namespace FalconBMS.Launcher.Override
 
         public virtual void SaveKeyMapping(Hashtable inGameAxis, DeviceControl deviceControl)
         {
+            Diagnostics.Log("Emitting BMS - Auto.key and BMS - Auto-F15ABCD.key..", Diagnostics.LogLevels.Info);
+
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.BMS_AUTO + ".key";
             string filenameF15 = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.BMS_AUTO + "-F15ABCD.key";
 
@@ -265,6 +271,8 @@ namespace FalconBMS.Launcher.Override
         /// </summary>
         protected void SaveAxisMapping(Hashtable inGameAxis, DeviceControl deviceControl)
         {
+            Diagnostics.Log("Overwriting AxisMapping.dat..", Diagnostics.LogLevels.Info);
+
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "axismapping.dat";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "axismapping.dat";
 
@@ -405,6 +413,8 @@ namespace FalconBMS.Launcher.Override
         /// </summary>
         protected virtual void SaveJoystickCal(Hashtable inGameAxis, DeviceControl deviceControl)
         {
+            Diagnostics.Log("Overwriting Joystick.cal..", Diagnostics.LogLevels.Info);
+
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "joystick.cal";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "joystick.cal";
 
