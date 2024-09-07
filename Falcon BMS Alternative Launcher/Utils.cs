@@ -19,7 +19,7 @@ namespace FalconBMS.Launcher
         {
             Diagnostics.Log($"Launching EXE: {exe} {args}", Diagnostics.LogLevels.Info);
             ProcessStartInfo psi = new ProcessStartInfo(exe, args);
-            psi.UseShellExecute = false;
+            psi.UseShellExecute = true; //NB: will prompt UAC dialog for EXEs with manifest: requestedExecutionLevel=requireAdministrator
             psi.WorkingDirectory = cwd;
 
             return Process.Start(psi);
