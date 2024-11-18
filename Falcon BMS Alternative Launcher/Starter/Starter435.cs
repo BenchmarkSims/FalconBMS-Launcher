@@ -14,7 +14,6 @@ namespace FalconBMS.Launcher.Starter
             Bandwidth(false);
             NewAxisFrom433(true);
             AVCSince433(true);
-            DISXuntil434(false);
             RTTsince435(true);
             NewAxisFrom435(true);
             VRsince437(false);
@@ -53,6 +52,11 @@ namespace FalconBMS.Launcher.Starter
                     break;
                 case "Launch_CFG":
                     process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Config.exe");
+                    mainWindow.minimizeWindowUntilProcessEnds(process);
+                    break;
+                case "Launch_MMC":
+                    if (!File.Exists(appReg.GetInstallDir() + "/Launcher/BmsDisplayConfig.exe")) break;
+                    process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Launcher/BmsDisplayConfig.exe");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
                     break;
                 case "Launch_RTTC":

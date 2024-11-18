@@ -343,6 +343,9 @@
   <ItemGroup>
     <Resource Include="Resources\UPD.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\BmsMultiMon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterResolveReferences">
     <ItemGroup>

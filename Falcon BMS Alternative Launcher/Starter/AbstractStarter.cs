@@ -114,20 +114,6 @@ namespace FalconBMS.Launcher.Starter
             }
         }
 
-        public void DISXuntil434(bool flg)
-        {
-            if (flg)
-            {
-                mainWindow.Launch_DISX.Visibility = Visibility.Visible;
-                mainWindow.Label_DISX.Visibility  = Visibility.Visible;
-            }
-            else
-            {
-                mainWindow.Launch_DISX.Visibility = Visibility.Hidden;
-                mainWindow.Label_DISX.Visibility  = Visibility.Hidden;
-            }
-        }
-
         public void NewAxisFrom435(bool flg)
         {
             if (flg)

@@ -14,7 +14,6 @@ namespace FalconBMS.Launcher.Starter
             Bandwidth(false);
             NewAxisFrom433(true);
             AVCSince433(true);
-            DISXuntil434(false);
             RTTsince435(true);
             NewAxisFrom435(true);
             VRsince437(true);
