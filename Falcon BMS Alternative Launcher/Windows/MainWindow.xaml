@@ -111,7 +111,7 @@
             <TabItem Header="LAUNCHER" x:Name="Tab_Launcher" HorizontalAlignment="Center" Margin="535,-40,-535.333,40.333">
                 <Grid>
 
-                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Width="573" Margin="48,0,0,97.333" VerticalAlignment="Bottom">
+                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Width="638" Margin="48,0,0,97" VerticalAlignment="Bottom">
                         <Border.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#7F151719" Offset="0"/>
@@ -133,64 +133,64 @@
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_DISX" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_MMC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
-                                        <Image Source="/Resources/DISX.png"/>
+                                        <Image Source="/Resources/BmsMultiMon.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_RTTC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_RTTC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="230,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Image Source="/Resources/RTTClient64.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_RTTS" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="230,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_RTTS" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="300,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Image Source="/Resources/RTTServer64.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_IVCC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="300,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_IVCC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="370,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Image Source="/Resources/IVCC.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_IVCS" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="370,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_IVCS" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="440,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Image Source="/Resources/IVCS.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_AVC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="440,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_AVC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="510,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Image Source="/Resources/AVC.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="Launch_EDIT" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="510,0,0,33.333" Height="32" Width="32"  Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
+                            <Button x:Name="Launch_EDIT" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="580,0,0,33.333" Height="32" Width="32"  Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Image Source="/Resources/EDIT.png"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Label x:Name="Label_UPD" Content="Update&#xA;" HorizontalAlignment="Left" Margin="18,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_UPD" Content="Update&#xD;&#xA;" HorizontalAlignment="Left" Margin="18,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
                             <Label x:Name="Label_CFG" Content="Config&#xD;&#xA;" HorizontalAlignment="Left" Margin="88,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_DISX" Content="Cockpit Display&#10;   Extraction" HorizontalAlignment="Left" Margin="142,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_RTTC" Content="       RTTR Client&#10;(Display Extraction)" HorizontalAlignment="Left" Margin="134,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_RTTS" Content="RTTR Server&#xD;&#xA;" HorizontalAlignment="Left" Margin="219,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_IVCC" Content=" IVC Client&#10;(MP Radio)" HorizontalAlignment="Left" Margin="290,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_IVCS" Content=" IVC Server&#10;(MP Radio)" HorizontalAlignment="Left" Margin="361,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_AVC" Content="   Avionics&#10;Configurator" HorizontalAlignment="Left" Margin="428,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" HorizontalAlignment="Left" Margin="509,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_MMC" Content="Display&#xD;&#xA;Config" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_RTTC" Content="RTT Client&#xD;&#xA;" HorizontalAlignment="Left" Margin="220,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_RTTS" Content="RTT Server&#xD;&#xA;" HorizontalAlignment="Left" Margin="290,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_IVCC" Content="IVC Client&#xD;&#xA;(MP Radio)" HorizontalAlignment="Left" Margin="361,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_IVCS" Content="IVC Server&#xD;&#xA;(MP Radio)" HorizontalAlignment="Left" Margin="428,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_AVC" Content="Avionics&#xD;&#xA;Configurator" HorizontalAlignment="Left" Margin="501,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
+                            <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" HorizontalAlignment="Left" Margin="575,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
                         </Grid>
                     </Border>
                     <CheckBox x:Name="ApplicationOverride" Content="Launch without any setup override" HorizontalAlignment="Right" Margin="0,0,14.667,97.667" VerticalAlignment="Bottom" Background="#FFECFF71" />
@@ -263,8 +263,6 @@
                         <Button x:Name="Launch_TheaterConfig" Content="Theater Config" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" Margin="424,2,429,0" VerticalAlignment="Top" Click="Launch_TheaterConfig_Click" FontSize="10" RenderTransformOrigin="-0.033,0.5"/>
 
                         <Label Content="Command Line :" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" Margin="0,96,0,-27" />
-
-                        <Label x:Name="Label_Platform" Content="Platform :" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.672,0.628" />
 
                         <Label x:Name="Label_VR" Content="Virtual Reality:" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" />
                         <RadioButton x:Name="VR_NoVR" Content="No VR" HorizontalAlignment="Left" Margin="181,69,0,0" VerticalAlignment="Top"/>

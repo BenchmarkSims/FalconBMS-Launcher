@@ -11,7 +11,6 @@ namespace FalconBMS.Launcher.Starter
             Bandwidth(false);
             NewAxisFrom433(false);
             AVCSince433(false);
-            DISXuntil434(true);
             RTTsince435(false);
             NewAxisFrom435(false);
             VRsince437(false);
@@ -42,9 +41,6 @@ namespace FalconBMS.Launcher.Starter
                 case "Launch_CFG":
                     process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Config.exe");
                     mainWindow.minimizeWindowUntilProcessEnds(process);
-                    break;
-                case "Launch_DISX":
-                    Utils.LaunchProcess(appReg.GetInstallDir() + "/Bin/x86/Display Extraction.exe");
                     break;
                 case "Launch_IVCC":
                     string ivcClientCmd = appReg.GetInstallDir() + "/Bin/x86/IVC/IVC Client.exe";
