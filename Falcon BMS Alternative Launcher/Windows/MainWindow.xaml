@@ -264,8 +264,6 @@
 
                         <Label Content="Command Line :" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" Margin="0,96,0,-27" />
 
-                        <Label x:Name="Label_Platform" Content="Platform :" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.672,0.628" />
-
                         <Label x:Name="Label_VR" Content="Virtual Reality:" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" />
                         <RadioButton x:Name="VR_NoVR" Content="No VR" HorizontalAlignment="Left" Margin="181,69,0,0" VerticalAlignment="Top"/>
                         <RadioButton x:Name="VR_SteamVR" Content="SteamVR" HorizontalAlignment="Left" Margin="250,69,0,0" VerticalAlignment="Top" Click="Misc_VR_Click"/>
