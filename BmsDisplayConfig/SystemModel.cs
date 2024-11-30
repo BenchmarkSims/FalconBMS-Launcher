@@ -50,18 +50,25 @@ namespace BmsDisplayConfig
     {
         public RectXYWH GetVirtualDesktopRect()
         {
-            RectXYWH rect = RectXYWH.FromXYWH(-2560, 0, 3840 + 2560, Math.Max(2160, 1440));
+            // 5 monitors .. 3x 1440p horizontally, with 2x 1080 below
+            RectXYWH rect = RectXYWH.FromXYWH(-2560, 0, 2560*3, 1440+1080);
             return rect;
         }
 
         public uint GetNumMonitors()
         {
-            return 2;
+            return 5;
         }
 
         public RectXYWH[] GetMonitorRects()
         {
-            return new RectXYWH[] { RectXYWH.FromXYWH(0, 0, 3840, 2160), RectXYWH.FromXYWH(-2560, 0, 2560, 1440) };
+            return new RectXYWH[] {
+                RectXYWH.FromXYWH(2560, 0, 2560, 1440),
+                RectXYWH.FromXYWH(0, 0, 2560, 1440),
+                RectXYWH.FromXYWH(-2560, 0, 2560, 1440),
+                RectXYWH.FromXYWH(2560/2-1920, 1440, 1920, 1080),
+                RectXYWH.FromXYWH(2560/2, 1440, 1920, 1080)
+            };
         }
     }
 }
