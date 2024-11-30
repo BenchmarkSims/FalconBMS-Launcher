@@ -51,9 +51,13 @@ namespace BmsDisplayConfig
 
         public void LoadDspFileOrDefault()
         {
+            Logger.WriteLine("DataModel.LoadDspFileOrDefault");
+
             _isDirty = false;
 
             string dspPath = ConfigFileProbe.FindDspFilePath();
+            Logger.WriteLine($"..dspPath: {dspPath}");
+
             if (File.Exists(dspPath))
                 _dspData = DisplayOptionsFile.Deserialize(dspPath);
             else
@@ -62,9 +66,13 @@ namespace BmsDisplayConfig
 
         public void SaveDspFile()
         {
+            Logger.WriteLine("DataModel.SaveDspFile");
+
             string dspPath = ConfigFileProbe.FindDspFilePath();
             _dspData.Serialize(dspPath);
             _isDirty = false;
+
+            Logger.WriteLine("..ok");
         }
     }
 

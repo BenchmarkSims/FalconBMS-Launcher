@@ -8,8 +8,12 @@ namespace BmsDisplayConfig
     {
         public static string FindDspFilePath()
         {
+            Logger.WriteLine("ConfigFileProbe.FindDspFilePath");
+
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             string pathToExe = assembly.Location;
+
+            Logger.WriteLine($"..pathToExe: {pathToExe}");
 
             string exeDir = Path.GetDirectoryName(pathToExe);
 
@@ -86,11 +90,17 @@ namespace BmsDisplayConfig
 
         public static DisplayOptionsFile Deserialize(string dspPath)
         {
+            Logger.WriteLine("DisplayOptionsFile.Deserialize");
+
             if (!File.Exists(dspPath))
                 return FromDefaults();
 
+            Logger.WriteLine($"..dspPath exists");
+
             using (FileStream fs = File.OpenRead(dspPath))
             {
+                Logger.WriteLine($"..dspPath opened");
+
                 DisplayOptionsFile dsp = new DisplayOptionsFile();
                 dsp.Initialize();
 
@@ -151,6 +161,8 @@ namespace BmsDisplayConfig
 
         public void Serialize(string dspPath)
         {
+            Logger.WriteLine("DisplayOptionsFile.Serialize");
+
             using (FileStream fs = File.Create(dspPath))
             {
                 BinaryWriter bw = new BinaryWriter(fs);

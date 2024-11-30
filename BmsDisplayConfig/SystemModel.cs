@@ -13,8 +13,11 @@ namespace BmsDisplayConfig
     {
         public RectXYWH GetVirtualDesktopRect()
         {
+            Logger.WriteLine("SystemModel.GetVirtualDesktopRect");
+
             Win32.Rect r1 = Win32.User32.GetVirtualDesktopRect();
             RectXYWH r2 = RectXYWH.FromLTRB(r1);
+            Logger.WriteLine($"..desktopRect: {r2}");
             return r2;
         }
 
@@ -25,10 +28,14 @@ namespace BmsDisplayConfig
 
         public RectXYWH[] GetMonitorRects()
         {
+            Logger.WriteLine("SystemModel.GetMonitorRects");
+
             uint n = GetNumMonitors();
+            Logger.WriteLine($"..numMonitors: {n}");
 
             Win32.Rect[] absRects = Win32.User32.EnumerateMonitors();
             Debug.Assert(n == absRects.Length);
+            Logger.WriteLine($"..numMonitorsEnumerated: {absRects.Length}");
 
             var relRects = new List<RectXYWH>();
             foreach (Win32.Rect r in absRects)
@@ -134,9 +141,12 @@ namespace Win32
 
         private static bool _MonitorEnumProc(IntPtr hMon, IntPtr hdc, ref Rect rect, IntPtr lParam)
         {
+            BmsDisplayConfig.Logger.WriteLine("User32._MonitorEnumProc");
+
             var list = GCHandle.FromIntPtr(lParam).Target as List<Rect>;
 
             Rect r2 = new Rect(rect.left, rect.top, rect.right, rect.bottom);
+            BmsDisplayConfig.Logger.WriteLine($"..rect: {r2}");
             list.Add(r2);
 
             return true;
