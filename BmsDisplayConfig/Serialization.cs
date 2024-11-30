@@ -17,14 +17,14 @@ namespace BmsDisplayConfig
 
             string exeDir = Path.GetDirectoryName(pathToExe);
 
-            string cfgDir = Path.Combine(exeDir, "User/Config");
+            string cfgDir = Path.Combine(exeDir, "User\\Config");
             if (Directory.Exists(cfgDir))
             {
                 return Path.Combine(cfgDir, "d3d11.dsp");
             }
 
             string baseDir = Directory.GetParent(exeDir).FullName;
-            cfgDir = Path.Combine(baseDir, "User/Config");
+            cfgDir = Path.Combine(baseDir, "User\\Config");
             if (Directory.Exists(cfgDir))
             {
                 return Path.Combine(cfgDir, "d3d11.dsp");
