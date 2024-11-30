@@ -20,13 +20,12 @@ namespace BmsDisplayConfig
             }
             catch (Exception ex)
             {
+                Logger.WriteLine("EXCEPTION:");
+                Logger.WriteLine(ex.ToString());
+
                 string msg = ex.Message;
                 if (ex.InnerException != null)
                     msg = ex.InnerException.Message;
-
-#if DEBUG
-                msg = ex.ToString();
-#endif
 
                 MessageBox.Show(msg, "ERROR", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.None);
             }
