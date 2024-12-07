@@ -1,0 +1,19 @@
+﻿<Window x:Class="BmsDisplayConfig.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:BmsDisplayConfig"
+        Title="Falcon BMS Display Selector"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        Background="DarkSlateGray">
+    <DockPanel Margin="10">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Button Content="Close" Margin="10" Padding="10" Click="x_OnClickClose" />
+            <Button x:Name="x_saveButton" Content="Save" Margin="10" Padding="10" Click="x_OnClickSave" />
+        </StackPanel>
+        <!--last child is DockPanel.Dock=Fill-->
+        <Canvas x:Name="x_desktopCanvas" MinWidth="200" MinHeight="100">
+            <!--child elements programmatically created, here-->
+        </Canvas>
+    </DockPanel>
+</Window>
