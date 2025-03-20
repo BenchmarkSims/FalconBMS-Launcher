@@ -29,7 +29,7 @@ namespace FalconBMS.Launcher.Input
 
         public static readonly int AXISMIN = 0;
         public static readonly int AXISMAX = 65536;
-        public static readonly float AXIS_NEUTRAL_TOLERANCE = 0.1f;
+        public static readonly int AXIS_NEUTRAL_TOLERANCE = AXISMAX / 128;
 
         public static readonly int FLUSHTIME1 = 900;
         public static readonly int FLUSHTIME2 = 1500;
