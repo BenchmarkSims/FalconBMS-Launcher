@@ -208,8 +208,8 @@ namespace FalconBMS.Launcher.Windows
                         tbprogressbar.Foreground = CommonConstants.LIGHTBLUE;
                         tblabelab.Visibility = Visibility.Hidden;
 
-                        if (Math.Abs(tbprogressbar.Value) < CommonConstants.AXISMAX * 0.5 - CommonConstants.AXIS_NEUTRAL_TORALANCE | 
-                            Math.Abs(tbprogressbar.Value) > CommonConstants.AXISMAX * 0.5 + CommonConstants.AXIS_NEUTRAL_TORALANCE)
+                        if (Math.Abs(tbprogressbar.Value) < CommonConstants.AXISMAX * 0.5 - CommonConstants.AXIS_NEUTRAL_TOLERANCE | 
+                            Math.Abs(tbprogressbar.Value) > CommonConstants.AXISMAX * 0.5 + CommonConstants.AXIS_NEUTRAL_TOLERANCE)
                         {
                             tbprogressbar.Foreground = CommonConstants.LIGHTRED;
                             tblabelab.Visibility = Visibility.Visible;

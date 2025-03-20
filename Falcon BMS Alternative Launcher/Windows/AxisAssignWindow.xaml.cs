@@ -329,8 +329,8 @@ namespace FalconBMS.Launcher.Windows
 
             if (whoCalledWindow == AxisName.Cursor_X.ToString() | whoCalledWindow == AxisName.Cursor_Y.ToString())
             {
-                if (Math.Abs(AxisValueProgress.Value) < CommonConstants.AXISMAX * 0.5 - CommonConstants.AXIS_NEUTRAL_TORALANCE |
-                    Math.Abs(AxisValueProgress.Value) > CommonConstants.AXISMAX * 0.5 + CommonConstants.AXIS_NEUTRAL_TORALANCE)
+                if (Math.Abs(AxisValueProgress.Value) < CommonConstants.AXISMAX * 0.5 - CommonConstants.AXIS_NEUTRAL_TOLERANCE |
+                    Math.Abs(AxisValueProgress.Value) > CommonConstants.AXISMAX * 0.5 + CommonConstants.AXIS_NEUTRAL_TOLERANCE)
                 {
                     AxisValueProgress.Foreground = CommonConstants.LIGHTRED;
                     check_ABIDLE.Visibility = Visibility.Visible;
