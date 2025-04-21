@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:commonConstants="clr-namespace:FalconBMS.Launcher.Input"
         mc:Ignorable="d"
         Title="FalconBMS Alternative Launcher" Height="768" Width="1024" MinHeight="768" MinWidth="1024" BorderThickness="0"
         Closed="Window_Closed" MouseDown="MetroWindow_MouseDown"
@@ -110,143 +111,189 @@
         <TabControl x:Name="LargeTab" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="TabControl_SelectionChanged" Margin="0,64,0.333,0.334" Background="{x:Null}" Grid.RowSpan="2">
             <TabItem Header="LAUNCHER" x:Name="Tab_Launcher" HorizontalAlignment="Center" Margin="535,-40,-535.333,40.333">
                 <Grid>
-
-                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Width="638" Margin="48,0,0,97" VerticalAlignment="Bottom">
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <Grid>
+                        <Grid.Resources>
+                            <LinearGradientBrush x:Key="ToolsTrayBackground"  EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#7F151719" Offset="0"/>
                                 <GradientStop Color="#3F151718" Offset="1"/>
                             </LinearGradientBrush>
-                        </Border.Background>
-                        <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
-                            <Button x:Name="Launch_UPD" BorderThickness="10" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/UPD.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+                            <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+                            <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+                            <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+                            <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+                            <ControlTemplate x:Key="ToolsTrayButton" TargetType="{x:Type ButtonBase}">
+                                <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                                    <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Button.IsDefaulted" Value="true">
+                                        <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="true">
+                                        <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                        <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="false">
+                                        <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                        <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                        <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Foreground" Value="{x:Static commonConstants:CommonConstants.WHITEILUM}" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="VerticalContentAlignment" Value="Top" />
+                                <Setter Property="Padding" Value="0 8 0 0" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#80000000" />
+                                        <Setter Property="Foreground" Value="{x:Static commonConstants:CommonConstants.BLUEILUM}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Height" Value="32" />
+                                <Setter Property="Width" Value="32" />
+                            </Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="FontSize" Value="9" />
+                                <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="Margin" Value="0 4 0 0" />
+                            </Style>
+                        </Grid.Resources>
+                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="72" Width="638" Margin="48,0,0,97" Background="{StaticResource ToolsTrayBackground}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="Launch_UPD" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click">
+                                <StackPanel>
+                                    <Image Source="/Resources/UPD.png" />
+                                    <TextBlock x:Name="Label_UPD" Text="Update" />
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_CFG" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/CFG.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="1" x:Name="Launch_CFG" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click">
+                                <StackPanel>
+                                    <Image Source="/Resources/CFG.png" />
+                                    <TextBlock x:Name="Label_CFG" Text="Config" />
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_MMC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/BmsMultiMon.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="2" x:Name="Launch_MMC" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/BmsMultiMon.png"/>
+                                    <TextBlock x:Name="Label_MMC" Text="Display Config" />
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_RTTC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="230,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/RTTClient64.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="3" x:Name="Launch_RTTC" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/RTTClient64.png"/>
+                                    <TextBlock x:Name="Label_RTTC" Text="RTT Client" />
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_RTTS" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="300,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/RTTServer64.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="4" x:Name="Launch_RTTS" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/RTTServer64.png" />
+                                    <TextBlock x:Name="Label_RTTS" Text="RTT Server" />
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_IVCC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="370,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/IVCC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="5" x:Name="Launch_IVCC" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/IVCC.png" />
+                                    <TextBlock x:Name="Label_IVCC">
+                                        IVC Client <LineBreak/> (MP Radio)
+                                    </TextBlock>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_IVCS" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="440,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/IVCS.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="6" x:Name="Launch_IVCS" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/IVCS.png" />
+                                    <TextBlock x:Name="Label_IVCS">
+                                        IVC Server <LineBreak/> (MP Radio)
+                                    </TextBlock>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_AVC" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="510,0,0,33.333" Height="32" Width="32" Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/AVC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="7" x:Name="Launch_AVC" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/AVC.png" />
+                                    <TextBlock x:Name="Label_AVC" Text="Avionics Configurator" />
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_EDIT" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="580,0,0,33.333" Height="32" Width="32"  Click="Launch_Click" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/EDIT.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <Button Grid.Column="8" x:Name="Launch_EDIT" Template="{StaticResource ToolsTrayButton}" Click="Launch_Click" >
+                                <StackPanel>
+                                    <Image Source="/Resources/EDIT.png" />
+                                    <TextBlock x:Name="Label_EDIT" Text="Editor" />
+                                </StackPanel>
                             </Button>
-                            <Label x:Name="Label_UPD" Content="Update&#xD;&#xA;" HorizontalAlignment="Left" Margin="18,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_CFG" Content="Config&#xD;&#xA;" HorizontalAlignment="Left" Margin="88,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_MMC" Content="Display&#xD;&#xA;Config" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_RTTC" Content="RTT Client&#xD;&#xA;" HorizontalAlignment="Left" Margin="220,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_RTTS" Content="RTT Server&#xD;&#xA;" HorizontalAlignment="Left" Margin="290,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_IVCC" Content="IVC Client&#xD;&#xA;(MP Radio)" HorizontalAlignment="Left" Margin="361,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_IVCS" Content="IVC Server&#xD;&#xA;(MP Radio)" HorizontalAlignment="Left" Margin="428,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_AVC" Content="Avionics&#xD;&#xA;Configurator" HorizontalAlignment="Left" Margin="501,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" HorizontalAlignment="Left" Margin="575,0,0,0" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
                         </Grid>
-                    </Border>
+                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="72" Width="503" Margin="48,0,0,20.333" Background="{StaticResource ToolsTrayBackground}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="Launch_WDP" Template="{StaticResource ToolsTrayButton}" Click="Launch_Third">
+                                <StackPanel>
+                                    <Image Source="/Resources/WDP.png"/>
+                                    <TextBlock x:Name="Label_WDP">
+                                        Weapon Delivery <LineBreak/> Planner
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="1" x:Name="Launch_MC" Template="{StaticResource ToolsTrayButton}" Click="Launch_Third" >
+                                <StackPanel>
+                                    <Image Source="/Resources/MC.png"/>
+                                    <TextBlock x:Name="Label_MC">
+                                        Mission <LineBreak/> Commander
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="2" x:Name="Launch_WC" Template="{StaticResource ToolsTrayButton}" Click="Launch_Third" >
+                                <StackPanel>
+                                    <Image Source="/Resources/WC.png"/>
+                                    <TextBlock x:Name="Label_WC">
+                                        Weather <LineBreak/> Commander
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="3" x:Name="Launch_F4WX" Template="{StaticResource ToolsTrayButton}" Click="Launch_Third" >
+                                <StackPanel>
+                                    <Image Source="/Resources/F4WX.png"/>
+                                    <TextBlock x:Name="Label_F4WX">
+                                        F4Wx <LineBreak/> Real Weather
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="4" x:Name="Launch_F4RADAR" Template="{StaticResource ToolsTrayButton}" Click="Launch_Third" >
+                                <StackPanel>
+                                    <Image Source="/Resources/F4RADAR.png"/>
+                                    <TextBlock x:Name="Label_F4RADAR">
+                                        F4 RADAR <LineBreak/> C2(AWACS) Tool
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+
+                        </Grid>
+                    </Grid>
                     <CheckBox x:Name="ApplicationOverride" Content="Launch without any setup override" HorizontalAlignment="Right" Margin="0,0,14.667,97.667" VerticalAlignment="Bottom" Background="#FFECFF71" />
-
-
-                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Margin="48,0,0,20.333" VerticalAlignment="Bottom" Width="503">
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#7F151719" Offset="0"/>
-                                <GradientStop Color="#3F151718" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
-                            <Button x:Name="Launch_WDP" BorderThickness="10" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,33.333" Height="32" Width="32" Click="Launch_Third" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/WDP.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-
-                            <Button x:Name="Launch_MC" BorderThickness="10" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,0,0,33.333" Height="32" Width="32" Click="Launch_Third" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/MC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                            <Button x:Name="Launch_WC" BorderThickness="10" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,33.333" Height="32" Width="32" Click="Launch_Third" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/WC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                            <Button x:Name="Launch_F4WX" BorderThickness="10" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="230,0,0,33.333" Height="32" Width="32" Click="Launch_Third" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/F4WX.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                            <Button x:Name="Launch_F4RADAR" BorderThickness="10" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="300,0,0,33.333" Height="32" Width="32" Click="Launch_Third" MouseEnter="MouseEnterLauncher" MouseLeave="MouseLeaveLauncher">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/F4RADAR.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                            <Label x:Name="Label_WDP" Content="Weapon Delivery&#10;        Planner" HorizontalAlignment="Left" Margin="0,0,0,0.333" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_MC" Content="    Mission&#xA;Commander" HorizontalAlignment="Left" Margin="75,0,0,0.333" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_WC" Content="   Weather&#xA;Commander" HorizontalAlignment="Left" Margin="147,0,0,0.333" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_F4WX" Content="      F4Wx&#xA;Real Weather" HorizontalAlignment="Left" Margin="216,0,0,0.333" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                            <Label x:Name="Label_F4RADAR" Content="     F4 RADAR&#xA;C2(AWACS) Tool" HorizontalAlignment="Left" Margin="281,0,0,0.333" VerticalAlignment="Bottom" Foreground="#FFF0F0F0" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="8"/>
-                        </Grid>
-                    </Border>
                     <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="0,0,9.667,20.333" VerticalAlignment="Bottom" Width="208" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
                     <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged"  HorizontalAlignment="Right" Height="72" Margin="0,0,222.667,20.333" VerticalAlignment="Bottom" Width="217" Background="#80000000" BorderBrush="#80FFFFFF" Foreground="#80FFFFFF" SelectionMode="Single">
                         <ListBox.Resources>
@@ -554,22 +601,22 @@
                     <Label Content="Category:" HorizontalAlignment="Left" Margin="223,-43,0,0" VerticalAlignment="Top" Height="26" Width="64" HorizontalContentAlignment="Right" Foreground="White"/>
                     <ComboBox x:Name="Category" ItemsSource="{Binding}" HorizontalAlignment="Left" Margin="300,-41,0,0" VerticalAlignment="Top" Width="256" BorderBrush="Black" Background="#80F0F0F0" Foreground="#FF191919" SelectionChanged="Category_SelectionChanged" Height="26" Grid.ColumnSpan="2">
                     </ComboBox>
-                    <DataGrid x:Name="KeyMappingGrid" HorizontalAlignment="Stretch" Height="auto" Margin="10,10,9.666,64.334" 
+                    <DataGrid x:Name="KeyMappingGrid" HorizontalAlignment="Stretch" Height="auto" Margin="10,10,9.666,64.334"
                               EnableColumnVirtualization="True" EnableRowVirtualization="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                               RowStyle="{StaticResource MyDataGridStyle}"
-                              AutoGenerateColumns="True" 
+                              AutoGenerateColumns="True"
                               AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"
-                              VerticalAlignment="Stretch" Width="auto" 
+                              VerticalAlignment="Stretch" Width="auto"
                               ItemsSource="{Binding}"
-                              IsReadOnly="True" 
-                              CanUserSortColumns="False" 
-                              CanUserReorderColumns="False" 
+                              IsReadOnly="True"
+                              CanUserSortColumns="False"
+                              CanUserReorderColumns="False"
                               FrozenColumnCount="1"
                               SelectionMode="Single"
                               GridLinesVisibility="Vertical"
                               VerticalGridLinesBrush="LightGray" Background="#7F202020"
                               MouseDoubleClick="DataGrid_MouseButtonDoubleClick" Grid.ColumnSpan="2">
-                        <!-- Below column is needed to refresh datagrid because of the following BUG: 
+                        <!-- Below column is needed to refresh datagrid because of the following BUG:
                         https://connect.microsoft.com/VisualStudio/feedback/details/778456/click-on-datagridrowheader-raise-an-argumentoutofrange-exception-when-there-is-no-columns -->
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Visibility="Hidden" />
