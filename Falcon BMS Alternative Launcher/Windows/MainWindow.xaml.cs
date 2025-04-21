@@ -143,7 +143,7 @@ namespace FalconBMS.Launcher.Windows
 
                         DeviceScanTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, DeviceScanTimer_Tick, this.Dispatcher);
                     }
-                break;
+                    break;
             }
 
             return (IntPtr)1;//TRUE
@@ -295,7 +295,7 @@ namespace FalconBMS.Launcher.Windows
             }
             catch (Exception ex)
             {
-                Diagnostics.Log(ex); 
+                Diagnostics.Log(ex);
             }
 
             return;
@@ -386,7 +386,7 @@ namespace FalconBMS.Launcher.Windows
                 return;
             }
         }
-        
+
         /// <summary>
         /// Execute/Stop timer event when changing top TAB menu (Launcher/AxisAssign/KeyMapping).
         /// </summary>
@@ -411,7 +411,7 @@ namespace FalconBMS.Launcher.Windows
                 Close();
             }
         }
-        
+
         /// <summary>
         /// Rewrite Theater setting in the registry and Show/Hide Theater own config icon.
         /// </summary>
@@ -430,7 +430,7 @@ namespace FalconBMS.Launcher.Windows
                 Close();
             }
         }
-        
+
         /// <summary>
         /// Launch Theater own config.
         /// </summary>
@@ -449,7 +449,7 @@ namespace FalconBMS.Launcher.Windows
                 Close();
             }
         }
-        
+
         /// <summary>
         /// When clicked BW button, changes BW value.
         /// </summary>
@@ -714,7 +714,7 @@ namespace FalconBMS.Launcher.Windows
                 Close();
             }
         }
-        
+
         /// <summary>
         /// Allow user to drag the window.
         /// </summary>
@@ -764,19 +764,19 @@ namespace FalconBMS.Launcher.Windows
             return;
         }
 
-        private void ListBox_BMS_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_BMS_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
-                if (!e.Source.Equals(ListBox_BMS))
+                if (!e.Source.Equals(ComboBox_BMS))
                     return;
                 if (appReg == null)
                     return;
 
-                if (this.ListBox_BMS.SelectedIndex < 0)
+                if (this.ComboBox_BMS.SelectedIndex < 0)
                     return;
 
-                string newVersion = this.ListBox_BMS.SelectedItem.ToString();
+                string newVersion = this.ComboBox_BMS.SelectedItem.ToString();
                 Properties.Settings.Default.BMS_Version = newVersion;
 
                 //// Don't lose user's recent changes!
@@ -809,10 +809,10 @@ namespace FalconBMS.Launcher.Windows
 
         private void ImportKeyfile_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult mbr = MessageBox.Show(this, 
+            MessageBoxResult mbr = MessageBox.Show(this,
                 "WARNING -- selecting a new key file will erase and replace all keyboard " +
-                "bindings, in the currently selected profile.\r\n\r\nProceed with caution!", 
-                "Import Key File - WARNING", 
+                "bindings, in the currently selected profile.\r\n\r\nProceed with caution!",
+                "Import Key File - WARNING",
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning);
 
             if (mbr != MessageBoxResult.OK) return;
@@ -837,7 +837,7 @@ namespace FalconBMS.Launcher.Windows
                 MessageBox.Show(this,
                     "Key file contains one or more incorrectly formed lines -- please see error log at \n\n" +
                     "\"%LocalAppData%\\Benchmark_Sims\\Launcher_Log.txt\" \n\n" +
-                    "for a complete list.", 
+                    "for a complete list.",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }

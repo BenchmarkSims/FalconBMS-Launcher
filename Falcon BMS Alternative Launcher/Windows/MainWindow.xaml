@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:commonConstants="clr-namespace:FalconBMS.Launcher.Input"
+        xmlns:input="clr-namespace:FalconBMS.Launcher.Input"
         mc:Ignorable="d"
         Title="FalconBMS Alternative Launcher" Height="768" Width="1024" MinHeight="768" MinWidth="1024" BorderThickness="0"
         Closed="Window_Closed" MouseDown="MetroWindow_MouseDown"
@@ -143,14 +143,14 @@
                             </ControlTemplate>
                             <Style TargetType="Button">
                                 <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Foreground" Value="{x:Static commonConstants:CommonConstants.WHITEILUM}" />
+                                <Setter Property="Foreground" Value="{x:Static input:CommonConstants.WHITEILUM}" />
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="VerticalContentAlignment" Value="Top" />
                                 <Setter Property="Padding" Value="0 8 0 0" />
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Background" Value="#80000000" />
-                                        <Setter Property="Foreground" Value="{x:Static commonConstants:CommonConstants.BLUEILUM}" />
+                                        <Setter Property="Foreground" Value="{x:Static input:CommonConstants.BLUEILUM}" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -240,7 +240,7 @@
                                 </StackPanel>
                             </Button>
                         </Grid>
-                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="72" Width="503" Margin="48,0,0,20.333" Background="{StaticResource ToolsTrayBackground}">
+                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="72" Width="638" Margin="48,0,0,20.333" Background="{StaticResource ToolsTrayBackground}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />
@@ -295,14 +295,7 @@
                     </Grid>
                     <CheckBox x:Name="ApplicationOverride" Content="Launch without any setup override" HorizontalAlignment="Right" Margin="0,0,14.667,97.667" VerticalAlignment="Bottom" Background="#FFECFF71" />
                     <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="0,0,9.667,20.333" VerticalAlignment="Bottom" Width="208" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
-                    <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged"  HorizontalAlignment="Right" Height="72" Margin="0,0,222.667,20.333" VerticalAlignment="Bottom" Width="217" Background="#80000000" BorderBrush="#80FFFFFF" Foreground="#80FFFFFF" SelectionMode="Single">
-                        <ListBox.Resources>
-                            <Style TargetType="{x:Type ListBoxItem}">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Margin" Value="1" />
-                            </Style>
-                        </ListBox.Resources>
-                    </ListBox>
+                    <ComboBox x:Name="ComboBox_BMS" SelectionChanged="ComboBox_BMS_SelectionChanged" HorizontalAlignment="Right" Margin="0,0,10,136" VerticalAlignment="Bottom" Width="208" Foreground="Black" />
                     <Grid HorizontalAlignment="Left" Height="127" Margin="46,0,0,191.333" VerticalAlignment="Bottom" Width="953">
                         <Label Content="Theater :" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" />
                         <ComboBox x:Name="Dropdown_TheaterList" Background="#80F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>

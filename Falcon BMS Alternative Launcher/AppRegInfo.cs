@@ -86,7 +86,7 @@ namespace FalconBMS.Launcher
             foundVersions.Sort((a, b) => { return -1 * String.CompareOrdinal(a, b); });
 
             // Data-bind the list to the UI control.
-            mainWindow.ListBox_BMS.ItemsSource = foundVersions;
+            mainWindow.ComboBox_BMS.ItemsSource = foundVersions;
 
             string selectedVersion = null;
 
@@ -97,7 +97,7 @@ namespace FalconBMS.Launcher
                 if (idx >= 0)
                 {
                     selectedVersion = Properties.Settings.Default.BMS_Version;
-                    mainWindow.ListBox_BMS.SelectedIndex = idx;
+                    mainWindow.ComboBox_BMS.SelectedIndex = idx;
                 }
             }
 
@@ -105,7 +105,7 @@ namespace FalconBMS.Launcher
             if (string.IsNullOrEmpty(selectedVersion))
             {
                 selectedVersion = foundVersions[0];
-                mainWindow.ListBox_BMS.SelectedIndex = 0;
+                mainWindow.ComboBox_BMS.SelectedIndex = 0;
             }
 
             UpdateSelectedBMSVersion(selectedVersion);
