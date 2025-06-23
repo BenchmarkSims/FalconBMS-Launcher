@@ -132,10 +132,11 @@
     <Compile Include="Input\KeyFile.cs" />
     <Compile Include="Override\OverrideSettingFor438.cs" />
     <Compile Include="SingleInstanceApp.cs" />
-    <Compile Include="Starter\Starter436I.cs" />
     <Compile Include="Starter\Starter438I.cs" />
+    <Compile Include="Starter\Starter438.cs" />
     <Compile Include="Starter\Starter437I.cs" />
     <Compile Include="Starter\Starter437.cs" />
+    <Compile Include="Starter\Starter436I.cs" />
     <Compile Include="Starter\Starter436.cs" />
     <Compile Include="Starter\Starter435.cs" />
     <Compile Include="Starter\Starter434.cs" />
