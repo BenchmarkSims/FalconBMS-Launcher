@@ -8,13 +8,14 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BmsDisplayConfig")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Benchmark Sims")]
 [assembly: AssemblyProduct("BmsDisplayConfig")]
 [assembly: AssemblyCopyright("Benchmark Sims")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+#if DEBUG
+[assembly: AssemblyInformationalVersion("TEST VERSION")]
+#endif
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -48,5 +49,5 @@ using System.Windows;
 //      Build Number
 //      Revision
 //
-[assembly:     AssemblyVersion("4.37.5.0")]
-[assembly: AssemblyFileVersion("4.37.5.0")]
+[assembly:     AssemblyVersion("4.38.0.9999")]
+[assembly: AssemblyFileVersion("4.38.0.9999")]

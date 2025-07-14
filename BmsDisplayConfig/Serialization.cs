@@ -31,7 +31,7 @@ namespace BmsDisplayConfig
             }
 
 #if DEBUG
-            cfgDir = @"C:\Falcon BMS 4.37.5 (Internal)\User\Config";
+            cfgDir = @"C:\Falcon BMS 4.38\User\Config";
             if (Directory.Exists(cfgDir))
             {
                 return Path.Combine(cfgDir, "d3d11.dsp");
