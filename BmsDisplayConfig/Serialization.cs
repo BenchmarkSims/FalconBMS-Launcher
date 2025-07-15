@@ -216,6 +216,7 @@ namespace BmsDisplayConfig
                 bw.Write((bool)this.b7);
                 bw.Write((bool)this.b8);
             }
+            Logger.WriteLine($"..dspPath saved");
         }
 
     }
