@@ -182,8 +182,11 @@ namespace BmsDisplayConfig
                     maxB = Math.Max(maxB, r.GetBottom());
                 }
             }
-            System.Diagnostics.Debug.Assert(maxR > minL);
-            System.Diagnostics.Debug.Assert(maxB > minT);
+            if (numSelected > 0)
+            {
+                System.Diagnostics.Debug.Assert(maxR > minL);
+                System.Diagnostics.Debug.Assert(maxB > minT);
+            }
 
             // Default to primary monitor rect, if none selected.
             if (numSelected == 0)
