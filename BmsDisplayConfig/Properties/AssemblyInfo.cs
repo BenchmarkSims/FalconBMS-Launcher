@@ -9,13 +9,10 @@ using System.Windows;
 // associated with an assembly.
 [assembly: AssemblyTitle("BmsDisplayConfig")]
 [assembly: AssemblyCompany("Benchmark Sims")]
-[assembly: AssemblyProduct("BmsDisplayConfig")]
+[assembly: AssemblyProduct("Falcon BMS Display Config")]
 [assembly: AssemblyCopyright("Benchmark Sims")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-#if DEBUG
-[assembly: AssemblyInformationalVersion("TEST VERSION")]
-#endif
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -49,5 +46,11 @@ using System.Windows;
 //      Build Number
 //      Revision
 //
+#if DEBUG
 [assembly:     AssemblyVersion("4.38.0.9999")]
 [assembly: AssemblyFileVersion("4.38.0.9999")]
+[assembly: AssemblyInformationalVersion("TEST BUILD")]
+#else
+[assembly:     AssemblyVersion("4.38.0.1")]
+[assembly: AssemblyFileVersion("4.38.0.1")]
+#endif
