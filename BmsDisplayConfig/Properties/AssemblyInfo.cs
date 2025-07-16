@@ -49,7 +49,7 @@ using System.Windows;
 #if DEBUG
 [assembly:     AssemblyVersion("4.38.0.9999")]
 [assembly: AssemblyFileVersion("4.38.0.9999")]
-[assembly: AssemblyInformationalVersion("TEST BUILD 20250715-14")]
+[assembly: AssemblyInformationalVersion("TEST BUILD 20250716-10")]
 #else
 [assembly:     AssemblyVersion("4.38.0.1")]
 [assembly: AssemblyFileVersion("4.38.0.1")]

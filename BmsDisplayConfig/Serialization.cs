@@ -169,8 +169,8 @@ namespace BmsDisplayConfig
 
                 bw.Write((bool)this.UiDisplayMode.Fullscreen);
                 bw.Write((bool)this.UiDisplayMode.WindowBorders);
-                bw.Write((byte)0);//padding
-                bw.Write((byte)0);//padding
+                bw.Write((byte)0x99);//padding
+                bw.Write((byte)0x99);//padding
                 bw.Write((uint)this.UiDisplayMode.AdapterIdx);
                 bw.Write((uint)this.UiDisplayMode.OutputIdx);
                 bw.Write((int)this.UiDisplayMode.Left);
@@ -189,8 +189,8 @@ namespace BmsDisplayConfig
 
                 bw.Write((bool)this.SimDisplayMode.Fullscreen);
                 bw.Write((bool)this.SimDisplayMode.WindowBorders);
-                bw.Write((byte)0);//padding
-                bw.Write((byte)0);//padding
+                bw.Write((byte)0x99);//padding
+                bw.Write((byte)0x99);//padding
                 bw.Write((uint)this.SimDisplayMode.AdapterIdx);
                 bw.Write((uint)this.SimDisplayMode.OutputIdx);
                 bw.Write((int)this.SimDisplayMode.Left);
