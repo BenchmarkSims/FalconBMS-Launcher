@@ -11,7 +11,13 @@ namespace BmsDisplayConfig
         {
             try
             {
-                Logger.WriteLine("Program.Main, version "+ Assembly.GetExecutingAssembly().GetName().Version);
+                Assembly thisExe = Assembly.GetExecutingAssembly();
+                Logger.WriteLine("Program.Main, version "+ thisExe.GetName().Version);
+
+#if DEBUG
+                string info_ver = thisExe.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+                Logger.WriteLine(info_ver);
+#endif
 
                 var app = new App();
                 app.InitializeComponent();
