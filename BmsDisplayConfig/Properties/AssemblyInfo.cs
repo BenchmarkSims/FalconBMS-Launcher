@@ -8,10 +8,8 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BmsDisplayConfig")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Benchmark Sims")]
-[assembly: AssemblyProduct("BmsDisplayConfig")]
+[assembly: AssemblyProduct("Falcon BMS Display Config")]
 [assembly: AssemblyCopyright("Benchmark Sims")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -48,5 +46,11 @@ using System.Windows;
 //      Build Number
 //      Revision
 //
-[assembly:     AssemblyVersion("4.37.5.0")]
-[assembly: AssemblyFileVersion("4.37.5.0")]
+#if DEBUG
+[assembly:     AssemblyVersion("4.38.0.9999")]
+[assembly: AssemblyFileVersion("4.38.0.9999")]
+[assembly: AssemblyInformationalVersion("TEST BUILD 20250716-10")]
+#else
+[assembly:     AssemblyVersion("4.38.0.1")]
+[assembly: AssemblyFileVersion("4.38.0.1")]
+#endif

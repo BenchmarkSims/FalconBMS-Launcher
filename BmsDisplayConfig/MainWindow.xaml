@@ -5,14 +5,23 @@
         Title="Falcon BMS Display Selector"
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight"
+        MinWidth="600" MinHeight="400"
         Background="DarkSlateGray">
     <DockPanel Margin="10">
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
-            <Button Content="Close" Margin="10" Padding="10" Click="x_OnClickClose" />
-            <Button x:Name="x_saveButton" Content="Save" Margin="10" Padding="10" Click="x_OnClickSave" />
-        </StackPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left">
+                <TextBlock Margin="10" Padding="5" Background="NavajoWhite" FontSize="11" Width="270" TextWrapping="Wrap">
+                    Select a monitor to host the 3d viewport -- or select multiple monitors to span across.
+                </TextBlock>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Close" Margin="10" Padding="10" Click="x_OnClickClose" />
+                <Button x:Name="x_saveButton" Content="Save" Margin="10" Padding="10" Click="x_OnClickSave" />
+            </StackPanel>
+        </DockPanel>
+
         <!--last child is DockPanel.Dock=Fill-->
-        <Canvas x:Name="x_desktopCanvas" MinWidth="200" MinHeight="100">
+        <Canvas x:Name="x_desktopCanvas" MinWidth="300" MinHeight="200">
             <!--child elements programmatically created, here-->
         </Canvas>
     </DockPanel>

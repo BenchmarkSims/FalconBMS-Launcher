@@ -165,7 +165,9 @@ namespace BmsDisplayConfig
                 button.Foreground = new SolidColorBrush(Colors.DarkSlateGray);
 
             // Set the effective rect to be the union encompassing all selected displays.
-            int minL = 0, minT = 0, maxR = 0, maxB = 0;
+            int minL = Int32.MaxValue, minT = Int32.MaxValue;
+            int maxR = Int32.MinValue, maxB = Int32.MinValue;
+
             int numSelected = 0;
             foreach (ToggleButton child in x_desktopCanvas.Children)
             {
@@ -179,6 +181,11 @@ namespace BmsDisplayConfig
                     maxR = Math.Max(maxR, r.GetRight());
                     maxB = Math.Max(maxB, r.GetBottom());
                 }
+            }
+            if (numSelected > 0)
+            {
+                System.Diagnostics.Debug.Assert(maxR > minL);
+                System.Diagnostics.Debug.Assert(maxB > minT);
             }
 
             // Default to primary monitor rect, if none selected.

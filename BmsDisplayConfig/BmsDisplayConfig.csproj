@@ -64,6 +64,7 @@
     </ApplicationDefinition>
     <Compile Include="Logger.cs" />
     <Compile Include="ModelInterface.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="RectXYWH.cs" />
     <Compile Include="Serialization.cs" />
     <Compile Include="DataModel.cs" />

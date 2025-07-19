@@ -31,7 +31,7 @@ namespace BmsDisplayConfig
             }
 
 #if DEBUG
-            cfgDir = @"C:\Falcon BMS 4.37.5 (Internal)\User\Config";
+            cfgDir = @"C:\Falcon BMS 4.38\User\Config";
             if (Directory.Exists(cfgDir))
             {
                 return Path.Combine(cfgDir, "d3d11.dsp");
@@ -169,8 +169,8 @@ namespace BmsDisplayConfig
 
                 bw.Write((bool)this.UiDisplayMode.Fullscreen);
                 bw.Write((bool)this.UiDisplayMode.WindowBorders);
-                bw.Write((byte)0);//padding
-                bw.Write((byte)0);//padding
+                bw.Write((byte)0x99);//padding
+                bw.Write((byte)0x99);//padding
                 bw.Write((uint)this.UiDisplayMode.AdapterIdx);
                 bw.Write((uint)this.UiDisplayMode.OutputIdx);
                 bw.Write((int)this.UiDisplayMode.Left);
@@ -189,8 +189,8 @@ namespace BmsDisplayConfig
 
                 bw.Write((bool)this.SimDisplayMode.Fullscreen);
                 bw.Write((bool)this.SimDisplayMode.WindowBorders);
-                bw.Write((byte)0);//padding
-                bw.Write((byte)0);//padding
+                bw.Write((byte)0x99);//padding
+                bw.Write((byte)0x99);//padding
                 bw.Write((uint)this.SimDisplayMode.AdapterIdx);
                 bw.Write((uint)this.SimDisplayMode.OutputIdx);
                 bw.Write((int)this.SimDisplayMode.Left);
@@ -216,6 +216,7 @@ namespace BmsDisplayConfig
                 bw.Write((bool)this.b7);
                 bw.Write((bool)this.b8);
             }
+            Logger.WriteLine($"..dspPath saved");
         }
 
     }

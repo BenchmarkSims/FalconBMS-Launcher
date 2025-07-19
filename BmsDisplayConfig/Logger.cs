@@ -27,6 +27,9 @@ namespace BmsDisplayConfig
         {
             s_logfile.WriteLine(line);
             s_logfile.Flush();
+
+            if (System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debug.WriteLine(line);
         }
     }
 }
