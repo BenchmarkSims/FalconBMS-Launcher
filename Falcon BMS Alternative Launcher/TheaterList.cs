@@ -1,4 +1,5 @@
 ﻿using FalconBMS.Launcher.Input;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace FalconBMS.Launcher
                 IEnumerable<string> lines = File.ReadLines(tdf, Encoding.UTF8);
                 foreach (string str in lines)
                 {
-                    if (str.Contains("name "))
+                    if (str.StartsWith("name "))
                     {
                         theaters.Add(str.Replace("name ", "").Trim());
                         break;
