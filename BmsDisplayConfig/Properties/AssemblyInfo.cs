@@ -51,6 +51,6 @@ using System.Windows;
 [assembly: AssemblyFileVersion("4.38.0.9999")]
 [assembly: AssemblyInformationalVersion("TEST BUILD 20250716-10")]
 #else
-[assembly:     AssemblyVersion("4.38.0.1")]
-[assembly: AssemblyFileVersion("4.38.0.1")]
+[assembly:     AssemblyVersion("4.38.1.0")]
+[assembly: AssemblyFileVersion("4.38.1.0")]
 #endif
