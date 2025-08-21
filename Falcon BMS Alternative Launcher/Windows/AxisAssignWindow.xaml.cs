@@ -326,21 +326,41 @@ namespace FalconBMS.Launcher.Windows
                 + ((AxisNumName)phyAxNumTmp).ToString().Replace('_', ' ') + " : "
                 + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].GetSanitizedProductName();
 
-            if (whoCalledWindow != AxisName.Throttle.ToString() & whoCalledWindow != AxisName.Throttle_Right.ToString())
-                return;
-            AxisValueProgress.Foreground = CommonConstants.LIGHTBLUE;
-            check_ABIDLE.Visibility = Visibility.Hidden;
-            if ( (Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value < IDLE) || (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value < IDLE))
+
+            if (whoCalledWindow == AxisName.Cursor_X.ToString() | whoCalledWindow == AxisName.Cursor_Y.ToString())
             {
-                AxisValueProgress.Foreground = CommonConstants.LIGHTRED;
-                check_ABIDLE.Visibility = Visibility.Visible;
-                check_ABIDLE.Content = "IDLE CUTOFF";
+                if (Math.Abs(AxisValueProgress.Value) < CommonConstants.AXISMAX * 0.5 - CommonConstants.AXIS_NEUTRAL_TOLERANCE |
+                    Math.Abs(AxisValueProgress.Value) > CommonConstants.AXISMAX * 0.5 + CommonConstants.AXIS_NEUTRAL_TOLERANCE)
+                {
+                    AxisValueProgress.Foreground = CommonConstants.LIGHTRED;
+                    check_ABIDLE.Visibility = Visibility.Visible;
+                    check_ABIDLE.Content = "NOT NEUTRAL";
+                }
+                else
+                {
+                    AxisValueProgress.Foreground = CommonConstants.LIGHTBLUE;
+                    check_ABIDLE.Visibility = Visibility.Hidden;
+                    check_ABIDLE.Content = "NOT NEUTRAL";
+                }
             }
-            if ( (Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value > AB) || (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value > AB) )
+
+            if (whoCalledWindow == AxisName.Throttle.ToString() | whoCalledWindow == AxisName.Throttle_Right.ToString())
             {
-                AxisValueProgress.Foreground = CommonConstants.LIGHTGREEN;
-                check_ABIDLE.Visibility = Visibility.Visible;
-                check_ABIDLE.Content = "AB";
+                AxisValueProgress.Foreground = CommonConstants.LIGHTBLUE;
+                check_ABIDLE.Visibility = Visibility.Hidden;
+
+                if ((Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value < IDLE) || (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value < IDLE))
+                {
+                    AxisValueProgress.Foreground = CommonConstants.LIGHTRED;
+                    check_ABIDLE.Visibility = Visibility.Visible;
+                    check_ABIDLE.Content = "IDLE CUTOFF";
+                }
+                if ((Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value > AB) || (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value > AB))
+                {
+                    AxisValueProgress.Foreground = CommonConstants.LIGHTGREEN;
+                    check_ABIDLE.Visibility = Visibility.Visible;
+                    check_ABIDLE.Content = "AB";
+                }
             }
         }
 

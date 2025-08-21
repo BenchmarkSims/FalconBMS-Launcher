@@ -201,30 +201,51 @@ namespace FalconBMS.Launcher.Windows
                     tblabel.Content = ((string)tblabel.Content).Replace("Slider 0", "S1");
                     tblabel.Content = ((string)tblabel.Content).Replace("Slider 1", "S2");
 
-                    if (nme != AxisName.Throttle & nme != AxisName.Throttle_Right)
-                        continue;
-
-                    tblabelab = FindName("AB_" + nme) as Label;
-                    tblabelab.Visibility = Visibility.Hidden;
-
-                    tbprogressbar.Foreground = CommonConstants.LIGHTBLUE;
-
-                    InGameAxAssgn throttleAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Throttle.ToString()];
-                    if (throttleAxis.GetDeviceNumber() >= 0)
+                    if (nme == AxisName.Cursor_X | nme == AxisName.Cursor_Y)
                     {
-                        if ( !axis.GetInvert() && CommonConstants.AXISMAX + tbprogressbar.Value < GetIDLE() ||
-                              axis.GetInvert() && CommonConstants.AXISMIN + tbprogressbar.Value < GetIDLE() ) 
+                        tblabelab = FindName("Non_Neutral_Warning_" + nme) as Label;
+
+                        tbprogressbar.Foreground = CommonConstants.LIGHTBLUE;
+                        tblabelab.Visibility = Visibility.Hidden;
+
+                        if (Math.Abs(tbprogressbar.Value) < CommonConstants.AXISMAX * 0.5 - CommonConstants.AXIS_NEUTRAL_TOLERANCE | 
+                            Math.Abs(tbprogressbar.Value) > CommonConstants.AXISMAX * 0.5 + CommonConstants.AXIS_NEUTRAL_TOLERANCE)
                         {
                             tbprogressbar.Foreground = CommonConstants.LIGHTRED;
                             tblabelab.Visibility = Visibility.Visible;
-                            tblabelab.Content = "IDLE CUTOFF";
+                            tblabelab.Content = "NOT NEUTRAL";
                         }
-                        if ( !axis.GetInvert() && CommonConstants.AXISMAX + tbprogressbar.Value > GetAB() ||
-                              axis.GetInvert() && CommonConstants.AXISMIN + tbprogressbar.Value > GetAB() )
+                        else
                         {
-                            tbprogressbar.Foreground = CommonConstants.LIGHTGREEN;
-                            tblabelab.Visibility = Visibility.Visible;
-                            tblabelab.Content = "AB";
+                            tbprogressbar.Foreground = CommonConstants.LIGHTBLUE;
+                            tblabelab.Visibility = Visibility.Hidden;
+                        }
+                    }
+
+                    if (nme == AxisName.Throttle | nme == AxisName.Throttle_Right)
+                    {
+                        tblabelab = FindName("AB_" + nme) as Label;
+                        tblabelab.Visibility = Visibility.Hidden;
+
+                        tbprogressbar.Foreground = CommonConstants.LIGHTBLUE;
+
+                        InGameAxAssgn throttleAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Throttle.ToString()];
+                        if (throttleAxis.GetDeviceNumber() >= 0)
+                        {
+                            if (!axis.GetInvert() && CommonConstants.AXISMAX + tbprogressbar.Value < GetIDLE() ||
+                                 axis.GetInvert() && CommonConstants.AXISMIN + tbprogressbar.Value < GetIDLE())
+                            {
+                                tbprogressbar.Foreground = CommonConstants.LIGHTRED;
+                                tblabelab.Visibility = Visibility.Visible;
+                                tblabelab.Content = "IDLE CUTOFF";
+                            }
+                            if (!axis.GetInvert() && CommonConstants.AXISMAX + tbprogressbar.Value > GetAB() ||
+                                 axis.GetInvert() && CommonConstants.AXISMIN + tbprogressbar.Value > GetAB())
+                            {
+                                tbprogressbar.Foreground = CommonConstants.LIGHTGREEN;
+                                tblabelab.Visibility = Visibility.Visible;
+                                tblabelab.Content = "AB";
+                            }
                         }
                     }
                 }
