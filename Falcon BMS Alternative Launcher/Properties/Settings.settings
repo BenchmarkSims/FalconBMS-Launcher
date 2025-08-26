@@ -80,5 +80,8 @@
     <Setting Name="Misc_3DClickableCursorFixToCenter" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="Misc_bExportRTTTextures" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

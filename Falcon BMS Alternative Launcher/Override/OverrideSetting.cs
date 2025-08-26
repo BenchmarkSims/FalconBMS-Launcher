@@ -63,6 +63,7 @@ namespace FalconBMS.Launcher.Override
                 OverridePovDeviceIDs(cfgUser, inGameAxis);
 
                 ApplyVROverrides(cfgUser);
+                ApplyMiscOverrides(cfgUser);
             }
         }
 
@@ -167,6 +168,21 @@ namespace FalconBMS.Launcher.Override
                 }
             }
             return;
+        }
+        private static void WriteIfOverride(StreamWriter cfg, string key, int value, int defaultValue, string comment)
+        {
+            if (value != defaultValue)
+                cfg.WriteLine($"set {key} {value} {comment}");
+        }
+        protected virtual void ApplyMiscOverrides(StreamWriter cfg)
+        {
+            var intFlags = new (string key, int current, int def)[]
+            {
+                ("g_bExportRTTTextures", (mainWindow.RTT_Enable?.IsChecked == true) ? 1 : 0, 0),
+            };
+
+            foreach (var (key, current, def) in intFlags)
+                WriteIfOverride(cfg, key, current, def, CommonConstants.CFGOVERRIDECOMMENT);
         }
 
         protected void SaveDeviceSorting(DeviceControl deviceControl)

@@ -50,6 +50,18 @@ namespace FalconBMS.Launcher
                 mainWindow.VR_SteamVR.IsChecked = false;
                 mainWindow.VR_OpenXR.IsChecked = false;
             }
+
+            if (Properties.Settings.Default.Misc_bExportRTTTextures)
+            {
+                mainWindow.RTT_Enable.IsChecked = true;
+                mainWindow.RTT_Disable.IsChecked = false;
+            }
+            else
+            {
+                mainWindow.RTT_Disable.IsChecked = true;
+                mainWindow.RTT_Enable.IsChecked = false;
+            }
+
             mainWindow.CMD_BW.Content               = "BW : " + bandWidthDefault;
             mainWindow.AB_Throttle.Visibility       = Visibility.Hidden;
             mainWindow.AB_Throttle_Right.Visibility = Visibility.Hidden;
@@ -73,6 +85,7 @@ namespace FalconBMS.Launcher
             Properties.Settings.Default.Misc_NaturalHeadMovement  = (bool)mainWindow.Misc_NaturalHeadMovement.IsChecked;
             Properties.Settings.Default.Misc_PilotModel           = (bool)mainWindow.Misc_PilotModel.IsChecked;
             Properties.Settings.Default.VR_Option = (bool)mainWindow.VR_SteamVR.IsChecked ? "SteamVR" : (bool)mainWindow.VR_OpenXR.IsChecked ? "OpenXR" : "NoVR";
+            Properties.Settings.Default.Misc_bExportRTTTextures   = (mainWindow.RTT_Enable.IsChecked == true);
             Properties.Settings.Default.Save();
         }
 
