@@ -276,12 +276,12 @@
                         <Label Content="Documentation and Manuals :" HorizontalAlignment="Left" Margin="0,32,0,0" VerticalAlignment="Top" FontWeight="Bold" />
                         <Button x:Name="OpenDocs" Content="Open Docs Folder" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Left" Margin="179,34,0,0" VerticalAlignment="Top" Width="141" Click="OpenDocs_Click" FontSize="10" Height="10"/>
 
-                        <ToggleButton x:Name="CMD_ACMI" Content="ACMI" HorizontalAlignment="Left" Margin="178,96,0,0" VerticalAlignment="Top" Width="64"/>
-                        <ToggleButton x:Name="CMD_WINDOW" Content="WINDOW" HorizontalAlignment="Left" Margin="260,96,0,0" VerticalAlignment="Top" Width="64" Click="CMD_WINDOW_Click"/>
-                        <ToggleButton x:Name="CMD_NOMOVIE" Content="NOMOVIE" HorizontalAlignment="Left" Margin="342,96,0,0" VerticalAlignment="Top" Width="64"/>
-                        <ToggleButton x:Name="CMD_EF" Content="EYEFLY" HorizontalAlignment="Left" Margin="425,96,0,0" VerticalAlignment="Top" Width="64"/>
-                        <ToggleButton x:Name="CMD_MONO" Content="DEBUG" HorizontalAlignment="Left" Margin="507,96,0,0" VerticalAlignment="Top" Width="64"/>
-                        <Button x:Name="CMD_BW" Content="BW : 1024" HorizontalAlignment="Left" Margin="591,96,0,0" VerticalAlignment="Top" Width="64" Click="CMD_BW_Click"/>
+                        <Controls:ToggleSwitch x:Name="CMD_ACMI" OnLabel="ACMI On" OffLabel="ACMI Off" HorizontalAlignment="Left" HorizontalContentAlignment="Left" FontSize="11" Margin="178,94,0,0" VerticalAlignment="Top" Width="120"/>
+                        <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnLabel="WINDOW On" OffLabel="WINDOW Off" HorizontalAlignment="Left" HorizontalContentAlignment="Left" FontSize="11" Margin="313,94,0,0" VerticalAlignment="Top" Width="142" Click="CMD_WINDOW_Click"/>
+                        <Controls:ToggleSwitch x:Name="CMD_NOMOVIE" OnLabel="NOMOVIE On" OffLabel="NOMOVIE Off" HorizontalAlignment="Left" HorizontalContentAlignment="Left" FontSize="11" Margin="472,94,0,0" VerticalAlignment="Top" Width="144"/>
+                        <Controls:ToggleSwitch x:Name="CMD_EF" OnLabel="EYEFLY On" OffLabel="EYEFLY Off" HorizontalAlignment="Left" HorizontalContentAlignment="Left" FontSize="11" Margin="633,94,0,0" VerticalAlignment="Top" Width="128"/>
+                        <Controls:ToggleSwitch x:Name="CMD_MONO" OnLabel="DEBUG On" OffLabel="DEBUG Off" HorizontalAlignment="Left" HorizontalContentAlignment="Left" FontSize="11" Margin="776,94,0,0" VerticalAlignment="Top" Width="130"/>
+                        <Button x:Name="CMD_BW" Content="BW : 1024" HorizontalAlignment="Left" Margin="881,66,0,0" VerticalAlignment="Top" Width="64" Click="CMD_BW_Click"/>
                         <Controls:ToggleSwitch x:Name="AB_Test" Visibility="Hidden" OffLabel="A" OnLabel="B" Margin="700,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Height="36" />
                     </Grid>
                     <ScrollViewer x:Name ="LogTextScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="48,57,563.667,349.333" Background="#54000000">

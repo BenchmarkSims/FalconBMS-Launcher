@@ -37,7 +37,7 @@ namespace FalconBMS.Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CMD_ACMI {
             get {
                 return ((bool)(this["CMD_ACMI"]));
@@ -49,7 +49,7 @@ namespace FalconBMS.Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CMD_WINDOW {
             get {
                 return ((bool)(this["CMD_WINDOW"]));
@@ -61,7 +61,7 @@ namespace FalconBMS.Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CMD_NOMOVIE {
             get {
                 return ((bool)(this["CMD_NOMOVIE"]));
@@ -73,7 +73,7 @@ namespace FalconBMS.Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CMD_EF {
             get {
                 return ((bool)(this["CMD_EF"]));
@@ -217,7 +217,7 @@ namespace FalconBMS.Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CMD_MONO {
             get {
                 return ((bool)(this["CMD_MONO"]));
