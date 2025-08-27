@@ -25,15 +25,15 @@ namespace FalconBMS.Launcher.Starter
         public virtual string getCommandLine()
         {
             string strCmdText = "";
-            if (mainWindow.CMD_ACMI.IsChecked == false)
+            if (mainWindow.CMD_ACMI.IsChecked == true)
                 strCmdText += "-acmi ";
-            if (mainWindow.CMD_WINDOW.IsChecked == false)
+            if (mainWindow.CMD_WINDOW.IsChecked == true)
                 strCmdText += "-window ";
-            if (mainWindow.CMD_NOMOVIE.IsChecked == false)
+            if (mainWindow.CMD_NOMOVIE.IsChecked == true)
                 strCmdText += "-nomovie ";
-            if (mainWindow.CMD_EF.IsChecked == false)
+            if (mainWindow.CMD_EF.IsChecked == true)
                 strCmdText += "-ef ";
-            if (mainWindow.CMD_MONO.IsChecked == false)
+            if (mainWindow.CMD_MONO.IsChecked == true)
                 strCmdText += "-mono ";
 
             if (mainWindow.VR_SteamVR.IsVisible && mainWindow.VR_SteamVR.IsChecked == true)
