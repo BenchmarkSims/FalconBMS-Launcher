@@ -1,0 +1,88 @@
+﻿<!-- Styles/Styles.xaml -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+
+    <!-- LAUNCHER tab -->
+    <Style x:Key="LauncherHeading" TargetType="Label">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="Foreground" Value="#80FFFFFF" />
+    </Style>
+    <Style x:Key="LauncherTitle" TargetType="Label">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#80FFFFFF" />
+    </Style>
+    <Style x:Key="LauncherToggleSwitch"
+           TargetType="Controls:ToggleSwitch"
+           BasedOn="{StaticResource {x:Type Controls:ToggleSwitch}}">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Foreground" Value="#80FFFFFF" />
+    </Style>
+    <Style x:Key="LauncherRadioButton" 
+           TargetType="RadioButton"
+           BasedOn="{StaticResource {x:Type RadioButton}}">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+    </Style>
+
+    <!-- AXISASSIGN tab -->
+    <Style x:Key="AxisHeading" TargetType="Label"
+            BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontStyle" Value="Oblique"/>
+        <Setter Property="Foreground" Value="#80FFFFFF"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Height" Value="41"/>
+        <Setter Property="Width" Value="349"/>
+    </Style>
+    <Style x:Key="AxisTitle" TargetType="Label"
+           BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="#80FFFFFF"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Width" Value="150"/>
+    </Style>
+    <Style x:Key="AssignButtonBase"
+       TargetType="Button"
+       BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Width" Value="74"/>
+        <Setter Property="Height" Value="27"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Background" Value="#FFFFFFFF"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Content" Value="Assign"/>
+    </Style>
+    <Style x:Key="AxisBar"
+       TargetType="Controls:MetroProgressBar"
+       BasedOn="{StaticResource {x:Type Controls:MetroProgressBar}}">
+        <Setter Property="Width" Value="256"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Background" Value="#80202020"/>
+        <Setter Property="Foreground" Value="#803878A8"/>
+        <Setter Property="BorderBrush" Value="#80FFFFFF"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+
+</ResourceDictionary>

@@ -10,6 +10,11 @@
         Closed="Window_Closed" MouseDown="MetroWindow_MouseDown"
         FontSize="12" WindowStartupLocation="CenterScreen" ShowTitleBar="False" WindowStyle="None" Background="#a4a9ac" OverrideDefaultWindowCommandsBrush="#a4a9ac">
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Styles/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
         <Style TargetType="Label">
             <Setter Property="Foreground" Value="#80FFFFFF" />
         </Style>
@@ -74,7 +79,8 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </Window.Resources>
+         </ResourceDictionary>
+        </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="651*"/>
@@ -110,7 +116,6 @@
         <TabControl x:Name="LargeTab" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="TabControl_SelectionChanged" Margin="0,64,0.333,0.334" Background="{x:Null}" Grid.RowSpan="2">
             <TabItem Header="LAUNCHER" x:Name="Tab_Launcher" HorizontalAlignment="Center" Margin="535,-40,-535.333,40.333">
                 <Grid>
-
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Width="638" Margin="48,0,0,97" VerticalAlignment="Bottom">
                         <Border.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -301,52 +306,32 @@
                         </ListBox.Resources>
                     </ListBox>
                     <Grid HorizontalAlignment="Left" Height="127" Margin="46,0,0,191.333" VerticalAlignment="Bottom" Width="953">
-                        <Grid.Resources>
-                            <Style TargetType="Label"
-                                BasedOn="{StaticResource {x:Type Label}}">
-                                <Setter Property="HorizontalAlignment" Value="Left" />
-                                <Setter Property="VerticalAlignment" Value="Top" />
-                                <Setter Property="FontWeight" Value="Bold" />
-                                <Setter Property="Foreground" Value="#80FFFFFF" />
-                            </Style>
-                            <Style TargetType="Controls:ToggleSwitch"
-                                BasedOn="{StaticResource {x:Type Controls:ToggleSwitch}}">
-                                <Setter Property="FontSize" Value="11" />
-                                <Setter Property="HorizontalAlignment" Value="Left" />
-                                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                                <Setter Property="VerticalAlignment" Value="Top" />
-                            </Style>
-                            <Style TargetType="RadioButton"
-                                BasedOn="{StaticResource {x:Type RadioButton}}">
-                                <Setter Property="HorizontalAlignment" Value="Left" />
-                                <Setter Property="VerticalAlignment" Value="Top" />
-                            </Style>
-                        </Grid.Resources>
-                        
-                        <Label Content="Theater :"/>
+
+                        <Label Content="Theater :" Style="{StaticResource LauncherTitle}"/>
                         <ComboBox x:Name="Dropdown_TheaterList" Background="#80F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
 
                         <Button x:Name="Launch_TheaterConfig" Content="Theater Config" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" Margin="424,2,429,0" VerticalAlignment="Top" Click="Launch_TheaterConfig_Click" FontSize="10" RenderTransformOrigin="-0.033,0.5"/>
 
-                        <Label Content="Command Line :" Margin="0,96,0,-27" />
+                        <Label Content="Command Line :" Margin="0,96,0,-27" Style="{StaticResource LauncherTitle}"/>
 
-                        <Label x:Name="Label_VR" Content="Virtual Reality:" Margin="0,64,0,0"/>
-                        <RadioButton x:Name="VR_NoVR" GroupName="VR" Content="No VR" Margin="181,69,0,0"/>
-                        <RadioButton x:Name="VR_SteamVR" GroupName="VR" Content="SteamVR" Margin="250,69,0,0" Click="Misc_VR_Click"/>
-                        <RadioButton x:Name="VR_OpenXR" GroupName="VR" Content="OpenXR" Margin="329,69,0,0" RenderTransformOrigin="-7.082,0.583"/>
+                        <Label x:Name="Label_VR" Content="Virtual Reality:" Margin="0,64,0,0" Style="{StaticResource LauncherTitle}"/>
+                        <RadioButton x:Name="VR_NoVR" GroupName="VR" Content="No VR" Margin="181,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
+                        <RadioButton x:Name="VR_SteamVR" GroupName="VR" Content="SteamVR" Margin="250,69,0,0" Click="Misc_VR_Click" Style="{StaticResource LauncherRadioButton}"/>
+                        <RadioButton x:Name="VR_OpenXR" GroupName="VR" Content="OpenXR" Margin="329,69,0,0" RenderTransformOrigin="-7.082,0.583" Style="{StaticResource LauncherRadioButton}"/>
 
-                        <Label x:Name="Label_RTT" Content="Export RTT Textures:" Margin="525,64,0,0"/>
-                        <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" Margin="660,69,0,0"/>
-                        <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" Margin="730,69,0,0"/>
+                        <Label x:Name="Label_RTT" Content="Export RTT Textures:" Margin="525,64,0,0" Style="{StaticResource LauncherTitle}"/>
+                        <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" Margin="660,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
+                        <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" Margin="730,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
 
-                        <Label Content="Documentation and Manuals :" Margin="0,32,0,0"/>
+                        <Label Content="Documentation and Manuals :" Margin="0,32,0,0" Style="{StaticResource LauncherTitle}"/>
                         <Button x:Name="OpenDocs" Content="Open Docs Folder" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Left" Margin="179,34,0,0" VerticalAlignment="Top" Width="141" Click="OpenDocs_Click" FontSize="10" Height="10"/>
 
-                        <Controls:ToggleSwitch x:Name="CMD_ACMI" OnLabel="ACMI On" OffLabel="ACMI Off" Margin="178,94,0,0"/>
-                        <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnLabel="WINDOW On" OffLabel="WINDOW Off" Margin="313,94,0,0" Click="CMD_WINDOW_Click"/>
-                        <Controls:ToggleSwitch x:Name="CMD_NOMOVIE" OnLabel="NOMOVIE On" OffLabel="NOMOVIE Off" Margin="472,94,0,0"/>
-                        <Controls:ToggleSwitch x:Name="CMD_EF" OnLabel="EYEFLY On" OffLabel="EYEFLY Off" Margin="633,94,0,0"/>
-                        <Controls:ToggleSwitch x:Name="CMD_MONO" OnLabel="DEBUG On" OffLabel="DEBUG Off" Margin="776,94,0,0"/>
+                        <Controls:ToggleSwitch x:Name="CMD_ACMI" OnLabel="ACMI On" OffLabel="ACMI Off" Margin="178,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
+
+                        <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnLabel="WINDOW On" OffLabel="WINDOW Off" Margin="313,94,0,0" Click="CMD_WINDOW_Click" Style="{StaticResource LauncherToggleSwitch}"/>
+                        <Controls:ToggleSwitch x:Name="CMD_NOMOVIE" OnLabel="NOMOVIE On" OffLabel="NOMOVIE Off" Margin="472,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
+                        <Controls:ToggleSwitch x:Name="CMD_EF" OnLabel="EYEFLY On" OffLabel="EYEFLY Off" Margin="633,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
+                        <Controls:ToggleSwitch x:Name="CMD_MONO" OnLabel="DEBUG On" OffLabel="DEBUG Off" Margin="776,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
                         
                         <Button x:Name="CMD_BW" Content="BW : 1024" HorizontalAlignment="Left" Margin="881,66,0,0" VerticalAlignment="Top" Width="64" Click="CMD_BW_Click"/>
                         <Controls:ToggleSwitch x:Name="AB_Test" Visibility="Hidden" OffLabel="A" OnLabel="B" Margin="700,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Height="36" />
@@ -354,47 +339,16 @@
                     <ScrollViewer x:Name ="LogTextScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="48,57,563.667,349.333" Background="#54000000">
                         <TextBlock x:Name="News" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="350" Margin="20,20,0,0" />
                     </ScrollViewer>
-                    <Label Content="News" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" FontStyle="Italic"/>
+                    <Label Content="News" Margin="48,10,0,0" Style="{StaticResource LauncherHeading}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="AXISASSIGN" Margin="535.333,-40,-535,40.333">
                 <Grid>
                     <Grid.Resources>
-                        <Style x:Key="AxisHeading" TargetType="Label"
-                             BasedOn="{StaticResource {x:Type Label}}">
-                            <Setter Property="FontSize" Value="16"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="FontStyle" Value="Oblique"/>
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Top"/>
-                            <Setter Property="Height" Value="41"/>
-                            <Setter Property="Width" Value="349"/>
-                        </Style>
-                        <Style x:Key="AxisTitle" TargetType="Label"
-                             BasedOn="{StaticResource {x:Type Label}}">
-                            <Setter Property="FontSize" Value="16"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Top"/>
-                            <Setter Property="Height" Value="34"/>
-                            <Setter Property="Width" Value="150"/>
-                        </Style>
-                        <Style x:Key="AssignButton" TargetType="Button"
-                             BasedOn="{StaticResource {x:Type Button}}">
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Top"/>
-                            <Setter Property="Width" Value="74"/>
-                            <Setter Property="Height" Value="27"/>
-                            <Setter Property="Content" Value="Assign"/>
+                        <Style x:Key="AssignButton"
+                             TargetType="Button"
+                             BasedOn="{StaticResource AssignButtonBase}">
                             <EventSetter Event="Click" Handler="Assign_Click"/>
-                        </Style>
-                        <Style x:Key="AxisBar"
-                             TargetType="{x:Type Controls:MetroProgressBar}"
-                             BasedOn="{StaticResource {x:Type Controls:MetroProgressBar}}">
-                            <Setter Property="Width" Value="256"/>
-                            <Setter Property="Height" Value="10"/>
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Top"/>
                         </Style>
                     </Grid.Resources>
                     <TabControl HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="auto" Margin="10,0" Background="{x:Null}">

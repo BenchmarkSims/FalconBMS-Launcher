@@ -165,6 +165,10 @@
     <Compile Include="TheaterList.cs" />
     <Compile Include="Input\DetentPosition.cs" />
     <Compile Include="Windows\RSSReader.cs" />
+    <Page Include="Styles\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\AxisAssignWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
