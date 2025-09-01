@@ -227,7 +227,7 @@
                         <Label Content="Theater :" Style="{StaticResource LauncherTitle}"/>
                         <ComboBox x:Name="Dropdown_TheaterList" Background="#80F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
 
-                        <Button x:Name="Launch_TheaterConfig" Content="Theater Config" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" Margin="424,2,429,0" VerticalAlignment="Top" Click="Launch_TheaterConfig_Click" FontSize="10" RenderTransformOrigin="-0.033,0.5"/>
+                        <Button x:Name="Launch_TheaterConfig" Content="Theater Config" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" Margin="424,4,429,0" VerticalAlignment="Top" Click="Launch_TheaterConfig_Click" FontSize="10" RenderTransformOrigin="-0.033,0.5"/>
 
                         <Label Content="Command Line :" Margin="0,96,0,-27" Style="{StaticResource LauncherTitle}"/>
 
@@ -240,8 +240,8 @@
                         <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" Margin="660,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
                         <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" Margin="730,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
 
-                        <Label Content="Documentation and Manuals :" Margin="0,32,0,0" Style="{StaticResource LauncherTitle}"/>
-                        <Button x:Name="OpenDocs" Content="Open Docs Folder" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Left" Margin="179,34,0,0" VerticalAlignment="Top" Width="141" Click="OpenDocs_Click" FontSize="10" Height="10"/>
+                        <Label Content="Documentation and Manuals :" Margin="0,35,0,0" Style="{StaticResource LauncherTitle}"/>
+                        <Button x:Name="OpenDocs" Content="Open Docs Folder" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Left" Margin="180,37,0,0" VerticalAlignment="Top" Width="141" Click="OpenDocs_Click" FontSize="10" Height="10"/>
 
                         <Controls:ToggleSwitch x:Name="CMD_ACMI" OnContent="ACMI On" OffContent="ACMI Off" Margin="178,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
                         <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnContent="WINDOW On" OffContent="WINDOW Off" Margin="313,94,0,0" Toggled="CMD_WINDOW_Click" Style="{StaticResource LauncherToggleSwitch}"/>
@@ -373,11 +373,11 @@
                                 </Grid>
                                 <TextBlock Margin="102,355,0,0" Height="55" Width="378" Style="{StaticResource HelpText}"><Run Text="&quot;Throttle&quot; works as "/><Run Text="&quot;"/><Run Text="Both Throttle"/><Run Text="&quot;"/><Run Text=" "/><Run Text="for twin engine jets"/><Run Text=" "/><Run Text="as long as no axis are applied to &quot;Throttle Right"/><Run Text="&quot; "/><Run Text="or it "/><Run Text="will work as &quot;Throttle Left&quot;"/><LineBreak/><Run Text="For F-16 &quot;Throttle&quot; works as a main engine."/><LineBreak/></TextBlock>
                                 <CheckBox x:Name="Misc_RollLinkedNWS"
-          Foreground="White"
-          Content="Use Roll Axis for Steering while on the Ground enabling NWS."
-          HorizontalAlignment="Left" Margin="512,533,0,0" VerticalAlignment="Top"
-          Height="18" Width="349"/>
-                                <Label Content="*Enabling this option disables Yaw axis." FontSize="11" HorizontalAlignment="Left" Margin="530,550,0,0" VerticalAlignment="Top" Height="25" Width="273"/>
+                                     Foreground="{StaticResource UiForegroundBrush}"
+                                     Content="Use Roll Axis for Steering while on the Ground enabling NWS."
+                                     HorizontalAlignment="Left" Margin="512,533,0,0" VerticalAlignment="Top"
+                                     Height="18" Width="349"/>
+                                <Label Content="*Enabling this option disables Yaw axis." FontSize="11" HorizontalAlignment="Left" Margin="530,550,0,0" VerticalAlignment="Top" Height="25" Width="273" Foreground="{StaticResource UiForegroundBrush}"/>
                                 <TextBlock Margin="32,574,0,0" Height="36" Width="378" Style="{StaticResource HelpText}"><Run Text="&quot;Toe Brake&quot; works as &quot;"/><Run Text="Both Toe Brakes"/><Run Text="&quot;"/><Run Text=" "/><Run Text="as long as no axis are applied to &quot;Toe Brake Right"/><Run Text="&quot; "/><Run Text="or it "/><Run Text="will work as &quot;Throttle Left&quot; &quot;Toe Brake Left&quot;"/><LineBreak/></TextBlock>
                                 <TextBlock Margin="32,145,0,0" Height="35" Width="378" Style="{StaticResource HelpText}"><Run Text="FalconBMS implements real F-16 FLCS curve. "/><LineBreak/><Run Text="Disable any Deadzone and Saturation/Curve recommended"/></TextBlock>
                             </Grid>
