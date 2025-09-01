@@ -16,15 +16,15 @@ namespace FalconBMS.Launcher
             this.mainWindow = mainWindow;
 
             // Load Buttons
-            mainWindow.CMD_ACMI.IsChecked                  = Properties.Settings.Default.CMD_ACMI;
-            mainWindow.CMD_WINDOW.IsChecked                = Properties.Settings.Default.CMD_WINDOW;
-            mainWindow.CMD_NOMOVIE.IsChecked               = Properties.Settings.Default.CMD_NOMOVIE;
-            mainWindow.CMD_EF.IsChecked                    = Properties.Settings.Default.CMD_EF;
-            mainWindow.CMD_MONO.IsChecked                  = Properties.Settings.Default.CMD_MONO;
+            mainWindow.CMD_ACMI.IsOn        = Properties.Settings.Default.CMD_ACMI;
+            mainWindow.CMD_WINDOW.IsOn      = Properties.Settings.Default.CMD_WINDOW;
+            mainWindow.CMD_NOMOVIE.IsOn     = Properties.Settings.Default.CMD_NOMOVIE;
+            mainWindow.CMD_EF.IsOn          = Properties.Settings.Default.CMD_EF;
+            mainWindow.CMD_MONO.IsOn        = Properties.Settings.Default.CMD_MONO;
             bandWidthDefault                               = Properties.Settings.Default.CMD_BW;
             mainWindow.ApplicationOverride.IsChecked       = Properties.Settings.Default.NoOverride;
             mainWindow.Misc_RollLinkedNWS.IsChecked        = Properties.Settings.Default.Misc_RLNWS;
-            mainWindow.Misc_TrackIRZ.IsChecked             = Properties.Settings.Default.Misc_TrackIRZ;
+            mainWindow.Misc_TrackIRZ.IsOn   = Properties.Settings.Default.Misc_TrackIRZ;
             mainWindow.Misc_ExMouseLook.IsChecked          = Properties.Settings.Default.Misc_ExMouseLook;
             mainWindow.Misc_SmartScalingOverride.IsChecked = Properties.Settings.Default.Misc_SmartScalingOverride;
             mainWindow.Misc_NaturalHeadMovement.IsChecked  = Properties.Settings.Default.Misc_NaturalHeadMovement;
@@ -71,15 +71,15 @@ namespace FalconBMS.Launcher
 
         public void SaveUISetup()
         {
-            Properties.Settings.Default.CMD_ACMI                  = (bool)mainWindow.CMD_ACMI.IsChecked;
-            Properties.Settings.Default.CMD_WINDOW                = (bool)mainWindow.CMD_WINDOW.IsChecked;
-            Properties.Settings.Default.CMD_NOMOVIE               = (bool)mainWindow.CMD_NOMOVIE.IsChecked;
-            Properties.Settings.Default.CMD_EF                    = (bool)mainWindow.CMD_EF.IsChecked;
-            Properties.Settings.Default.CMD_MONO                  = (bool)mainWindow.CMD_MONO.IsChecked;
+            Properties.Settings.Default.CMD_ACMI                  = (bool)mainWindow.CMD_ACMI.IsOn;
+            Properties.Settings.Default.CMD_WINDOW                = (bool)mainWindow.CMD_WINDOW.IsOn;
+            Properties.Settings.Default.CMD_NOMOVIE               = (bool)mainWindow.CMD_NOMOVIE.IsOn;
+            Properties.Settings.Default.CMD_EF                    = (bool)mainWindow.CMD_EF.IsOn;
+            Properties.Settings.Default.CMD_MONO                  = (bool)mainWindow.CMD_MONO.IsOn;
             Properties.Settings.Default.CMD_BW                    = bandWidthDefault;
             Properties.Settings.Default.NoOverride                = (bool)mainWindow.ApplicationOverride.IsChecked;
             Properties.Settings.Default.Misc_RLNWS                = (bool)mainWindow.Misc_RollLinkedNWS.IsChecked;
-            Properties.Settings.Default.Misc_TrackIRZ             = (bool)mainWindow.Misc_TrackIRZ.IsChecked;
+            Properties.Settings.Default.Misc_TrackIRZ             = (bool)mainWindow.Misc_TrackIRZ.IsOn;
             Properties.Settings.Default.Misc_ExMouseLook          = (bool)mainWindow.Misc_ExMouseLook.IsChecked;
             Properties.Settings.Default.Misc_SmartScalingOverride = (bool)mainWindow.Misc_SmartScalingOverride.IsChecked;
             Properties.Settings.Default.Misc_NaturalHeadMovement  = (bool)mainWindow.Misc_NaturalHeadMovement.IsChecked;
