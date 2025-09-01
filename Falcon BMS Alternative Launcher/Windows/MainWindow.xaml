@@ -225,7 +225,7 @@
                     <Grid HorizontalAlignment="Left" Height="127" Margin="46,0,0,191.333" VerticalAlignment="Bottom" Width="953">
 
                         <Label Content="Theater :" Style="{StaticResource LauncherTitle}"/>
-                        <ComboBox x:Name="Dropdown_TheaterList" Background="#80F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
+                        <ComboBox x:Name="Dropdown_TheaterList" Background="#F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
 
                         <Button x:Name="Launch_TheaterConfig" Content="Theater Config" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" Margin="424,4,429,0" VerticalAlignment="Top" Click="Launch_TheaterConfig_Click" FontSize="10" RenderTransformOrigin="-0.033,0.5"/>
 
@@ -477,12 +477,12 @@
 
                                     <Label Content="FOV : " Margin="32,51,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_FOV" Margin="188,51,0,0" Style="{StaticResource AxisLabel}"/>
-                                    <Controls:MetroProgressBar x:Name="Axis_FOV" HorizontalAlignment="Left" Margin="32,85,0,0" VerticalAlignment="Top" Width="256" Height="10"/>
+                                    <Controls:MetroProgressBar x:Name="Axis_FOV" Margin="32,85,0,0" Width="256" Height="10" Style="{StaticResource AxisBar}"/>
                                     <Button x:Name="FOV" Margin="320,77,0,0" Style="{StaticResource AssignButton}" RenderTransformOrigin="0.216,1.519"/>
 
                                     <Label Content="Distance :" Margin="32,100,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_Camera_Distance" Margin="188,100,0,0" Style="{StaticResource AxisLabel}"/>
-                                    <Controls:MetroProgressBar x:Name="Axis_Camera_Distance" HorizontalAlignment="Left" Margin="32,134,0,0" VerticalAlignment="Top" Width="256" Height="10"/>
+                                    <Controls:MetroProgressBar x:Name="Axis_Camera_Distance" Margin="32,134,0,0" Width="256" Height="10" Style="{StaticResource AxisBar}"/>
                                     <Button x:Name="Camera_Distance" Margin="320,126,0,0" Style="{StaticResource AssignButton}"/>
                                     <Controls:ToggleSwitch x:Name="Misc_TrackIRZ" OnContent="TrackIR Zoom Fov" OffContent="TrackIR Head Forward" Margin="228,10,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
                                     <CheckBox x:Name="Misc_ExMouseLook" Content="External MouseLook" HorizontalAlignment="Left" Margin="32,192,0,0" VerticalAlignment="Top" />
