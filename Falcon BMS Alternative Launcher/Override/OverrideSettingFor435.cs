@@ -90,7 +90,7 @@ namespace FalconBMS.Launcher.Override
 
             // TrackIR Z-Axis(0:Z-axis 1:FOV)
             bs[336 + 48] = 0x00;
-            if (mainWindow.Misc_TrackIRZ.IsOn == true)
+            if (mainWindow.TrackIRZ_ZoomFOV.IsChecked == true)
                 bs[336 + 48] = 0x01;
 
             // External Mouselook

@@ -484,13 +484,15 @@
                                     <Label x:Name="Label_Camera_Distance" Margin="188,100,0,0" Style="{StaticResource AxisLabel}"/>
                                     <Controls:MetroProgressBar x:Name="Axis_Camera_Distance" Margin="32,134,0,0" Width="256" Height="10" Style="{StaticResource AxisBar}"/>
                                     <Button x:Name="Camera_Distance" Margin="320,126,0,0" Style="{StaticResource AssignButton}"/>
-                                    <Controls:ToggleSwitch x:Name="Misc_TrackIRZ" OnContent="TrackIR Zoom Fov" OffContent="TrackIR Head Forward" Margin="228,10,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
-                                    <CheckBox x:Name="Misc_ExMouseLook" Content="External MouseLook" HorizontalAlignment="Left" Margin="32,192,0,0" VerticalAlignment="Top" />
-                                    <TextBlock Text="Allows the mouse to control the camera for external views. Note that if this is enabled, controlling the external camera with the POV hat will be disabled." Margin="56,215,0,82" Style="{StaticResource HelpText}"/>
-                                    <CheckBox x:Name="Misc_NaturalHeadMovement" Content="Natural Head Movement" HorizontalAlignment="Left" Margin="32,258,0,0" VerticalAlignment="Top" />
-                                    <TextBlock Text="Using this option will provide a more realistic experience when looking back at your six o'clock position as it will take into account the torso movement necessary to do so (valid with and without TIR)." TextWrapping="Wrap" Margin="56,281,0,-4" Style="{StaticResource HelpText}"/>
-                                    <CheckBox x:Name="Misc_PilotModel" Content="Pilot Model" HorizontalAlignment="Left" Margin="32,338,0,0" VerticalAlignment="Top"  Height="17"/>
-                                    <TextBlock Margin="56,359,0,-61" Style="{StaticResource HelpText}">
+                                    <RadioButton x:Name="TrackIRZ_HeadForward" GroupName="TrackIRZ" Content="TrackIR Head Forward" Margin="183,19,0,0" Style="{StaticResource LauncherRadioButton}"/>
+                                    <RadioButton x:Name="TrackIRZ_ZoomFOV" GroupName="TrackIRZ" Content="TrackIR Zoom FOV" Margin="349,19,0,0" Style="{StaticResource LauncherRadioButton}"/>
+
+                                    <CheckBox x:Name="Misc_ExMouseLook" Content="External MouseLook" HorizontalAlignment="Left" Margin="32,193,0,0" VerticalAlignment="Top" />
+                                    <TextBlock Text="Allows the mouse to control the camera for external views. Note that if this is enabled, controlling the external camera with the POV hat will be disabled." Margin="56,216,0,0" Style="{StaticResource HelpText}"/>
+                                    <CheckBox x:Name="Misc_NaturalHeadMovement" Content="Natural Head Movement" HorizontalAlignment="Left" Margin="32,260,0,0" VerticalAlignment="Top" />
+                                    <TextBlock Text="Using this option will provide a more realistic experience when looking back at your six o'clock position as it will take into account the torso movement necessary to do so (valid with and without TIR)." TextWrapping="Wrap" Margin="56,283,0,0" Style="{StaticResource HelpText}"/>
+                                    <CheckBox x:Name="Misc_PilotModel" Content="Pilot Model" HorizontalAlignment="Left" Margin="32,340,0,0" VerticalAlignment="Top"  Height="17"/>
+                                    <TextBlock Margin="56,361,0,0" Style="{StaticResource HelpText}">
                                         <Run Text="Shows Pilot Model in 3D cockpit with kneeboards. "/>
                                         <Hyperlink NavigateUri="http://www.weapondeliveryplanner.nl/" RequestNavigate="WDP_RequestNavigate" Foreground="#FF6CD2FF">
                                             Weapon Delivery Planner
