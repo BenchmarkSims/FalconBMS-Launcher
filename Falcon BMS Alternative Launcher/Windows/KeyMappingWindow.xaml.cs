@@ -145,7 +145,7 @@ namespace FalconBMS.Launcher.Windows
             string currCallback0 = tmpjoy.dx[buttonId].assign[0].GetCallback();
             if (currCallback0 == "SimHotasPinkyShift" || currCallback0 == "SimHotasShift")
             {
-                this.Select_PinkyShift.IsChecked = newState;
+                this.Select_PinkyShift.IsOn = newState;
                 return;
             }
 
@@ -154,9 +154,9 @@ namespace FalconBMS.Launcher.Windows
                 return;
 
             // Show UI feedback, and currently mapped callback, if any -- incl consideration for shift- and release-modes.
-            Pinky pinky = (this.Select_PinkyShift.IsChecked == true ? Pinky.Shift : Pinky.UnShift);
-            Behaviour behaviour = (this.Select_DX_Release.IsChecked == true ? Behaviour.Release : Behaviour.Press);
-            Invoke action = (this.Select_DX_Release.IsChecked == true ? Invoke.Down : Invoke.Default);
+            Pinky pinky = (this.Select_PinkyShift.IsOn == true ? Pinky.Shift : Pinky.UnShift);
+            Behaviour behaviour = (this.Select_DX_Release.IsOn == true ? Behaviour.Release : Behaviour.Press);
+            Invoke action = (this.Select_DX_Release.IsOn == true ? Invoke.Down : Invoke.Default);
 
             int mappingBehavior = (int)pinky + (int)behaviour;
             string currCallback = tmpjoy.dx[buttonId].assign[mappingBehavior].GetCallback();
@@ -172,7 +172,7 @@ namespace FalconBMS.Launcher.Windows
                 KeyAssgn row = _keyFile.LookupCallback(currCallback);
                 string currCallbackDescr = row != null ? row.GetKeyDescription() : currCallback;
 
-                string pressOrRelease = (this.Select_DX_Release.IsChecked == true) ? "release" : "press";
+                string pressOrRelease = (this.Select_DX_Release.IsOn == true) ? "release" : "press";
                 this.CurrentlyMapped.Text = $"Button {pressOrRelease} currently bound to:\r\n" + currCallbackDescr;
                 this.CurrentlyMapped.Visibility = Visibility.Visible;
             }
@@ -197,7 +197,7 @@ namespace FalconBMS.Launcher.Windows
             if (newDirection < 0) return;
 
             // Show UI feedback, and currently mapped callback, if any -- incl support for dx-shift mappings.
-            Pinky pinky = (this.Select_PinkyShift.IsChecked == true ? Pinky.Shift : Pinky.UnShift);
+            Pinky pinky = (this.Select_PinkyShift.IsOn == true ? Pinky.Shift : Pinky.UnShift);
 
             string currCallback = tmpjoy.pov[povhatId].GetCurrentCallback(newDirection, pinky);
 
@@ -280,7 +280,7 @@ namespace FalconBMS.Launcher.Windows
             if ((Microsoft.DirectX.DirectInput.Key)catchedScanCode == Microsoft.DirectX.DirectInput.Key.Y && !Shift && !Ctrl && !Alt)
                 return;
 
-            Pinky pinkyStatus = (Select_PinkyShift.IsChecked == true) ? Pinky.Shift : Pinky.UnShift;
+            Pinky pinkyStatus = (Select_PinkyShift.IsOn == true) ? Pinky.Shift : Pinky.UnShift;
 
             // Determine if this input is already mapped to another callback, and display warning/hint if so.
             KeyAssgn currCallbackAssgn = _keyFile.ReverseLookupKeyboardInput(catchedScanCode, Shift, Ctrl, Alt);
