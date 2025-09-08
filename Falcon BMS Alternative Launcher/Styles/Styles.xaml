@@ -15,6 +15,14 @@
     <SolidColorBrush x:Key="GridSelectedFgBrush" Color="#FFE0E0E0"/>
     <SolidColorBrush x:Key="GridFocusedFgBrush" Color="#FF00F8F8"/>
 
+    <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.StrokeOff" Color="#8888" />
+    <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.KnobFillOff" Color="#8888" />
+    <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.FillOff" Color="#8222" />
+
+    <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.StrokeOffPointerOver" Color="#6888" />
+    <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.KnobFillOffPointerOver" Color="#6888" />
+    <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.FillOffPointerOver" Color="#6222" />
+
     <Style TargetType="DataGridDetailsPresenter">
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
