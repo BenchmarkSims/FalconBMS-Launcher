@@ -154,6 +154,7 @@
     <Compile Include="Override\OverrideSettingFor437.cs" />
     <Compile Include="SteamVR.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Util\DdsFileHeader.cs" />
     <Compile Include="Windows\CallsignWindow.xaml.cs">
       <DependentUpon>CallsignWindow.xaml</DependentUpon>
     </Compile>

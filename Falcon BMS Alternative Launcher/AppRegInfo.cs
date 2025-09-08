@@ -11,7 +11,6 @@ using Microsoft.Win32;
 using FalconBMS.Launcher.Windows;
 using FalconBMS.Launcher.Override;
 using FalconBMS.Launcher.Starter;
-
 using FalconBMS.Launcher.Input;
 
 namespace FalconBMS.Launcher
@@ -32,6 +31,9 @@ namespace FalconBMS.Launcher
         private string currentTheater;
         private string pilotCallsign;
 
+        private bool has16kTerrainTilesInNeedOfProcessing;
+        private bool hasLowFreeSpaceOnDrive;
+
         private MainWindow mainWindow;
 
         public string theaterOwnConfig = "";
@@ -40,6 +42,9 @@ namespace FalconBMS.Launcher
         public string GetInstallDir() { return installDir; }
         public string GetCurrentTheater() { return currentTheater; }
         public string GetPilotCallsign() { return pilotCallsign; }
+
+        public bool Has16kTerrainTilesInNeedOfProcessing() { return has16kTerrainTilesInNeedOfProcessing; }
+        public bool HasLowFreeSpaceOnDrive() { return hasLowFreeSpaceOnDrive; }
 
         public OverrideSetting getOverrideWriter() { return overRideSetting; }
         public BMS_Version getBMSVersion() { return bms_Version; }
@@ -124,6 +129,26 @@ namespace FalconBMS.Launcher
             //TODO: refactor this innocent-looking boolean getter, which has side-effects to init many member fields for
             // the currently selected version.. in the meantime, we must call it again now that we have selectedVersion.
             BMSExists(version);
+
+            // Hack: try to help users with some sanity-checks, before launching into 16K conversion.
+            string warning_text = @"WARNING: Found 16K folder containing unprocessed terrain textures -- BMS must run in 2D until the conversion process is complete." +
+                "\n\n" +
+                @"This conversion process will take several minutes, and require 21 Gb of free drive space.";
+
+            if (this.Has16kTerrainTilesInNeedOfProcessing())
+            {
+                if (this.HasLowFreeSpaceOnDrive())
+                    warning_text += "\n\n" + @"WARNING: drive currently has LOW FREE SPACE!";
+
+                MessageBox.Show(mainWindow, warning_text, "16K Terrain - Texture Convesion Needed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                mainWindow.CMD_MONO.IsOn = true;
+                mainWindow.CMD_MONO.IsEnabled = false;
+            }
+            else
+            {
+                mainWindow.CMD_MONO.IsEnabled = true;
+            }
+
             return;
         }
 
@@ -138,13 +163,70 @@ namespace FalconBMS.Launcher
 
             this.installDir = (string)rk.GetValue("baseDir");
             if (String.IsNullOrEmpty(installDir)) return false;
+            if (!Directory.Exists(installDir)) return false;
 
             this.currentTheater = ReadCurrentTheater();
             this.pilotCallsign = ReadPilotCallsign();
 
             //if (platform == Platform.OS_64bit)
             exeDir = installDir + "\\bin\\x64\\Falcon BMS.exe";
-            return File.Exists(exeDir);
+            if (!File.Exists(exeDir)) return false;
+
+            FileVersionInfo exe_version_info = FileVersionInfo.GetVersionInfo(exeDir);
+            Diagnostics.Log(exe_version_info.ToString());
+
+            int major = exe_version_info.FileMajorPart;
+            int minor = exe_version_info.FileMinorPart;
+            int build = exe_version_info.FileBuildPart;
+            int patch = exe_version_info.FilePrivatePart;
+
+            this.has16kTerrainTilesInNeedOfProcessing = false;
+            if (major == 4 && minor == 38 && build == 1 && patch >= 3099)
+                ScanFor16K();
+
+            this.hasLowFreeSpaceOnDrive = false;
+            if (this.has16kTerrainTilesInNeedOfProcessing)
+                CheckDriveFreeSpace();
+
+            return true;
+        }
+
+        private void ScanFor16K()
+        {
+            Diagnostics.Log("BMS version is 4.38.1 - scanning for 16K textures..");
+
+            this.has16kTerrainTilesInNeedOfProcessing = false;
+
+            string dataDir = this.installDir + @"\Data";
+            foreach (string d in Directory.GetDirectories(dataDir, "16K", SearchOption.AllDirectories))
+            {
+                foreach (string f in Directory.GetFiles(d, "*.dds", SearchOption.TopDirectoryOnly))
+                {
+                    if (DdsFileHeader.FileResolutionIs16Kx16K(f))
+                    {
+                        Diagnostics.Log("Found one or more 16K dds files: " + f);
+                        this.has16kTerrainTilesInNeedOfProcessing = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void CheckDriveFreeSpace()
+        {
+            Diagnostics.Log("BMS version is 4.38.1 - checking free space on BMS drive..");
+
+            this.hasLowFreeSpaceOnDrive = false;
+
+            string drive_root = Path.GetPathRoot(this.installDir);
+
+            DriveInfo di = new System.IO.DriveInfo(drive_root);
+            long free_space = di.AvailableFreeSpace;
+
+            // 16K texture conversion process will require ~22 Gb of free space.
+            const long space_reqd = 30_000_000_000L;
+            this.hasLowFreeSpaceOnDrive = (free_space < space_reqd);
+            return;
         }
 
         public void ChangeCfgPath()
