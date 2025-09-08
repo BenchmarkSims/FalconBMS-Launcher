@@ -11,7 +11,6 @@ namespace FalconBMS.Launcher.Starter
     {
         public Starter436(AppRegInfo appReg, MainWindow mainWindow) : base(appReg, mainWindow)
         {
-            Bandwidth(false);
             NewAxisFrom433(true);
             AVCSince433(true);
             RTTsince435(true);

@@ -451,25 +451,6 @@ namespace FalconBMS.Launcher.Windows
         }
         
         /// <summary>
-        /// When clicked BW button, changes BW value.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CMD_BW_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                appProperties.CMD_BW_Click();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-                Diagnostics.ShowErrorMsgbox(ex);
-                Close();
-            }
-        }
-
-        /// <summary>
         /// Open BMS Docs and Manuals.
         /// </summary>
         /// <param name="sender"></param>
@@ -513,15 +494,6 @@ namespace FalconBMS.Launcher.Windows
                 Diagnostics.ShowErrorMsgbox(ex);
                 Close();
             }
-        }
-
-        /// <summary>
-        /// As the name implies.
-        /// </summary>
-        /// <returns></returns>
-        public int getBWValue()
-        {
-            return appProperties.bandWidthDefault;
         }
 
         /// <summary>
