@@ -149,10 +149,9 @@
                             <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" Margin="575,0,0,0"/>
                         </Grid>
                     </Border>
-                    <CheckBox x:Name="ApplicationOverride" Content="Launch without any setup override" HorizontalAlignment="Right" Margin="0,0,14.667,97.667" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
+                    <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
 
-
-                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Margin="48,0,0,20.333" VerticalAlignment="Bottom" Width="503" Style="{StaticResource LauncherStripBorder}">
+                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Margin="48,0,0,20" VerticalAlignment="Bottom" Width="480" Style="{StaticResource LauncherStripBorder}">
                         <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
                             <Grid.Resources>
                                 <Style TargetType="Button">
@@ -219,43 +218,43 @@
                             <Label x:Name="Label_F4RADAR" Content="     F4 RADAR&#xA;C2(AWACS) Tool" Margin="281,0,0,0.333"/>
                         </Grid>
                     </Border>
-                    <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="0,0,9.667,20.333" VerticalAlignment="Bottom" Width="208" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
-                    <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged" Height="72" Margin="0,0,222.667,20.333" Width="217" Style="{StaticResource LauncherListBox}">
+
+                    <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="20,20,20,20" VerticalAlignment="Bottom" Width="208" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
+                    <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,20,240,20" Width="220" Height="72" SelectionMode="Single" d:ItemsSource="{d:SampleData ItemCount=5}" Style="{StaticResource LauncherListBox}">
                     </ListBox>
-                    <Grid HorizontalAlignment="Left" Height="127" Margin="46,0,0,191.333" VerticalAlignment="Bottom" Width="953">
 
-                        <Label Content="Theater :" Style="{StaticResource LauncherTitle}"/>
+                    <Grid HorizontalAlignment="Left" Height="127" Margin="46,0,0,191" VerticalAlignment="Bottom" Width="953">
+                        <Label Content="Theater :" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource LauncherTitle}"/>
                         <ComboBox x:Name="Dropdown_TheaterList" Background="#F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
-
-                        <Button x:Name="Launch_TheaterConfig" Content="Theater Config" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" Margin="424,4,429,0" VerticalAlignment="Top" Click="Launch_TheaterConfig_Click" FontSize="10" RenderTransformOrigin="-0.033,0.5"/>
-
-                        <Label Content="Command Line :" Margin="0,96,0,-27" Style="{StaticResource LauncherTitle}"/>
-
-                        <Label x:Name="Label_VR" Content="Virtual Reality:" Margin="0,64,0,0" Style="{StaticResource LauncherTitle}"/>
-                        <RadioButton x:Name="VR_NoVR" GroupName="VR" Content="No VR" Margin="181,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="VR_SteamVR" GroupName="VR" Content="SteamVR" Margin="250,69,0,0" Click="Misc_VR_Click" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="VR_OpenXR" GroupName="VR" Content="OpenXR" Margin="329,69,0,0" RenderTransformOrigin="-7.082,0.583" Style="{StaticResource LauncherRadioButton}"/>
-
-                        <Label x:Name="Label_RTT" Content="Export RTT Textures:" Margin="525,64,0,0" Style="{StaticResource LauncherTitle}"/>
-                        <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" Margin="660,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" Margin="730,69,0,0" Style="{StaticResource LauncherRadioButton}"/>
-
-                        <Label Content="Documentation and Manuals :" Margin="0,35,0,0" Style="{StaticResource LauncherTitle}"/>
+                        <Label Content="Documentation :" HorizontalAlignment="Left" Margin="0,32,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
                         <Button x:Name="OpenDocs" Content="Open Docs Folder" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Left" Margin="180,37,0,0" VerticalAlignment="Top" Width="141" Click="OpenDocs_Click" FontSize="10" Height="10"/>
+                        <Label x:Name="Label_VR" Content="Virtual / Mixed Reality :" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
+                        <RadioButton x:Name="VR_NoVR" GroupName="VR" Content="No VR" HorizontalAlignment="Left" Margin="180,70,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
+                        <RadioButton x:Name="VR_SteamVR" GroupName="VR" Content="SteamVR" HorizontalAlignment="Left" Margin="250,70,0,0" VerticalAlignment="Top" Click="Misc_VR_Click" Style="{StaticResource LauncherRadioButton}"/>
+                        <RadioButton x:Name="VR_OpenXR" GroupName="VR" Content="OpenXR" HorizontalAlignment="Left" Margin="329,70,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
 
-                        <Controls:ToggleSwitch x:Name="CMD_ACMI" OnContent="ACMI On" OffContent="ACMI Off" Margin="178,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
-                        <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnContent="WINDOW On" OffContent="WINDOW Off" Margin="313,94,0,0" Toggled="CMD_WINDOW_Click" Style="{StaticResource LauncherToggleSwitch}"/>
-                        <Controls:ToggleSwitch x:Name="CMD_NOMOVIE" OnContent="NOMOVIE On" OffContent="NOMOVIE Off" Margin="472,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
-                        <Controls:ToggleSwitch x:Name="CMD_EF" OnContent="EYEFLY On" OffContent="EYEFLY Off" Margin="633,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
-                        <Controls:ToggleSwitch x:Name="CMD_MONO" OnContent="DEBUG On" OffContent="DEBUG Off" Margin="776,94,0,0" Style="{StaticResource LauncherToggleSwitch}"/>
-
-                        <Button x:Name="CMD_BW" Content="BW : 1024" HorizontalAlignment="Left" Margin="881,66,0,0" VerticalAlignment="Top" Width="64" Click="CMD_BW_Click"/>
-                        <Controls:ToggleSwitch x:Name="AB_Test" Visibility="Hidden" OffContent="A" OnContent="B" Margin="700,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Height="36" />
+                        <Label x:Name="Label_RTT" Content="Export RTT Textures:" HorizontalAlignment="Left" Margin="0,94,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
+                        <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" HorizontalAlignment="Left" Margin="180,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
+                        <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" HorizontalAlignment="Left" Margin="250,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
                     </Grid>
-                    <ScrollViewer x:Name ="LogTextScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="48,57,563.667,349.333" Background="#54000000">
-                        <TextBlock x:Name="News" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="350" Margin="20,20,0,0" />
+
+                    <Label Content="News" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" FontStyle="Italic"/>
+                    <ScrollViewer x:Name ="LogTextScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="48,60,460,350" Background="#5000">
+                        <TextBlock x:Name="News" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="380" Margin="20,20,0,0" />
                     </ScrollViewer>
-                    <Label Content="News" Margin="48,10,0,0" Style="{StaticResource LauncherHeading}"/>
+
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Margin="480,60,20,20" Padding="10" Background="#3000" Width="200">
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Launch Options :" HorizontalAlignment="Left" Margin="10" FontSize="13" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
+                            <Controls:ToggleSwitch x:Name="CMD_ACMI" OnContent="ACMI On" OffContent="ACMI Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
+                            <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnContent="WINDOW On" OffContent="WINDOW Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
+                            <Controls:ToggleSwitch x:Name="CMD_NOMOVIE" OnContent="NOMOVIE On" OffContent="NOMOVIE Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
+                            <Controls:ToggleSwitch x:Name="CMD_EF" OnContent="EYEFLY On" OffContent="EYEFLY Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
+                            <Controls:ToggleSwitch x:Name="CMD_MONO" OnContent="DEBUG On" OffContent="DEBUG Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
+                            <Controls:ToggleSwitch x:Name="AB_Test" Visibility="Hidden" OffContent="A" OnContent="B" Margin="10" HorizontalAlignment="Right" Style="{StaticResource LauncherToggleSwitch}" />
+                        </StackPanel>
+                    </Border>
+
                 </Grid>
             </TabItem>
             <TabItem Header="AXISASSIGN" Margin="535.333,-40,-535,40.333" Style="{StaticResource TabHeader}">
@@ -277,7 +276,7 @@
                                     <Label Content="Roll : " Margin="32,51,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_Roll" Margin="188,51,0,0" Style="{StaticResource AxisLabel}"/>
                                     <Controls:MetroProgressBar x:Name="Axis_Roll" Margin="32,85,0,0" Style="{StaticResource AxisBar}"/>
-                                    <Button x:Name="Roll" Margin="320,77,0,0" RenderTransformOrigin="0.216,1.519" Style="{StaticResource AssignButton}"/>
+                                    <Button x:Name="Roll" Margin="320,77,0,0" Style="{StaticResource AssignButton}"/>
 
                                     <Label Content="Pitch :" Margin="32,100,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_Pitch" Margin="188,100,0,0" Style="{StaticResource AxisLabel}"/>
@@ -451,7 +450,7 @@
                                     <Label Content="Course : " Margin="32,51,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_HSI_Course_Knob" Margin="188,51,0,0" Style="{StaticResource AxisLabel}"/>
                                     <Controls:MetroProgressBar x:Name="Axis_HSI_Course_Knob" Margin="32,85,0,0" Style="{StaticResource AxisBar}"/>
-                                    <Button x:Name="HSI_Course_Knob" Margin="320,77,0,0" Style="{StaticResource AssignButton}" RenderTransformOrigin="0.216,1.519"/>
+                                    <Button x:Name="HSI_Course_Knob" Margin="320,77,0,0" Style="{StaticResource AssignButton}" />
 
                                     <Label Content="Heading :" Margin="32,100,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_HSI_Heading_Knob" Margin="188,100,0,0" Style="{StaticResource AxisLabel}"/>
@@ -478,7 +477,7 @@
                                     <Label Content="FOV : " Margin="32,51,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_FOV" Margin="188,51,0,0" Style="{StaticResource AxisLabel}"/>
                                     <Controls:MetroProgressBar x:Name="Axis_FOV" Margin="32,85,0,0" Width="256" Height="10" Style="{StaticResource AxisBar}"/>
-                                    <Button x:Name="FOV" Margin="320,77,0,0" Style="{StaticResource AssignButton}" RenderTransformOrigin="0.216,1.519"/>
+                                    <Button x:Name="FOV" Margin="320,77,0,0" Style="{StaticResource AssignButton}" />
 
                                     <Label Content="Distance :" Margin="32,100,0,0" Style="{StaticResource AxisTitle}"/>
                                     <Label x:Name="Label_Camera_Distance" Margin="188,100,0,0" Style="{StaticResource AxisLabel}"/>
@@ -561,8 +560,8 @@
                             <DataGridTemplateColumn Visibility="Hidden" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Label Content="ASSIGNMENT" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="10,0,0,32.334" VerticalAlignment="Bottom" RenderTransformOrigin="-4.878,1.143" FontWeight="Bold" Height="26" Width="89" Foreground="{StaticResource UiForegroundBrush}"/>
-                    <Label x:Name="Label_AssgnStatus" Content="KEYSEARCH MODE" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="114,0,0,32.334" VerticalAlignment="Bottom" RenderTransformOrigin="-4.878,1.143" FontStyle="Italic" Height="26" Width="886" Foreground="{StaticResource UiForegroundBrush}" Grid.ColumnSpan="2"/>
+                    <Label Content="ASSIGNMENT" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="10,0,0,32.334" VerticalAlignment="Bottom" FontWeight="Bold" Height="26" Width="89" Foreground="{StaticResource UiForegroundBrush}"/>
+                    <Label x:Name="Label_AssgnStatus" Content="KEYSEARCH MODE" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="114,0,0,32.334" VerticalAlignment="Bottom" FontStyle="Italic" Height="26" Width="886" Foreground="{StaticResource UiForegroundBrush}" Grid.ColumnSpan="2"/>
 
                     <Label Content="Filter:" HorizontalAlignment="Left" Margin="227.167,-43,0,0" VerticalAlignment="Top" Width="43" HorizontalContentAlignment="Right" Foreground="White" Grid.Column="1"/>
                     <TextBox x:Name="SearchBox" HorizontalAlignment="Left" Height="23" Margin="282.167,-41,0,0" VerticalAlignment="Top" Width="384" Background="#80F0F0F0" Foreground="#FF191919" Controls:TextBoxHelper.ClearTextButton="True" TextChanged="SearchBox_TextChanged" Grid.Column="1"/>
