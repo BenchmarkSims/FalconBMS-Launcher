@@ -517,12 +517,12 @@ namespace FalconBMS.Launcher.Override
         /// <summary>
         /// Axis information order for AxisMapping.dat
         /// </summary>
-        private AxisName[] axisMappingList;
+        private AxisName[] axisMappingList = { };
 
         /// <summary>
         /// Axis information order for JoyStick.cal
         /// </summary>
-        private AxisName[] joystickCalList;
+        private AxisName[] joystickCalList = { };
     }
     
 

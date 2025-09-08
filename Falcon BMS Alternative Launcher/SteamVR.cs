@@ -82,7 +82,7 @@ namespace FalconBMS.Launcher
 
         private class OpenVRJson
         {
-            public String[] runtime;
+            public String[] runtime = { };
         }
         private List<string> GetOpenVRPaths()
         {
