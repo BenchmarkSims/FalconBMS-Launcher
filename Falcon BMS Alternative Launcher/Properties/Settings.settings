@@ -17,9 +17,6 @@
     <Setting Name="CMD_EF" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="CMD_BW" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1024</Value>
-    </Setting>
     <Setting Name="NoOverride" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>

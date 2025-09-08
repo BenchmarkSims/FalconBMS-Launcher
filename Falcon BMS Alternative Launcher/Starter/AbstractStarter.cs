@@ -150,17 +150,5 @@ namespace FalconBMS.Launcher.Starter
             }
         }
 
-        public void Bandwidth(bool flg)
-        {
-            if (flg)
-            {
-                mainWindow.CMD_BW.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                mainWindow.CMD_BW.Visibility = Visibility.Hidden;
-            }
-        }
-
     }
 }
