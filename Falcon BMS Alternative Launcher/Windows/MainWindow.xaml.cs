@@ -173,6 +173,12 @@ namespace FalconBMS.Launcher.Windows
 
         private void _Post_UpdateRss()
         {
+            if (appReg == null || appReg.Has16kTerrainTilesInNeedOfProcessing())
+                return;
+
+            if (this.News == null)
+                return;
+
             RSSReader.Write(News);
             Diagnostics.Log("RSS update finished.");
         }
