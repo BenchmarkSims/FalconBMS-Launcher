@@ -333,20 +333,21 @@ namespace FalconBMS.Launcher
             rk.SetValue("curTheater", combobox.Items[combobox.SelectedIndex].ToString());
             rk.Close();
 
-            switch ((string)mainWindow.Dropdown_TheaterList.SelectedItem)
-            {
-                case "Israel":
-                    mainWindow.Launch_TheaterConfig.Visibility = Visibility.Visible;
-                    theaterOwnConfig = GetInstallDir() + "\\Data\\Add-On Israel\\Israel Theater Settings.exe";
-                    return;
-                case "Ikaros":
-                    mainWindow.Launch_TheaterConfig.Visibility = Visibility.Visible;
-                    theaterOwnConfig = GetInstallDir() + "\\Data\\Add-On Ikaros\\Ikaros Settings.exe";
-                    return;
-                default:
-                    mainWindow.Launch_TheaterConfig.Visibility = Visibility.Collapsed;
-                    break;
-            }
+            //switch ((string)mainWindow.Dropdown_TheaterList.SelectedItem)
+            //{
+            //    case "Israel":
+            //        mainWindow.Launch_TheaterConfig.Visibility = Visibility.Visible;
+            //        theaterOwnConfig = GetInstallDir() + "\\Data\\Add-On Israel\\Israel Theater Settings.exe";
+            //        return;
+            //    case "Ikaros":
+            //        mainWindow.Launch_TheaterConfig.Visibility = Visibility.Visible;
+            //        theaterOwnConfig = GetInstallDir() + "\\Data\\Add-On Ikaros\\Ikaros Settings.exe";
+            //        return;
+            //    default:
+            //        mainWindow.Launch_TheaterConfig.Visibility = Visibility.Collapsed;
+            //        break;
+            //}
+            //mainWindow.Launch_TheaterConfig.Visibility = Visibility.Hidden;
         }
     }
 
