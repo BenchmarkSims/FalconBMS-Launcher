@@ -144,6 +144,7 @@
     </Style>
     <Style x:Key="LauncherToggleSwitch" TargetType="Controls:ToggleSwitch" BasedOn="{StaticResource {x:Type Controls:ToggleSwitch}}">
         <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Top"/>

@@ -238,7 +238,7 @@
                         <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" HorizontalAlignment="Left" Margin="250,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
                     </Grid>
 
-                    <Label Content="News" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" FontStyle="Italic"/>
+                    <Label Content="News" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" FontStyle="Italic" Style="{StaticResource LauncherTitle}"/>
                     <ScrollViewer x:Name ="LogTextScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="48,60,460,350" Background="#5000">
                         <TextBlock x:Name="News" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="380" Margin="20,20,0,0" />
                     </ScrollViewer>
