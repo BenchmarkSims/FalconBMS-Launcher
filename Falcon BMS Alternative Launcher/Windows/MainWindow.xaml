@@ -51,173 +51,374 @@
         <TabControl x:Name="LargeTab" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="TabControl_SelectionChanged" Margin="0,64,0.333,0.334" Background="{x:Null}" Grid.RowSpan="2">
             <TabItem Header="LAUNCHER" x:Name="Tab_Launcher" Margin="535,-40,-535.333,40.333" Style="{StaticResource TabHeader}">
                 <Grid>
-                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Width="638" Margin="48,0,0,97" VerticalAlignment="Bottom" Style="{StaticResource LauncherStripBorder}">
-                        <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
+
+                    <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
+
+                    <Border BorderThickness="1"
+        HorizontalAlignment="Left"
+        Height="72"
+        Width="638"
+        Margin="48,0,0,97"
+        VerticalAlignment="Bottom"
+        Style="{StaticResource LauncherStripBorder}">
+
+                        <Grid VerticalAlignment="Center">
+                            <!-- 9 columns -->
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Rows: Row 0 = icon baseline, Row 1 = captions -->
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="32"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
                             <Grid.Resources>
-                                <Style TargetType="Button">
-                                    <Setter Property="BorderThickness" Value="10" />
-                                    <Setter Property="BorderBrush" Value="Black" />
-                                    <Setter Property="HorizontalAlignment" Value="Left" />
-                                    <Setter Property="VerticalAlignment" Value="Bottom" />
-                                    <Setter Property="Width" Value="32" />
-                                    <Setter Property="Height" Value="32" />
+                                <!-- Launcher button -->
+                                <Style x:Key="LauncherItemButton" TargetType="Button">
+                                    <!-- Prevent MahApps background states -->
+                                    <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <!-- Just present the content -->
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Top"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                     <EventSetter Event="Click" Handler="Launch_Click"/>
                                     <EventSetter Event="MouseEnter" Handler="MouseEnterLauncher"/>
                                     <EventSetter Event="MouseLeave" Handler="MouseLeaveLauncher"/>
                                 </Style>
-                                <Style TargetType="Label">
-                                    <Setter Property="HorizontalAlignment" Value="Left" />
-                                    <Setter Property="VerticalAlignment" Value="Bottom" />
-                                    <Setter Property="Foreground" Value="#FFF0F0F0" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                    <Setter Property="FontSize" Value="8" />
+
+                                <!-- Launcher caption -->
+                                <Style x:Key="LauncherCaptionText" TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Top"/>
+                                    <Setter Property="Foreground" Value="#FFF0F0F0"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="9"/>
+                                    <Setter Property="MaxWidth" Value="80"/>
+
+                                    <Style.Triggers>
+                                        <!-- Hovering the text itself -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource GridFocusedFgBrush}"/>
+                                        </Trigger>
+
+                                        <!-- Hovering anywhere on the parent Button (icon OR text) -->
+                                        <DataTrigger Value="True"
+                     Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}">
+                                            <Setter Property="Foreground" Value="{DynamicResource GridFocusedFgBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
                                 </Style>
                             </Grid.Resources>
 
-                            <Button x:Name="Launch_UPD" Margin="20,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/UPD.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <!-- 1) Update -->
+                            <Button x:Name="Launch_UPD"
+                Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/UPD.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_UPD"
+                           Text="Update"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_CFG" Margin="90,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/CFG.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 2) Config -->
+                            <Button x:Name="Launch_CFG"
+                Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/CFG.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_CFG"
+                           Text="Config"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_MMC" Margin="160,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/BmsMultiMon.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 3) Display Config -->
+                            <Button x:Name="Launch_MMC"
+                Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/BmsMultiMon.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_MMC"
+                           Text="Display Config"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_RTTC" Margin="230,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/RTTClient64.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 4) RTT Client -->
+                            <Button x:Name="Launch_RTTC"
+                Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/RTTClient64.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_RTTC"
+                           Text="RTT Client"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_RTTS" Margin="300,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/RTTServer64.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 5) RTT Server -->
+                            <Button x:Name="Launch_RTTS"
+                Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/RTTServer64.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_RTTS"
+                           Text="RTT Server"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_IVCC" Margin="370,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/IVCC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 6) IVC Client (MP Radio) -->
+                            <Button x:Name="Launch_IVCC"
+                Grid.Column="5" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/IVCC.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_IVCC"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0">
+                    <Run Text="IVC Client"/>
+                    <LineBreak/>
+                    <Run Text="(MP Radio)"/>
+                                    </TextBlock>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_IVCS" Margin="440,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/IVCS.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 7) IVC Server (MP Radio) -->
+                            <Button x:Name="Launch_IVCS"
+                Grid.Column="6" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/IVCS.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_IVCS"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0">
+                    <Run Text="IVC Server"/>
+                    <LineBreak/>
+                    <Run Text="(MP Radio)"/>
+                                    </TextBlock>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_AVC" Margin="510,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/AVC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 8) Avionics Configurator -->
+                            <Button x:Name="Launch_AVC"
+                Grid.Column="7" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/AVC.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_AVC"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0">
+                    <Run Text="Avionics"/>
+                    <LineBreak/>
+                    <Run Text="Configurator"/>
+                                    </TextBlock>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_EDIT" Margin="580,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/EDIT.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 9) Editor -->
+                            <Button x:Name="Launch_EDIT"
+                Grid.Column="8" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Click">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/EDIT.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_EDIT"
+                           Text="Editor"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Label x:Name="Label_UPD" Content="Update&#xD;&#xA;" Margin="18,0,0,0"/>
-                            <Label x:Name="Label_CFG" Content="Config&#xD;&#xA;" Margin="88,0,0,0"/>
-                            <Label x:Name="Label_MMC" Content="Display&#xD;&#xA;Config" Margin="158,0,0,0"/>
-                            <Label x:Name="Label_RTTC" Content="RTT Client&#xD;&#xA;" Margin="220,0,0,0"/>
-                            <Label x:Name="Label_RTTS" Content="RTT Server&#xD;&#xA;" Margin="290,0,0,0"/>
-                            <Label x:Name="Label_IVCC" Content="IVC Client&#xD;&#xA;(MP Radio)" Margin="361,0,0,0"/>
-                            <Label x:Name="Label_IVCS" Content="IVC Server&#xD;&#xA;(MP Radio)" Margin="428,0,0,0"/>
-                            <Label x:Name="Label_AVC" Content="Avionics&#xD;&#xA;Configurator" Margin="501,0,0,0"/>
-                            <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" Margin="575,0,0,0"/>
                         </Grid>
                     </Border>
-                    <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
 
-                    <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Margin="48,0,0,20" VerticalAlignment="Bottom" Width="480" Style="{StaticResource LauncherStripBorder}">
-                        <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
+
+                    <Border BorderThickness="1"
+        HorizontalAlignment="Left"
+        Height="72"
+        Width="480"
+        Margin="48,0,0,20"
+        VerticalAlignment="Bottom"
+        Style="{StaticResource LauncherStripBorder}">
+
+                        <Grid VerticalAlignment="Center">
+                            <!-- 5 columns -->
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Rows: Row 0 = icon baseline, Row 1 = captions -->
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="32"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
                             <Grid.Resources>
-                                <Style TargetType="Button">
-                                    <Setter Property="BorderThickness" Value="10" />
-                                    <Setter Property="BorderBrush" Value="Black" />
-                                    <Setter Property="HorizontalAlignment" Value="Left" />
-                                    <Setter Property="VerticalAlignment" Value="Bottom" />
-                                    <Setter Property="Width" Value="32" />
-                                    <Setter Property="Height" Value="32" />
-                                    <EventSetter Event="Click" Handler="Launch_Third"/>
+                                <!-- Launcher button -->
+                                <Style x:Key="LauncherItemButton" TargetType="Button">
+                                    <!-- Prevent MahApps background states -->
+                                    <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <!-- Just present the content -->
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Top"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <EventSetter Event="Click" Handler="Launch_Click"/>
                                     <EventSetter Event="MouseEnter" Handler="MouseEnterLauncher"/>
                                     <EventSetter Event="MouseLeave" Handler="MouseLeaveLauncher"/>
                                 </Style>
-                                <Style TargetType="Label">
-                                    <Setter Property="HorizontalAlignment" Value="Left" />
-                                    <Setter Property="VerticalAlignment" Value="Bottom" />
-                                    <Setter Property="Foreground" Value="#FFF0F0F0" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                    <Setter Property="FontSize" Value="8" />
+
+                                <!-- Launcher caption -->
+                                <Style x:Key="LauncherCaptionText" TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Top"/>
+                                    <Setter Property="Foreground" Value="#FFF0F0F0"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="9"/>
+                                    <Setter Property="MaxWidth" Value="80"/>
+
+                                    <Style.Triggers>
+                                        <!-- Hovering the text itself -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource GridFocusedFgBrush}"/>
+                                        </Trigger>
+
+                                        <!-- Hovering anywhere on the parent Button (icon OR text) -->
+                                        <DataTrigger Value="True"
+                     Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}">
+                                            <Setter Property="Foreground" Value="{DynamicResource GridFocusedFgBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
                                 </Style>
                             </Grid.Resources>
 
-                            <Button x:Name="Launch_WDP" Margin="20,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/WDP.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 1) Weapon Delivery Planner -->
+                            <Button x:Name="Launch_WDP"
+                Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Third">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/WDP.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_WDP"
+                           Text="Weapon Delivery Planner"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
 
-                            <Button x:Name="Launch_MC" Margin="90,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/MC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+                            <!-- 2) Mission Commander -->
+                            <Button x:Name="Launch_MC"
+                Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Third">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/MC.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_MC"
+                           Text="Mission Commander"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_WC" Margin="160,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/WC.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 3) Weather Commander -->
+                            <Button x:Name="Launch_WC"
+                Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Third">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/WC.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_WC"
+                           Text="Weather Commander"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_F4WX" Margin="230,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/F4WX.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 4) F4Wx Real Weather -->
+                            <Button x:Name="Launch_F4WX"
+                Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Third">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/F4WX.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_F4WX"
+                           Text="F4Wx Real Weather"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,4,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Button x:Name="Launch_F4RADAR" Margin="300,0,0,33.333">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Image Source="/Resources/F4RADAR.png"/>
-                                    </ControlTemplate>
-                                </Button.Template>
+
+                            <!-- 5) F4 RADAR C2 (AWACS) Tool -->
+                            <Button x:Name="Launch_F4RADAR"
+                Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
+                Style="{StaticResource LauncherItemButton}"
+                Click="Launch_Third">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Source="/Resources/F4RADAR.png" Width="32" Height="32" Stretch="Uniform"/>
+                                    <TextBlock x:Name="Label_F4RADAR"
+                           Text="F4 RADAR C2 (AWACS) Tool"
+                           Style="{StaticResource LauncherCaptionText}"
+                           Margin="0,2,0,0"/>
+                                </StackPanel>
                             </Button>
-                            <Label x:Name="Label_WDP" Content="Weapon Delivery&#10;        Planner" Margin="0,0,0,0.333"/>
-                            <Label x:Name="Label_MC" Content="    Mission&#xA;Commander" Margin="75,0,0,0.333"/>
-                            <Label x:Name="Label_WC" Content="   Weather&#xA;Commander" Margin="147,0,0,0.333"/>
-                            <Label x:Name="Label_F4WX" Content="      F4Wx&#xA;Real Weather" Margin="216,0,0,0.333"/>
-                            <Label x:Name="Label_F4RADAR" Content="     F4 RADAR&#xA;C2(AWACS) Tool" Margin="281,0,0,0.333"/>
                         </Grid>
                     </Border>
+
 
                     <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="20,20,20,20" VerticalAlignment="Bottom" Width="208" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
                     <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,20,240,20" Width="220" Height="72" SelectionMode="Single" d:ItemsSource="{d:SampleData ItemCount=5}" Style="{StaticResource LauncherListBox}">
