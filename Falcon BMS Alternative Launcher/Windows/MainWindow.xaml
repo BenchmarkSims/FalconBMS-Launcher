@@ -424,19 +424,145 @@
                     <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,20,240,20" Width="220" Height="72" SelectionMode="Single" d:ItemsSource="{d:SampleData ItemCount=5}" Style="{StaticResource LauncherListBox}">
                     </ListBox>
 
-                    <Grid HorizontalAlignment="Left" Height="127" Margin="46,0,0,191" VerticalAlignment="Bottom" Width="953">
-                        <Label Content="Theater :" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource LauncherTitle}"/>
-                        <ComboBox x:Name="Dropdown_TheaterList" Background="#F0F0F0" Foreground="#FF191919" HorizontalAlignment="Left" Margin="180,4,0,0" VerticalAlignment="Top" Width="239" SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
-                        <Label Content="Documentation :" HorizontalAlignment="Left" Margin="0,32,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
-                        <Button x:Name="OpenDocs" Content="Open Docs Folder" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Left" Margin="180,37,0,0" VerticalAlignment="Top" Width="141" Click="OpenDocs_Click" FontSize="10" Height="10"/>
-                        <Label x:Name="Label_VR" Content="Virtual / Mixed Reality :" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
-                        <RadioButton x:Name="VR_NoVR" GroupName="VR" Content="No VR" HorizontalAlignment="Left" Margin="180,70,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="VR_SteamVR" GroupName="VR" Content="SteamVR" HorizontalAlignment="Left" Margin="250,70,0,0" VerticalAlignment="Top" Click="Misc_VR_Click" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="VR_OpenXR" GroupName="VR" Content="OpenXR" HorizontalAlignment="Left" Margin="329,70,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
+                    <Grid HorizontalAlignment="Left"
+          VerticalAlignment="Bottom"
+          Width="480"
+          Height="Auto"
+          Margin="46,0,0,191"
+          Grid.IsSharedSizeScope="True">
 
-                        <Label x:Name="Label_RTT" Content="Export RTT Textures:" HorizontalAlignment="Left" Margin="0,94,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
-                        <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" HorizontalAlignment="Left" Margin="180,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" HorizontalAlignment="Left" Margin="250,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
+                        <!-- Two columns: labels (fixed) + inputs (stretch) -->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Rows: content rows with small spacer rows between -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <!-- 0: Theater -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- 2: Documentation -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- 4: VR -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- 6: RTT -->
+                        </Grid.RowDefinitions>
+
+                        <!-- Theater -->
+                        <Label Grid.Row="0" Grid.Column="0"
+           Content="Theater :"
+           HorizontalAlignment="Left"
+           VerticalAlignment="Center"
+           Style="{StaticResource LauncherTitle}"/>
+                        <ComboBox x:Name="Dropdown_TheaterList"
+              Grid.Row="0" Grid.Column="1"
+              Width="239"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Center"
+              Background="#F0F0F0"
+              Foreground="#FF191919"
+              SelectionChanged="Dropdown_TheaterList_SelectionChanged"/>
+
+                        <!-- Documentation -->
+                        <Label Grid.Row="2" Grid.Column="0"
+           Content="Documentation :"
+           HorizontalAlignment="Left"
+           VerticalAlignment="Center"
+           FontWeight="Bold"
+           Style="{StaticResource LauncherTitle}"/>
+                        <Button x:Name="OpenDocs"
+            Grid.Row="2" Grid.Column="1"
+            Width="141"
+            Height="20"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="Open Docs Folder"
+            FontSize="10"
+            Click="OpenDocs_Click"
+            Style="{StaticResource MahApps.Styles.Button.Square.Accent}"
+            Controls:ControlsHelper.ContentCharacterCasing="Normal"/>
+
+                        <!-- Virtual / Mixed Reality -->
+                        <Label x:Name="Label_VR"
+           Grid.Row="4" Grid.Column="0"
+           Content="Virtual / Mixed Reality :"
+           HorizontalAlignment="Left"
+           VerticalAlignment="Center"
+           FontWeight="Bold"
+           Style="{StaticResource LauncherTitle}"/>
+
+                        <!-- Radio columns used in both rows (shared sizes) -->
+                        <Grid Grid.Row="4" Grid.Column="1"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="RB1"/>
+                                <ColumnDefinition Width="24"  SharedSizeGroup="SP"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="RB2"/>
+                                <ColumnDefinition Width="24"  SharedSizeGroup="SP"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="RB3"/>
+                            </Grid.ColumnDefinitions>
+
+                            <RadioButton x:Name="VR_NoVR"
+                     Grid.Column="0"
+                     GroupName="VR"
+                     Content="No VR"
+                     Style="{StaticResource LauncherRadioButton}"/>
+
+                            <RadioButton x:Name="VR_SteamVR"
+                     Grid.Column="2"
+                     GroupName="VR"
+                     Content="SteamVR"
+                     Style="{StaticResource LauncherRadioButton}"
+                     Click="Misc_VR_Click"/>
+
+                            <RadioButton x:Name="VR_OpenXR"
+                     Grid.Column="4"
+                     GroupName="VR"
+                     Content="OpenXR"
+                     Style="{StaticResource LauncherRadioButton}"/>
+                        </Grid>
+
+                        <!-- Export RTT Textures -->
+                        <Label x:Name="Label_RTT"
+           Grid.Row="6" Grid.Column="0"
+           Content="Export RTT Textures:"
+           HorizontalAlignment="Left"
+           VerticalAlignment="Center"
+           FontWeight="Bold"
+           Style="{StaticResource LauncherTitle}"/>
+
+                        <!-- Radio columns used in both rows (shared sizes) -->
+                        <Grid Grid.Row="6" Grid.Column="1"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="RB1"/>
+                                <ColumnDefinition Width="24"  SharedSizeGroup="SP"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="RB2"/>
+                                <ColumnDefinition Width="24"  SharedSizeGroup="SP"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="RB3"/>
+                            </Grid.ColumnDefinitions>
+
+                            <RadioButton x:Name="RTT_Disable"
+                     Grid.Column="0"
+                     GroupName="RTT"
+                     Content="Disable"
+                     Style="{StaticResource LauncherRadioButton}"/>
+
+                            <RadioButton x:Name="RTT_Enable"
+                     Grid.Column="2"
+                     GroupName="RTT"
+                     Content="Enable"
+                     Style="{StaticResource LauncherRadioButton}"/>
+
+                            <!-- Column 4 (RB3) intentionally empty; reserves the same width as VRs third radio -->
+                        </Grid>
+
                     </Grid>
 
                     <Label Content="News" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" FontStyle="Italic"/>
