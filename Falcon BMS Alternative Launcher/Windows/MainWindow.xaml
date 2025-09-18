@@ -110,6 +110,7 @@
             VerticalAlignment="Center"
             Content="Open Docs Folder"
             FontSize="10"
+            Cursor="Hand"
             Click="OpenDocs_Click"
             Style="{StaticResource MahApps.Styles.Button.Square.Accent}"
             Controls:ControlsHelper.ContentCharacterCasing="Normal"/>
@@ -454,7 +455,7 @@
                     <ListBox x:Name="ListBox_BMS" SelectionChanged="ListBox_BMS_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,20,240,20" Width="220" Height="72" SelectionMode="Single" d:ItemsSource="{d:SampleData ItemCount=5}" Style="{StaticResource LauncherListBox}">
                     </ListBox>
 
-                    <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="20,20,20,20" VerticalAlignment="Bottom" Width="208" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
+                    <Button x:Name="Launch_BMS_Large" Content="LAUNCH" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Controls:ControlsHelper.ContentCharacterCasing="Normal" HorizontalAlignment="Right" Margin="20,20,20,20" VerticalAlignment="Bottom" Width="208" Cursor="Hand" Click="Launch_Click" Height="72" Background="#CC2494FF" BorderBrush="{x:Null}" FontSize="24" Grid.Row="1"/>
 
                 </Grid>
             </TabItem>
@@ -769,7 +770,7 @@
 
                     <Label Content="* Double Click a cell to Assign keys." HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="0,0,9.666,30.334" VerticalAlignment="Bottom" Width="596" Height="29" Foreground="{StaticResource UiForegroundBrush}" Grid.Column="1"/>
 
-                    <Button x:Name="ImportButton" Content="Import Key File..." HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,20,240,20" Width="129" Click="ImportKeyfile_Click" Height="27" Grid.Column="1"/>
+                    <Button x:Name="ImportButton" Content="Import Key File..." HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,20,240,20" Width="129" Click="ImportKeyfile_Click" Cursor="Hand" Height="27" Grid.Column="1"/>
                 </Grid>
             </TabItem>
         </TabControl>

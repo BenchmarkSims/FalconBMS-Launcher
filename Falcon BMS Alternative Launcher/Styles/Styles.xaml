@@ -248,6 +248,7 @@
         <Setter Property="Background" Value="#FFFFFFFF"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Content" Value="Assign"/>
     </Style>
     <Style x:Key="AxisBar"
