@@ -23,6 +23,9 @@
     <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.KnobFillOffPointerOver" Color="#6888" />
     <SolidColorBrush x:Key="MahApps.Brushes.ToggleSwitch.FillOffPointerOver" Color="#6222" />
 
+    <SolidColorBrush x:Key="LauncherHoverBorderBrush" Color="#7FC0E8FF"/>
+    <SolidColorBrush x:Key="LauncherHoverLabelBrush"  Color="#FF4DB5FF"/>
+
     <Style TargetType="DataGridDetailsPresenter">
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -189,18 +192,81 @@
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="9"/>
         <Setter Property="MaxWidth" Value="80"/>
+    </Style>
 
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource GridFocusedFgBrush}"/>
-            </Trigger>
 
-            <!-- Hovering anywhere on the parent Button (icon OR text) -->
-            <DataTrigger Value="True"
-                     Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}">
-                <Setter Property="Foreground" Value="{DynamicResource GridFocusedFgBrush}"/>
-            </DataTrigger>
-        </Style.Triggers>
+    <!-- Shared button visuals for strip items (image + label + optional sublabel) -->
+    <Style x:Key="LauncherStripButtonStyle"
+       TargetType="Button"
+       BasedOn="{StaticResource LauncherButtonBase}">
+        <!-- Carry the logical Id so code-behind can route -->
+        <Setter Property="Tag" Value="{Binding Id}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin"  Value="6,0,6,0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd"
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="4"
+              SnapsToDevicePixels="True"
+              Padding="2">
+
+                        <Grid VerticalAlignment="Top">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="32"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Icon (row 0) -->
+                            <Image Grid.Row="0"
+                 Source="{Binding IconPath}"
+                 Style="{StaticResource LauncherIcon}" />
+
+                            <!-- Labels (row 1) -->
+                            <StackPanel Grid.Row="1"
+                      Orientation="Vertical"
+                      HorizontalAlignment="Center">
+                                <TextBlock x:Name="Lbl"
+                       Text="{Binding Label}"
+                       Style="{StaticResource LauncherLabel}"
+                       TextAlignment="Center"
+                       Margin="0,2,0,0"/>
+                                <TextBlock x:Name="SubLbl"
+                       Text="{Binding SubLabel}"
+                       Style="{StaticResource LauncherLabel}"
+                       TextAlignment="Center"
+                       Margin="0,-2,0,0"
+                       Visibility="Visible"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!-- Hide SubLbl when empty -->
+                        <Trigger SourceName="SubLbl" Property="Text" Value="">
+                            <Setter TargetName="SubLbl" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <!-- Hover labels -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Lbl"    Property="Foreground" Value="{StaticResource LauncherHoverLabelBrush}"/>
+                            <Setter TargetName="SubLbl" Property="Foreground" Value="{StaticResource LauncherHoverLabelBrush}"/>
+                        </Trigger>
+
+                        <!-- Disabled -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.6"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- AXISASSIGN tab -->

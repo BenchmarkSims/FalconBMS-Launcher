@@ -491,7 +491,17 @@ namespace FalconBMS.Launcher.Windows
                     if (appReg.IsUniqueNameDefined() == false)
                         return;
                 }
-
+                // Build the legacy route key ("Launch_*") and pass a small proxy Button
+                // so existing routing code can keep working without changes.
+                var btn = sender as System.Windows.Controls.Button;
+                var id = btn?.Tag as string;
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    var routeName = "Launch_" + id;
+                    var proxy = new System.Windows.Controls.Button { Name = routeName };
+                    appReg.getLauncher().execute(proxy);
+                    return;
+                }
                 appReg.getLauncher().execute(sender);
             }
             catch (FileNotFoundException ex)
@@ -499,6 +509,31 @@ namespace FalconBMS.Launcher.Windows
                 Diagnostics.Log(ex);
                 Diagnostics.ShowErrorMsgbox(ex);
                 Close();
+            }
+        }
+
+        // Toggle visibility of a launcher item (by Id) in the primary strip.
+        public void SetPrimaryLauncherVisible(string id, bool isVisible)
+        {
+            SetItemVisibilityInItemsControl(PrimaryStripControl, id, isVisible);
+        }
+
+        private static void SetItemVisibilityInItemsControl(System.Windows.Controls.ItemsControl ic, string id, bool isVisible)
+        {
+            if (ic == null || string.IsNullOrWhiteSpace(id)) return;
+
+            // Find the item with the matching Id
+            for (int i = 0; i < ic.Items.Count; i++)
+            {
+                if (ic.Items[i] is FalconBMS.Launcher.Windows.LauncherItem li &&
+                    string.Equals(li.Id, id, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Get the container and hide/show it
+                    var container = ic.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement;
+                    if (container != null)
+                        container.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+                    break;
+                }
             }
         }
 
@@ -558,7 +593,7 @@ namespace FalconBMS.Launcher.Windows
                 string downloadlink = "";
                 string installexe   = "";
 
-                switch (((Button)sender).Name)
+                switch ("Launch_" + (string)((Button)sender).Tag)
                 {
                     case "Launch_WDP":
                         target = "\\WeaponDeliveryPlanner.exe";
@@ -690,73 +725,6 @@ namespace FalconBMS.Launcher.Windows
                 Diagnostics.Log(ex);
                 Diagnostics.ShowErrorMsgbox(ex);
                 Close();
-            }
-        }
-
-        /// <summary>
-        /// Change label color when mouse enters one of launcher icons.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MouseEnterLauncher(object sender, EventArgs e)
-        {
-            try
-            {
-                string nme = ((Button)sender).Name;
-
-                if (nme.Contains("Launch_"))
-                {
-                    if (nme.Contains("Launch_TheaterConfig"))
-                        return;
-                    Button tbButton = FindName(nme) as Button;
-                    if (tbButton == null)
-                        return;
-                    tbButton.BorderBrush = CommonConstants.LIGHTBLUE;
-                    tbButton.BorderThickness = new Thickness(1);
-
-                    nme = nme.Replace("Launch_", "");
-                    Label tblabel = FindName("Label_" + nme) as Label;
-                    if (tblabel == null)
-                        return;
-                    tblabel.Foreground = CommonConstants.BLUEILUM;
-                }
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-            }
-        }
-
-        /// <summary>
-        /// Reset label color when mouse leaves a launcher icon.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MouseLeaveLauncher(object sender, EventArgs e)
-        {
-            try
-            {
-                string nme = ((Button)sender).Name;
-
-                if (nme.Contains("Launch_"))
-                {
-                    if (nme.Contains("Launch_TheaterConfig"))
-                        return;
-                    Button tbButton = FindName(nme) as Button;
-                    if (tbButton == null)
-                        return;
-                    tbButton.BorderThickness = new Thickness(0);
-
-                    nme = nme.Replace("Launch_", "");
-                    Label tblabel = FindName("Label_" + nme) as Label;
-                    if (tblabel == null)
-                        return;
-                    tblabel.Foreground = CommonConstants.WHITEILUM;
-                }
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
             }
         }
         

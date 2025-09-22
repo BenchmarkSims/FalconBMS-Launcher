@@ -84,16 +84,8 @@ namespace FalconBMS.Launcher.Starter
 
         public void AVCSince433(bool flg)
         {
-            if (flg)
-            {
-                mainWindow.Launch_AVC.Visibility = Visibility.Visible;
-                mainWindow.Label_AVC.Visibility  = Visibility.Visible;
-            }
-            else
-            {
-                mainWindow.Launch_AVC.Visibility = Visibility.Hidden;
-                mainWindow.Label_AVC.Visibility  = Visibility.Hidden;
-            }
+            // Hide/show the Avionics Configurator button (and its label) by item Id.
+            mainWindow.SetPrimaryLauncherVisible("AVC", flg);
         }
 
         public void VRsince437(bool flg)
@@ -134,20 +126,9 @@ namespace FalconBMS.Launcher.Starter
 
         public void RTTsince435(bool flg)
         {
-            if (flg)
-            {
-                mainWindow.Launch_RTTC.Visibility = Visibility.Visible;
-                mainWindow.Label_RTTC.Visibility  = Visibility.Visible;
-                mainWindow.Launch_RTTS.Visibility = Visibility.Visible;
-                mainWindow.Label_RTTS.Visibility  = Visibility.Visible;
-            }
-            else
-            {
-                mainWindow.Launch_RTTC.Visibility = Visibility.Hidden;
-                mainWindow.Label_RTTC.Visibility  = Visibility.Hidden;
-                mainWindow.Launch_RTTS.Visibility = Visibility.Hidden;
-                mainWindow.Label_RTTS.Visibility  = Visibility.Hidden;
-            }
+            // Hide/show both RTT items by Id.
+            mainWindow.SetPrimaryLauncherVisible("RTTC", flg);
+            mainWindow.SetPrimaryLauncherVisible("RTTS", flg);
         }
 
     }

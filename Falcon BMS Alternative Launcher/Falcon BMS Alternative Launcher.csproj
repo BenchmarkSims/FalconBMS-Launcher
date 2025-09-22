@@ -168,6 +168,7 @@
     <Compile Include="Starter\AbstractStarter.cs" />
     <Compile Include="TheaterList.cs" />
     <Compile Include="Input\DetentPosition.cs" />
+    <Compile Include="Windows\LauncherCatalog.cs" />
     <Compile Include="Windows\RSSReader.cs" />
     <Page Include="Styles\Styles.xaml">
       <SubType>Designer</SubType>
