@@ -87,9 +87,9 @@ namespace FalconBMS.Launcher.Override
                     string line = reader.ReadLine();
                     if (line == null) break;
 
-                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT))
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT_OLD))
                         continue;
-                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT2))
+                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT_NEW))
                         continue;
                     if (line.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
                         break; // read no more below this cutoff line
@@ -128,7 +128,7 @@ namespace FalconBMS.Launcher.Override
             cfg.Write(
                 "set g_nButtonsPerDevice "
                 + CommonConstants.DX_MAX_BUTTONS_LEGACY
-                + " " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
+                + " " + CommonConstants.CFGOVERRIDECOMMENT_OLD + "\r\n");
         }
 
         protected virtual void ApplyVROverrides(StreamWriter cfg)
@@ -164,25 +164,21 @@ namespace FalconBMS.Launcher.Override
                             line = line.Replace("\x201C", "\x0022").Replace("\x201D", "\x0022");
                     }
 
-                    cfg.WriteLine(line + CommonConstants.CFGOVERRIDECOMMENT);
+                    cfg.WriteLine(line + CommonConstants.CFGOVERRIDECOMMENT_OLD);
                 }
             }
             return;
         }
-        private static void WriteIfOverride(StreamWriter cfg, string key, int value, int defaultValue, string comment)
-        {
-            if (value != defaultValue)
-                cfg.WriteLine($"set {key} {value} {comment}");
-        }
+
         protected virtual void ApplyMiscOverrides(StreamWriter cfg)
         {
-            var intFlags = new (string key, int current, int def)[]
+            var miscFlags = new (string key, int value)[]
             {
-                ("g_bExportRTTTextures", (mainWindow.RTT_Enable?.IsChecked == true) ? 1 : 0, 0),
+                ("g_bExportRTTTextures", (mainWindow.RTT_Enable?.IsChecked == true) ? 1 : 0),
             };
 
-            foreach (var (key, current, def) in intFlags)
-                WriteIfOverride(cfg, key, current, def, CommonConstants.CFGOVERRIDECOMMENT);
+            foreach (var (key, value) in miscFlags)
+                cfg.WriteLine($"set {key} {value}" + " " + CommonConstants.CFGOVERRIDECOMMENT_NEW);
         }
 
         protected void SaveDeviceSorting(DeviceControl deviceControl)
