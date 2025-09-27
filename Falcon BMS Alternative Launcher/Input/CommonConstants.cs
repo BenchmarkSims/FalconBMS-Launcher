@@ -43,8 +43,8 @@ namespace FalconBMS.Launcher.Input
         public static readonly int JOYNUMUNASSIGNED = -1;
 //        public static readonly int JOYNUMMOUSEWHEEL = -2;
 
-        public static readonly string CFGOVERRIDECOMMENT = "// SETUP OVERRIDE";
-        public static readonly string CFGOVERRIDECOMMENT2 = "// LAUNCHER OVERRIDE";
+        public static readonly string CFGOVERRIDECOMMENT_OLD = "// SETUP OVERRIDE";
+        public static readonly string CFGOVERRIDECOMMENT_NEW = "// LAUNCHER OVERRIDE";
         public static readonly string CFGOVERRIDECOMMENTLINE = "// LAUNCHER OVERRIDES BEGIN HERE - DO NOT EDIT OR ADD BELOW THIS LINE";
 
         public static readonly string DEFAULTPILOTNAME = "Joe Pilot";

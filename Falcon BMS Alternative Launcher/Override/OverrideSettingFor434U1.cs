@@ -36,11 +36,11 @@ namespace FalconBMS.Launcher.Override
             // Note 1: these may be 2 hats on the same device
             // Note 2: it's somewhat common for throttle axis to be unassigned (ie. buttons or the new gamepad triggers)
             // Note 3: for some unexplained historical quirk of BMS, the device-numbering here starts at '2'.
-            cfg.Write("set g_nNumOfPOVs 2 " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
-            cfg.Write("set g_nPOV1DeviceID " + (rollAxis.GetDeviceNumber() + 2) + " " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
-            cfg.Write("set g_nPOV1ID 0 " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
-            cfg.Write("set g_nPOV2DeviceID " + ((hasThrottleAxis ? throttleAxis : rollAxis).GetDeviceNumber() + 2) + " " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
-            cfg.Write("set g_nPOV2ID " + (singleDevice ? "1" : "0") + " " + CommonConstants.CFGOVERRIDECOMMENT + "\r\n");
+            cfg.Write("set g_nNumOfPOVs 2 " + CommonConstants.CFGOVERRIDECOMMENT_NEW + "\r\n");
+            cfg.Write("set g_nPOV1DeviceID " + (rollAxis.GetDeviceNumber() + 2) + " " + CommonConstants.CFGOVERRIDECOMMENT_NEW + "\r\n");
+            cfg.Write("set g_nPOV1ID 0 " + CommonConstants.CFGOVERRIDECOMMENT_NEW + "\r\n");
+            cfg.Write("set g_nPOV2DeviceID " + ((hasThrottleAxis ? throttleAxis : rollAxis).GetDeviceNumber() + 2) + " " + CommonConstants.CFGOVERRIDECOMMENT_NEW + "\r\n");
+            cfg.Write("set g_nPOV2ID " + (singleDevice ? "1" : "0") + " " + CommonConstants.CFGOVERRIDECOMMENT_NEW + "\r\n");
             return;
         }
 
