@@ -29,6 +29,7 @@ namespace FalconBMS.Launcher.Starter
                     process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Updater.exe");
                     mainWindow.Close();
                     break;
+
                 case "Launch_BMS_Large":
                     string strCmdText = getCommandLine();
 
@@ -36,7 +37,8 @@ namespace FalconBMS.Launcher.Starter
                     mainWindow.executeOverride();
 
                     string testPlatform = appReg.GetInstallDir() + "/Bin/x64/Falcon BMS Test.exe";
-                    if (File.Exists(testPlatform) && MessageBox.Show(Program.mainWin, "Start Test Exe?", "Launcher", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (File.Exists(testPlatform) &&
+                        MessageBox.Show(Program.mainWin, "Start Test Exe?", "Launcher", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         process = Utils.LaunchProcess(testPlatform, strCmdText);
                         MainWindow.bmsHasBeenLaunched = true;
@@ -47,8 +49,19 @@ namespace FalconBMS.Launcher.Starter
                         process = Utils.LaunchProcess(bmsExe, strCmdText);
                         MainWindow.bmsHasBeenLaunched = true;
                     }
-                    mainWindow.Close();
+
+                    if (Properties.Settings.Default.KeepLauncherOpen)
+                    {
+                        // Stay open: minimize while BMS runs, then restore on exit
+                        mainWindow.minimizeWindowUntilProcessEnds(process);
+                    }
+                    else
+                    {
+                        // Default behavior: close after launching BMS
+                        mainWindow.Close();
+                    }
                     break;
+
                 case "Launch_CFG":
                     process = Utils.LaunchProcess(appReg.GetInstallDir() + "/Config.exe");
                     mainWindow.minimizeWindowUntilProcessEnds(process);

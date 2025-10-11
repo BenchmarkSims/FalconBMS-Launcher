@@ -21,6 +21,7 @@ namespace FalconBMS.Launcher
             mainWindow.CMD_EF.IsOn          = Properties.Settings.Default.CMD_EF;
             mainWindow.CMD_MONO.IsOn        = Properties.Settings.Default.CMD_MONO;
 
+            mainWindow.KeepLauncherOpen.IsChecked          = Properties.Settings.Default.KeepLauncherOpen;
             mainWindow.ApplicationOverride.IsChecked       = Properties.Settings.Default.NoOverride;
 
             mainWindow.Misc_RollLinkedNWS.IsChecked        = Properties.Settings.Default.Misc_RLNWS;
@@ -86,6 +87,7 @@ namespace FalconBMS.Launcher
             Properties.Settings.Default.CMD_EF                    = (bool)mainWindow.CMD_EF.IsOn;
             Properties.Settings.Default.CMD_MONO                  = (bool)mainWindow.CMD_MONO.IsOn;
 
+            Properties.Settings.Default.KeepLauncherOpen          = (bool)mainWindow.KeepLauncherOpen.IsChecked;
             Properties.Settings.Default.NoOverride                = (bool)mainWindow.ApplicationOverride.IsChecked;
             
             Properties.Settings.Default.Misc_RLNWS                = (bool)mainWindow.Misc_RollLinkedNWS.IsChecked;
