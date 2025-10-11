@@ -150,8 +150,8 @@
                         </Grid>
                     </Border>
                     
-                    <CheckBox x:Name="KeepLauncherOpen" Content="Open Launcher after exiting BMS" 
-                              HorizontalAlignment="Right" Margin="0,0,20,123" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
+                    <CheckBox x:Name="KeepLauncherOpen" Content="Reopen Launcher after exiting BMS" 
+                              HorizontalAlignment="Right" Margin="0,0,17,124" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
                     <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" 
                               HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
 
