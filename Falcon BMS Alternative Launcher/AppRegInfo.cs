@@ -197,7 +197,7 @@ namespace FalconBMS.Launcher
 
             this.has16kTerrainTilesInNeedOfProcessing = false;
 
-            string dataDir = this.installDir + @"\Data";
+            string dataDir = this.installDir + @"\Data\TerrData\Korea";
             foreach (string d in Directory.GetDirectories(dataDir, "16K", SearchOption.AllDirectories))
             {
                 foreach (string f in Directory.GetFiles(d, "*.dds", SearchOption.TopDirectoryOnly))
