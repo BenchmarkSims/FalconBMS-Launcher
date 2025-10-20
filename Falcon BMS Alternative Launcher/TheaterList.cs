@@ -13,7 +13,7 @@ namespace FalconBMS.Launcher
         /// <summary>
         /// Read theater.lst and apply the list to Combobox.
         /// </summary>
-        public static void PopulateAndSave(AppRegInfo appReg, ComboBox Combo)
+        public static void PopulateAndSave(AppRegInfo appReg, ComboBox comboBox)
         {
             if (!Directory.Exists(appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER))
                 Directory.CreateDirectory(appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER);
@@ -24,20 +24,27 @@ namespace FalconBMS.Launcher
                 File.Copy(filename, fbackupname, false);
             File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
-            var theaterFiles = Directory.GetFiles(appReg.GetInstallDir() + "/Data", "*.tdf", SearchOption.AllDirectories);
-            System.Array.Sort(theaterFiles);
+            // Recursively scan all subdirectories, for *.tdf files.
+            string dataRoot = Path.Combine(appReg.GetInstallDir(), "Data");
+            var theaterFiles = Directory.GetFiles(dataRoot, "*.tdf", SearchOption.AllDirectories);
 
             // KoreaKTO should be at the Top or MC will have a problem. I'd say MC should fix this!
-            theaterFiles = theaterFiles.OrderByDescending(y => y.EndsWith("Data\\TerrData\\TheaterDefinition\\Korea KTO.tdf")).ToArray();
+            Array.Sort(theaterFiles, 
+                (a, b) => {
+                    if (a.EndsWith("\\Korea KTO.tdf")) return -1;
+                    if (b.EndsWith("\\Korea KTO.tdf")) return +1;
+                    return String.CompareOrdinal(a, b);
+                    }
+                );
 
-            // Write all TDFs to the theater list, slicing the install dir off.
-            var dataDirLength = appReg.GetInstallDir().Length + "/Data/".Length;
-            File.WriteAllLines(filename, theaterFiles.Select(t => t.Substring(dataDirLength)).ToArray());
+            // Write relative paths for all TDFs to the theater list (relative to the /Data subdir).
+            File.WriteAllLines(filename, theaterFiles.Select(t => t.Substring(dataRoot.Length).TrimStart('\\')));
 
+            // Populate the combobox.
             List<string> theaters = new List<string>();
             foreach (string tdf in theaterFiles)
             {
-                // For EMF theater
+                //Hack: ignore tdf output from F4Patch, used by some theater configs
                 if (tdf.Contains("F4Patch"))
                     continue;
 
@@ -52,14 +59,14 @@ namespace FalconBMS.Launcher
                 }
             }
 
-            Combo.SelectedIndex = -1;
-            Combo.Items.Clear();
+            comboBox.SelectedIndex = -1;
+            comboBox.Items.Clear();
 
-            for (int ii = 0; ii < theaters.Count; ii++)
+            foreach (string t in theaters)
             {
-                Combo.Items.Add(theaters[ii]);
-                if (theaters[ii] == appReg.GetCurrentTheater())
-                    Combo.SelectedIndex = ii;
+                comboBox.Items.Add(t);
+                if (t == appReg.GetCurrentTheater())
+                    comboBox.SelectedItem = t;
             }
         }
     }
