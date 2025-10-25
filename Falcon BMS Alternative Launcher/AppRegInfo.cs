@@ -37,6 +37,7 @@ namespace FalconBMS.Launcher
         private MainWindow mainWindow;
 
         public string theaterOwnConfig = "";
+        private string currentExeFourPartVersion = "";
 
         // Method
         public string GetInstallDir() { return installDir; }
@@ -78,7 +79,7 @@ namespace FalconBMS.Launcher
             var foundVersions = new List<string>(10);
             foreach (string version in availableBMSVersions)
             {
-                if (Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\Benchmark Sims\\" + version, writable:false) == null)
+                if (Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\Benchmark Sims\\" + version, writable: false) == null)
                     continue;
 
                 if (BMSExists(version))
@@ -90,11 +91,52 @@ namespace FalconBMS.Launcher
                 return;
             }
 
-            // Sort order: most recent releases on top.
+            // Sort order: most recent releases on top (by the registry-key strings).
             foundVersions.Sort((a, b) => { return -1 * String.CompareOrdinal(a, b); });
 
-            // Data-bind the list to the UI control.
-            mainWindow.ListBox_BMS.ItemsSource = foundVersions;
+            // Build the display list in the SAME order (Key = real key, Value = pretty label)
+            var sortedItems = new List<KeyValuePair<string, string>>(foundVersions.Count);
+            foreach (var v in foundVersions)
+            {
+                // Ensure exeDir is set for this version
+                BMSExists(v);
+
+                // Read the real version parts from the EXE
+                int major = 0, minor = 0, build = 0, patch = 0;
+                try
+                {
+                    var vi = FileVersionInfo.GetVersionInfo(exeDir);
+                    major = vi.FileMajorPart;   // ex: 4
+                    minor = vi.FileMinorPart;   // ex: 38
+                    build = vi.FileBuildPart;   // ex: 1
+                    patch = vi.FilePrivatePart; // ex: 3236
+                }
+                catch
+                {
+                    // If anything goes wrong, leave zeros
+                }
+
+                bool isInternal = v.EndsWith("(Internal)", StringComparison.Ordinal);
+
+                string label;
+                if (isInternal)
+                {
+                    // Internal: {major}.{minor}.{build} Build {patch} (Internal)
+                    label = $"Falcon BMS {major}.{minor}.{build} (Internal Build {patch})";
+                }
+                else
+                {
+                    // Non-Internal: {major}.{minor}.{build}
+                    label = $"Falcon BMS {major}.{minor}.{build}";
+                }
+
+                sortedItems.Add(new KeyValuePair<string, string>(v, label));
+            }
+
+            // Bind pretty labels but keep real keys via SelectedValue
+            mainWindow.ListBox_BMS.ItemsSource = sortedItems;
+            mainWindow.ListBox_BMS.DisplayMemberPath = "Value";
+            mainWindow.ListBox_BMS.SelectedValuePath = "Key";
 
             string selectedVersion = null;
 
@@ -105,7 +147,8 @@ namespace FalconBMS.Launcher
                 if (idx >= 0)
                 {
                     selectedVersion = Properties.Settings.Default.BMS_Version;
-                    mainWindow.ListBox_BMS.SelectedIndex = idx;
+                    // Select by value (real registry key)
+                    mainWindow.ListBox_BMS.SelectedValue = selectedVersion;
                 }
             }
 
@@ -113,7 +156,8 @@ namespace FalconBMS.Launcher
             if (string.IsNullOrEmpty(selectedVersion))
             {
                 selectedVersion = foundVersions[0];
-                mainWindow.ListBox_BMS.SelectedIndex = 0;
+                // Select by value (real registry key)
+                mainWindow.ListBox_BMS.SelectedValue = selectedVersion;
             }
 
             UpdateSelectedBMSVersion(selectedVersion);
@@ -179,6 +223,8 @@ namespace FalconBMS.Launcher
             int minor = exe_version_info.FileMinorPart;
             int build = exe_version_info.FileBuildPart;
             int patch = exe_version_info.FilePrivatePart;
+
+            currentExeFourPartVersion = $"{major}.{minor}.{build}.{patch}";
 
             this.has16kTerrainTilesInNeedOfProcessing = false;
             if (major == 4 && minor == 38 && build == 1 && patch >= 3099)
