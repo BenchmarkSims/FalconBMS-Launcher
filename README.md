@@ -3,14 +3,15 @@
 
 The **Alternative Launcher** is a modern utility for assigning key, axis, and configuration settings used before launching Falcon BMS.
 
-It **replaces** the need to configure controls inside the in-game Setup screen. When BMS is launched through the Alternative Launcher, it automatically configures and applies proper setup files ensuring your devices stay in the correct order every time you launch.
+It **replaces** the need to configure controls inside the in-game Setup screen. When BMS is launched through the Alternative Launcher, it automatically configures and applies proper setup files, ensuring your devices stay in the correct order every time you launch.
 
-The Alternative Launcher works with every version of Falcon BMS and supports systems with multiple version of BMS installed simultaneously.
+The Alternative Launcher works with every version of Falcon BMS and supports systems with multiple versions of BMS installed simultaneously.
 
 ## Quick Links
 * [Launcher Tab](#launcher-tab)
 * [AxisAssign Tab](#axisassign-tab)
 * [KeyMapping Tab](#keymapping-tab)
+* [Quick Start Guide](#quick-start-guide)
  
 # Using the Alternative Launcher
 The Alternative Launcher includes several pages (tabs) that help configure different parts of Falcon BMS.
@@ -31,7 +32,7 @@ The Alternative Launcher includes several pages (tabs) that help configure diffe
 * **Window** – Enables running BMS in windowed mode
 * **NoMovie** – Enabling this disables the intro and in-game videos
 * **EyeFly** – Enables the free camera mode that lets you move the camera independently of aircraft
-* **Debug** – Enables debug console which also writes xlog files to the User/Logs folder
+* **Debug** – Enables debug console, which also writes xlog files to the User/Logs folder
 
 ### Tools and Utilities
 <img width="659" height="171" alt="Tools and Utilities" src="https://github.com/user-attachments/assets/53f3a4e6-c015-4add-b75c-7f4fb78bc873" />
@@ -49,8 +50,8 @@ These launch external tools and utilities:
 * **Weapon Delivery Planner** – Preflight planning, DTC generation, steerpoints, weapon profiles, package planning
 * **Mission Commander** – Campaign building and editing tool
 * **Weather Commander** – Create and edit weather maps
-* **F4Wx Real Weather** – Generates weather based off real forecasts 
-* **F4 RADAR C2 (AWACS) Tool** – External radar tool, displays ATC/AWACS like contact maps
+* **F4Wx Real Weather** – Generates weather based on real forecasts 
+* **F4 RADAR C2 (AWACS) Tool** – External radar tool, displays ATC/AWACS-like contact maps
  
 ### Version Selection
 <img width="229" height="83" alt="Version Selection" src="https://github.com/user-attachments/assets/87cae7d7-1207-4307-bd7b-0be5b726866c" />
@@ -85,9 +86,9 @@ Starts the selected version of BMS.
 
     * Invert – reverses the direction of the axis
 
-    * DeadZone – removes small unwanted movements around center
+    * DeadZone – removes small unwanted movements around the center
 
-    * Saturation – controls where the maximum travel point is detected, used when the device cannot reach it's full travel
+    * Saturation – controls where the maximum travel point is detected, used when the device cannot reach its full travel
 
 1. Click "Save" to apply the mapping.
 
@@ -99,7 +100,7 @@ To close the popup without saving anything, click the "X" button in the top-righ
 ### Flight Control & Avionics Subtab
 <img width="1024" height="776" alt="AXISASSIGN Tab" src="https://github.com/user-attachments/assets/e2934213-0051-452f-b6b7-54f4bced2cff" />
 
-Assign axis for:
+Assign axes for:
 * Stick
 * Throttle
 * Rudder
@@ -108,7 +109,7 @@ Assign axis for:
 ### ICP, Radios, Audio & Altimeter Subtab
 <img width="1024" height="776" alt="ICP, Radios, Audio & Altimeter Subtab" src="https://github.com/user-attachments/assets/ee9756b1-4685-40c9-9bcd-e83634ccea87" />
 
-Assign axis for:
+Assign axes for:
 * ICP
 * HSI
 * Altimeter
@@ -144,10 +145,11 @@ This tab lets you assign buttons to your keyboard, HOTAS, MFDs, button boxes, an
 
 ### DX vs Key Assignments
 * DX — DirectX button assignment, used for mapping HOTAS, sticks, throttles, MFDs, and other physical devices
-
 * Key — Keyboard assignment (e.g., Ctrl+Alt+D, Shift+K, etc.)
 
-### How to Map a Key
+It is possible, and common, to assign the same action to both a DX button and a keyboard key.
+
+### How to Map
 <img width="512" height="236" alt="How to Map a Key" src="https://github.com/user-attachments/assets/0025a513-0ecb-4193-8c7f-b2fb38499fed" />
 
 1. Find the command you want to map in the table
@@ -160,9 +162,9 @@ This tab lets you assign buttons to your keyboard, HOTAS, MFDs, button boxes, an
 
 1. Click "Save" to apply the mapping.
 
-To test a mapping, simply press the button you want to test. The table will jump to the command associated with that key, and the button you pressed will be shown in the preview area below the table.
-
-<img width="471" height="25" alt="assignment" src="https://github.com/user-attachments/assets/bb5f0a97-365e-4c9d-9115-7f61524173da" />
+#### Mapping Options
+* Unshifted — Selects whether the mapping applies to the normal (unshifted) command or the shifted version of that command. **Unshifted is the default**.
+* On Press — Selects whether the command is triggered when the button is pressed or when it is released. **On Press is the default**.
 
 #### Clearing Keys
 * Clicking "Clear DX" removes the current DX assignment, leaves Key intact.
@@ -171,6 +173,45 @@ To test a mapping, simply press the button you want to test. The table will jump
 After clearing an assignment, the Alternative Launcher will listen for the next control input you make and automatically assign it to this mapping.
 
 To close the popup without saving anything, click the "X" button in the top-right corner.
+
+#### Testing Inputs
+To test a mapping, return to the KEYMAPPING tab and press the button you want to test. The table will jump to the command associated with that key, and the button you pressed will be shown in the preview area below the table.
+
+<img width="471" height="25" alt="assignment" src="https://github.com/user-attachments/assets/bb5f0a97-365e-4c9d-9115-7f61524173da" />
+
+
+# Quick Start Guide
+
+1. Open the Alternative Launcher.
+
+1. Press the **"Update"** icon near the lower left of the window to check for any updates. Restart the Alternative Launcher if needed.
+
+1. Click **"AXISASSIGN"** in the top right.
+
+1. Click **"ASSIGN"** next to the **"Roll"** label.
+
+1. Move your stick left to right. The blue bar will eventually move in relation to your stick movements. If you mess up, click the **"Clear"** button and try again. Click **"Save"** when set correctly.
+
+1. Repeat this for all other inputs you have controls for.
+   * With a stick, you’ll need **Roll** and **Pitch** at minimum, and **Throttle** if you have a throttle.
+   * To set the afterburner zone on the throttle, click **ASSIGN** next to the **Throttle** label. Move your throttle to the point where you want the afterburner to light. Keep your throttle at that position and press **AB DETENT**. Now, when you push your throttle forward past that point, the blue bar will turn green to show the afterburner is lit.
+
+1. Click the **"KEYMAPPING"** tab.
+
+1. In the top right, next to **"Filter"**, type **"stick"** to display all the stick keymappings.
+
+1. Double-click the first input and a popup will appear.
+
+1. Press the button on your stick, then click **"Save"**.
+
+1. Repeat for all the other stick inputs. You can search for **"TQS"** next, or clear the text filter and scroll through the other mappings.
+
+1. Map any other devices such as MFD's or button boxes.
+
+1. When complete, click the **"LAUNCHER"** tab to return to the main window.
+
+1. Click **"LAUNCH"** in the lower right to start BMS.
+
 
  
 # Files Overwritten by the Launcher
