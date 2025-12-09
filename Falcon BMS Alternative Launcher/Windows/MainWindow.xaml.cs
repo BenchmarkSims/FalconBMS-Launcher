@@ -173,7 +173,7 @@ namespace FalconBMS.Launcher.Windows
 
         private void _Post_UpdateRss()
         {
-            if (appReg == null || appReg.Has16kTerrainTilesInNeedOfProcessing())
+            if (appReg == null)
                 return;
 
             if (this.News == null)
