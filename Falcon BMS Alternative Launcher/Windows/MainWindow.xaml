@@ -149,7 +149,24 @@
                             <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" Margin="575,0,0,0"/>
                         </Grid>
                     </Border>
-                    <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
+                    
+                    <!-- APPLICATION SETTINGS OVERRIDE -->
+                    <CheckBox x:Name="ApplicationOverride"
+                          Content="Launch without applying overrides"
+                          HorizontalAlignment="Right"
+                          Margin="0,0,20,98"
+                          MinWidth="206"
+                          VerticalAlignment="Bottom"
+                          Background="#FFECFF71"
+                          Foreground="{StaticResource UiForegroundBrush}">
+                        <CheckBox.ToolTip>
+                            <ToolTip MaxWidth="300">
+                                <TextBlock Text="Starts Falcon BMS without applying any options or controls set within the Alternative Launcher."
+                       TextWrapping="Wrap"/>
+                            </ToolTip>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+
 
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Margin="48,0,0,20" VerticalAlignment="Bottom" Width="480" Style="{StaticResource LauncherStripBorder}">
                         <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
@@ -233,9 +250,37 @@
                         <RadioButton x:Name="VR_SteamVR" GroupName="VR" Content="SteamVR" HorizontalAlignment="Left" Margin="250,70,0,0" VerticalAlignment="Top" Click="Misc_VR_Click" Style="{StaticResource LauncherRadioButton}"/>
                         <RadioButton x:Name="VR_OpenXR" GroupName="VR" Content="OpenXR" HorizontalAlignment="Left" Margin="329,70,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
 
-                        <Label x:Name="Label_RTT" Content="Export RTT Textures:" HorizontalAlignment="Left" Margin="0,94,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
-                        <RadioButton x:Name="RTT_Disable" GroupName="RTT" Content="Disable" HorizontalAlignment="Left" Margin="180,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
-                        <RadioButton x:Name="RTT_Enable" GroupName="RTT" Content="Enable" HorizontalAlignment="Left" Margin="250,100,0,0" VerticalAlignment="Top" Style="{StaticResource LauncherRadioButton}"/>
+                        <!-- EXPORT RTT TEXTURES -->
+                        <Label x:Name="Label_RTT" Content="Export RTT Textures :" HorizontalAlignment="Left" Margin="0,94,0,0" VerticalAlignment="Top" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
+                        <RadioButton x:Name="RTT_Disable"
+                             GroupName="RTT"
+                             Content="Disable"
+                             HorizontalAlignment="Left"
+                             Margin="180,100,0,0"
+                             VerticalAlignment="Top"
+                             Style="{StaticResource LauncherRadioButton}">
+                            <RadioButton.ToolTip>
+                                <ToolTip MaxWidth="300">
+                                    <TextBlock Text="Disables cockpit display (MFDs/HUD/etc.) export to external monitors and devices."
+                       TextWrapping="Wrap"/>
+                                </ToolTip>
+                            </RadioButton.ToolTip>
+                        </RadioButton>
+                        <RadioButton x:Name="RTT_Enable"
+                             GroupName="RTT"
+                             Content="Enable"
+                             HorizontalAlignment="Left"
+                             Margin="250,100,0,0"
+                             VerticalAlignment="Top"
+                             Style="{StaticResource LauncherRadioButton}">
+                            <RadioButton.ToolTip>
+                                <ToolTip MaxWidth="300">
+                                    <TextBlock Text="Enables cockpit display (MFDs/HUD/etc.) export to external monitors and devices."
+                       TextWrapping="Wrap"/>
+                                </ToolTip>
+                            </RadioButton.ToolTip>
+                        </RadioButton>
+
                     </Grid>
 
                     <Label Content="News" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" FontStyle="Italic" Style="{StaticResource LauncherTitle}"/>
@@ -245,13 +290,181 @@
 
                     <Border HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Margin="480,60,20,20" Padding="10" Background="#3000" Width="200">
                         <StackPanel Orientation="Vertical">
-                            <Label Content="Launch Options :" HorizontalAlignment="Left" Margin="10" FontSize="13" FontWeight="Bold" Style="{StaticResource LauncherTitle}" />
-                            <Controls:ToggleSwitch x:Name="CMD_ACMI" OnContent="ACMI On" OffContent="ACMI Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
-                            <Controls:ToggleSwitch x:Name="CMD_WINDOW" OnContent="WINDOW On" OffContent="WINDOW Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
-                            <Controls:ToggleSwitch x:Name="CMD_NOMOVIE" OnContent="NOMOVIE On" OffContent="NOMOVIE Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
-                            <Controls:ToggleSwitch x:Name="CMD_EF" OnContent="EYEFLY On" OffContent="EYEFLY Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
-                            <Controls:ToggleSwitch x:Name="CMD_MONO" OnContent="DEBUG On" OffContent="DEBUG Off" HorizontalAlignment="Right" FontSize="11" Margin="10" Style="{StaticResource LauncherToggleSwitch}" />
-                            <Controls:ToggleSwitch x:Name="AB_Test" Visibility="Hidden" OffContent="A" OnContent="B" Margin="10" HorizontalAlignment="Right" Style="{StaticResource LauncherToggleSwitch}" />
+
+                            <Label Content="Launch Options"
+               HorizontalAlignment="Left"
+               Margin="0"
+               FontSize="16"
+               FontWeight="Bold"
+               Style="{StaticResource LauncherTitle}" />
+
+                            <!-- ACMI -->
+                            <Controls:ToggleSwitch x:Name="CMD_ACMI"
+                               Margin="10"
+                               HorizontalAlignment="Right"
+                               FontSize="11"
+                               OnContent="On"
+                               OffContent="Off"
+                               Style="{StaticResource LauncherToggleSwitch}">
+
+                                <!-- TOOLTIP -->
+                                <Controls:ToggleSwitch.ToolTip>
+                                    <ToolTip MaxWidth="300">
+                                        <TextBlock Text="Records Air Combat Maneuvering Instrumentation flight data (position, maneuvers, combat events) for playback and debriefing. Enabling this writes .VHS files BMS's \User\Acmi\ folder."
+                               TextWrapping="Wrap" />
+                                    </ToolTip>
+                                </Controls:ToggleSwitch.ToolTip>
+
+                                <!-- TIGHT HEADER -->
+                                <Controls:ToggleSwitch.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding}"
+                           Style="{StaticResource LauncherTitle}"
+                           Padding="0"
+                           Margin="-6" />
+                                    </DataTemplate>
+                                </Controls:ToggleSwitch.HeaderTemplate>
+
+                                <Controls:ToggleSwitch.Header>
+                                    ACMI Recording
+                                </Controls:ToggleSwitch.Header>
+                            </Controls:ToggleSwitch>
+
+                            <!-- WINDOWED MODE -->
+                            <Controls:ToggleSwitch x:Name="CMD_WINDOW"
+                               Margin="10"
+                               HorizontalAlignment="Right"
+                               FontSize="11"
+                               OnContent="On"
+                               OffContent="Off"
+                               Style="{StaticResource LauncherToggleSwitch}">
+
+                                <!-- TOOLTIP -->
+                                <Controls:ToggleSwitch.ToolTip>
+                                    <ToolTip MaxWidth="300">
+                                        <TextBlock Text="Runs Falcon BMS in a window instead of full-screen."
+                               TextWrapping="Wrap" />
+                                    </ToolTip>
+                                </Controls:ToggleSwitch.ToolTip>
+
+                                <Controls:ToggleSwitch.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding}"
+                           Style="{StaticResource LauncherTitle}"
+                           Padding="0"
+                           Margin="-6" />
+                                    </DataTemplate>
+                                </Controls:ToggleSwitch.HeaderTemplate>
+
+                                <Controls:ToggleSwitch.Header>
+                                    Windowed Mode
+                                </Controls:ToggleSwitch.Header>
+                            </Controls:ToggleSwitch>
+
+                            <!-- SKIP IN-GAME MOVIES -->
+                            <Controls:ToggleSwitch x:Name="CMD_NOMOVIE"
+                               Margin="10"
+                               HorizontalAlignment="Right"
+                               FontSize="11"
+                               OnContent="On"
+                               OffContent="Off"
+                               Style="{StaticResource LauncherToggleSwitch}">
+
+                                <!-- TOOLTIP -->
+                                <Controls:ToggleSwitch.ToolTip>
+                                    <ToolTip MaxWidth="300">
+                                        <TextBlock Text="Skips the intro and campaign videos."
+                               TextWrapping="Wrap" />
+                                    </ToolTip>
+                                </Controls:ToggleSwitch.ToolTip>
+
+                                <Controls:ToggleSwitch.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding}"
+                           Style="{StaticResource LauncherTitle}"
+                           Padding="0"
+                           Margin="-6" />
+                                    </DataTemplate>
+                                </Controls:ToggleSwitch.HeaderTemplate>
+
+                                <Controls:ToggleSwitch.Header>
+                                    Skip In-Game Movies
+                                </Controls:ToggleSwitch.Header>
+                            </Controls:ToggleSwitch>
+
+                            <!-- EYEFLY CAMERA -->
+                            <Controls:ToggleSwitch x:Name="CMD_EF"
+                               Margin="10"
+                               HorizontalAlignment="Right"
+                               FontSize="11"
+                               OnContent="On"
+                               OffContent="Off"
+                               Style="{StaticResource LauncherToggleSwitch}">
+
+                                <!-- TOOLTIP -->
+                                <Controls:ToggleSwitch.ToolTip>
+                                    <ToolTip MaxWidth="300">
+                                        <TextBlock Text="Enables free camera mode that lets you move the camera independently of aircraft."
+                               TextWrapping="Wrap" />
+                                    </ToolTip>
+                                </Controls:ToggleSwitch.ToolTip>
+
+                                <Controls:ToggleSwitch.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding}"
+                           Style="{StaticResource LauncherTitle}"
+                           Padding="0"
+                           Margin="-6" />
+                                    </DataTemplate>
+                                </Controls:ToggleSwitch.HeaderTemplate>
+
+                                <Controls:ToggleSwitch.Header>
+                                    Eyefly Camera
+                                </Controls:ToggleSwitch.Header>
+                            </Controls:ToggleSwitch>
+
+                            <!-- DEBUG LOGGING -->
+                            <Controls:ToggleSwitch x:Name="CMD_MONO"
+                               Margin="10"
+                               HorizontalAlignment="Right"
+                               FontSize="11"
+                               OnContent="On"
+                               OffContent="Off"
+                               Style="{StaticResource LauncherToggleSwitch}">
+
+                                <!-- TOOLTIP -->
+                                <Controls:ToggleSwitch.ToolTip>
+                                    <ToolTip MaxWidth="300"
+                                        Placement="Left"
+                                        HorizontalOffset="-10">
+                                        <TextBlock Text="Enables debug console, which also writes xlog files to BMS's \User\Logs folder."
+                               TextWrapping="Wrap" />
+                                    </ToolTip>
+                                </Controls:ToggleSwitch.ToolTip>
+
+                                <Controls:ToggleSwitch.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding}"
+                           Style="{StaticResource LauncherTitle}"
+                           Padding="0"
+                           Margin="-6" />
+                                    </DataTemplate>
+                                </Controls:ToggleSwitch.HeaderTemplate>
+
+                                <Controls:ToggleSwitch.Header>
+                                    Debug Logging
+                                </Controls:ToggleSwitch.Header>
+                            </Controls:ToggleSwitch>
+
+                            <!-- Hidden test switch -->
+                            <Controls:ToggleSwitch x:Name="AB_Test"
+                               Visibility="Hidden"
+                               OffContent="A"
+                               OnContent="B"
+                               Margin="10"
+                               HorizontalAlignment="Right"
+                               Style="{StaticResource LauncherToggleSwitch}" />
+
                         </StackPanel>
                     </Border>
 
