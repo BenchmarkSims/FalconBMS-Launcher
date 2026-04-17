@@ -127,6 +127,21 @@ namespace FalconBMS.Launcher.Override
             return writer;
         }
 
+        private static string NormalizeCfgSetLine(string line)
+        {
+            string lineTrimmed = line.Trim();
+            if (!lineTrimmed.StartsWith("set"))
+                return null;
+
+            string normalizedLine = lineTrimmed;
+            while (normalizedLine.Contains("  "))
+                normalizedLine = normalizedLine.Replace("  ", " "); // consecutive spaces break BMS parser (as of 4.37)
+            while (normalizedLine.Contains("\x201C") || normalizedLine.Contains("\x201D"))
+                normalizedLine = normalizedLine.Replace("\x201C", "\x0022").Replace("\x201D", "\x0022");
+
+            return normalizedLine;
+        }
+
         protected virtual void OverridePovDeviceIDs(StreamWriter cfg, Hashtable inGameAxis) { }
 
         protected virtual void OverrideHotasPinkyShiftMagnitude(StreamWriter cfg, DeviceControl deviceControl) { }
@@ -157,28 +172,26 @@ namespace FalconBMS.Launcher.Override
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.VRCFGFILE;
             if (!File.Exists(filename)) return;
 
-            using (StreamReader reader = new StreamReader(filename, Encoding.UTF8))
+            List<string> lines = File.ReadAllLines(filename, Encoding.UTF8).ToList();
+            int overrideStart = lines.FindIndex(x => x.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE));
+            IEnumerable<string> vrLines = (overrideStart >= 0) ? lines.Skip(overrideStart + 1) : lines;
+
+            foreach (string rawLine in vrLines)
             {
-                while (true)
-                {
-                    string line = reader.ReadLine();
-                    if (line == null) break;
+                if (String.IsNullOrWhiteSpace(rawLine))
+                    continue;
+                if (rawLine.Contains(CommonConstants.CFGOVERRIDECOMMENT_OLD))
+                    continue;
+                if (rawLine.Contains(CommonConstants.CFGOVERRIDECOMMENT_NEW))
+                    continue;
+                if (rawLine.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
+                    continue;
 
-                    //TODO: refactor to remove duplicated code .. actually this whole VR-override feature should be ported over to native BMS.
-                    string lineTrimmed = line.Trim();
-                    if (lineTrimmed.Length == 0) continue;
+                string normalizedSetLine = NormalizeCfgSetLine(rawLine);
+                if (String.IsNullOrEmpty(normalizedSetLine))
+                    continue;
 
-                    if (lineTrimmed.StartsWith("set"))
-                    {
-                        line = lineTrimmed;
-                        while (line.Contains("  "))
-                            line = line.Replace("  ", " "); //consecutive spaces break BMS parser (as of 4.37)
-                        while (line.Contains("\x201C") || line.Contains("\x201D")) //unicode smart-doublequotes
-                            line = line.Replace("\x201C", "\x0022").Replace("\x201D", "\x0022");
-                    }
-
-                    cfg.WriteLine(line + CommonConstants.CFGOVERRIDECOMMENT_OLD);
-                }
+                cfg.WriteLine(normalizedSetLine + " " + CommonConstants.CFGOVERRIDECOMMENT_NEW);
             }
             return;
         }
