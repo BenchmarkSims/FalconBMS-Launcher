@@ -22,6 +22,17 @@ namespace FalconBMS.Launcher.Windows
     {
         private List<ButtonStateTracker> _buttonTrackers;
         private bool _isShiftButtonPressed = false;
+        private int _keyMappingMaxButtons = CommonConstants.DX_MAX_BUTTONS;
+
+        private int GetSelectedKeyMappingMaxButtons()
+        {
+            ComboBoxItem selectedItem = KeyMappingMaxButtonsDropdown.SelectedItem as ComboBoxItem;
+            int maxButtons;
+            if (selectedItem != null && Int32.TryParse(selectedItem.Content.ToString(), out maxButtons))
+                return maxButtons;
+
+            return CommonConstants.DX_MAX_BUTTONS;
+        }
 
         public void UpdateCategoryHeaders()
         {
@@ -109,7 +120,7 @@ namespace FalconBMS.Launcher.Windows
             if (selectedItem.GetCallback() == CommonConstants.SIMDONOTHING)
                 return;
 
-            KeyMappingWindow.ShowKeyMappingWindow(this, deviceControl, selectedItem);
+            KeyMappingWindow.ShowKeyMappingWindow(this, deviceControl, selectedItem, _keyMappingMaxButtons);
 
             KeyMappingGrid.Items.Refresh();
             KeyMappingGrid.UnselectAllCells();
@@ -157,6 +168,9 @@ namespace FalconBMS.Launcher.Windows
         private void _onButtonChanged(JoyAssgn joy, int buttonId, bool newState)
         {
             System.Diagnostics.Debug.WriteLine($"_onButtonChanged({joy.GetSanitizedProductName()}, {buttonId}, {newState})");
+
+            if (buttonId >= _keyMappingMaxButtons)
+                return;
 
             if (newState == true) // button pressed
             {
@@ -410,6 +424,11 @@ namespace FalconBMS.Launcher.Windows
             Category.IsEnabled = isFilterEmpty;
 
             KeyMappingGrid.Items.Filter = x => isFilterEmpty || ((KeyAssgn)x).Mapping.Trim().ToLower().Contains(filter);
+        }
+
+        private void KeyMappingMaxButtonsDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _keyMappingMaxButtons = GetSelectedKeyMappingMaxButtons();
         }
 
         private void ProfileSelect_SelectionChanged(object sender, SelectionChangedEventArgs e)

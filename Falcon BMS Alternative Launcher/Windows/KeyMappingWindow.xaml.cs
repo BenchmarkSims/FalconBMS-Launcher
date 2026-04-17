@@ -36,9 +36,12 @@ namespace FalconBMS.Launcher.Windows
         private int _tickNextUIFlush2 = Environment.TickCount;
         private int _maxButtonsToShow = CommonConstants.DX_MAX_BUTTONS;
 
-        public KeyMappingWindow(DeviceControl deviceControl, KeyAssgn selectedCallback)
+        public KeyMappingWindow(DeviceControl deviceControl, KeyAssgn selectedCallback, int initialMaxButtons = CommonConstants.DX_MAX_BUTTONS)
         {
             InitializeComponent();
+
+            _maxButtonsToShow = initialMaxButtons;
+            SetSelectedMaxButtons(_maxButtonsToShow);
 
             this._selectedCallback = selectedCallback;
 
@@ -56,10 +59,27 @@ namespace FalconBMS.Launcher.Windows
             CloneTempDialogData();
         }
 
-        public static void ShowKeyMappingWindow(Window owner, DeviceControl deviceControl, KeyAssgn selectedCallback)
+        public static void ShowKeyMappingWindow(Window owner, DeviceControl deviceControl, KeyAssgn selectedCallback, int initialMaxButtons = CommonConstants.DX_MAX_BUTTONS)
         {
-            KeyMappingWindow ownWindow = new KeyMappingWindow(deviceControl, selectedCallback);
+            KeyMappingWindow ownWindow = new KeyMappingWindow(deviceControl, selectedCallback, initialMaxButtons);
             Program.ShowDialogAndMakeActive(ownWindow);
+        }
+
+        private void SetSelectedMaxButtons(int maxButtons)
+        {
+            foreach (object item in MaxButtonsDropdown.Items)
+            {
+                ComboBoxItem comboItem = item as ComboBoxItem;
+                if (comboItem == null)
+                    continue;
+
+                int value;
+                if (Int32.TryParse(comboItem.Content.ToString(), out value) && value == maxButtons)
+                {
+                    MaxButtonsDropdown.SelectedItem = comboItem;
+                    return;
+                }
+            }
         }
 
         private int GetSelectedMaxButtons()
@@ -75,6 +95,10 @@ namespace FalconBMS.Launcher.Windows
         private void MaxButtonsDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _maxButtonsToShow = GetSelectedMaxButtons();
+
+            if (_tmpKeyboard == null || _tmpJoyAssgns == null)
+                return;
+
             ShowAssignedStatus();
         }
 
