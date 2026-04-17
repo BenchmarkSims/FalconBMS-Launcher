@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
 using FalconBMS.Launcher.Input;
@@ -33,6 +34,7 @@ namespace FalconBMS.Launcher.Windows
 
         private int _tickNextUIFlush1 = Environment.TickCount;
         private int _tickNextUIFlush2 = Environment.TickCount;
+        private int _maxButtonsToShow = CommonConstants.DX_MAX_BUTTONS;
 
         public KeyMappingWindow(DeviceControl deviceControl, KeyAssgn selectedCallback)
         {
@@ -58,6 +60,22 @@ namespace FalconBMS.Launcher.Windows
         {
             KeyMappingWindow ownWindow = new KeyMappingWindow(deviceControl, selectedCallback);
             Program.ShowDialogAndMakeActive(ownWindow);
+        }
+
+        private int GetSelectedMaxButtons()
+        {
+            ComboBoxItem selectedItem = MaxButtonsDropdown.SelectedItem as ComboBoxItem;
+            int maxButtons;
+            if (selectedItem != null && Int32.TryParse(selectedItem.Content.ToString(), out maxButtons))
+                return maxButtons;
+
+            return CommonConstants.DX_MAX_BUTTONS;
+        }
+
+        private void MaxButtonsDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _maxButtonsToShow = GetSelectedMaxButtons();
+            ShowAssignedStatus();
         }
 
         private void CloneTempDialogData()
@@ -101,7 +119,7 @@ namespace FalconBMS.Launcher.Windows
             if (sb.Length > 0) sb.Append("; ");
 
             for (int i = 0; i < _tmpJoyAssgns.Length; i++)
-                sb.Append(_tmpKeyboard.ReadJoyAssignment(i, _tmpJoyAssgns));
+                sb.Append(_tmpKeyboard.ReadJoyAssignment(i, _tmpJoyAssgns, _maxButtonsToShow));
 
             string currentKeyAndButtons = sb.ToString();
             MappedButton.Content = currentKeyAndButtons;
@@ -138,6 +156,9 @@ namespace FalconBMS.Launcher.Windows
         private void _onButtonChanged(JoyAssgn tmpjoy, int buttonId, bool newState)
         {
             System.Diagnostics.Debug.WriteLine($"KMW::_onButtonChanged({tmpjoy.GetSanitizedProductName()}, {buttonId}, {newState})");
+
+            if (buttonId >= _maxButtonsToShow)
+                return;
 
             string selectedCallbackName = _selectedCallback.GetCallback();
 

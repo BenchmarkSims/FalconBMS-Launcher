@@ -341,14 +341,16 @@ namespace FalconBMS.Launcher.Input
         /// <summary>
         /// Write Joy Assignment Status to KeyMappingGridCell.
         /// </summary>
-        public string KeyMappingPreviewDX(KeyAssgn keyAssign)
+        public string KeyMappingPreviewDX(KeyAssgn keyAssign, int maxButtons = CommonConstants.DX_MAX_BUTTONS)
         {
             _Debug_ValidateCurrentProfile();
 
             string result;
             result = "";
 
-            for (int i = 0; i < dx.Length; i++)
+            int buttonsToCheck = Math.Min(Math.Max(0, maxButtons), dx.Length);
+
+            for (int i = 0; i < buttonsToCheck; i++)
             {
                 for (int ii = 0; ii < dx[i].assign.Length; ii++)
                 {

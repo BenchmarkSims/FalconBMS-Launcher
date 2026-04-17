@@ -38,6 +38,13 @@
             </ImageBrush>
         </Grid.Background>
         <Label x:Name="CallbackName" Content="CallbackName" HorizontalAlignment="Left" Margin="24,12,0,0" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" FontWeight="Bold"/>
+        <Label Content="Max buttons" HorizontalAlignment="Left" Margin="32,37,0,0" VerticalAlignment="Top" Height="22" Width="82"/>
+        <ComboBox x:Name="MaxButtonsDropdown" HorizontalAlignment="Left" Margin="118,37,0,0" VerticalAlignment="Top" Width="72" Height="22" SelectionChanged="MaxButtonsDropdown_SelectionChanged">
+            <ComboBoxItem Content="16" />
+            <ComboBoxItem Content="32" />
+            <ComboBoxItem Content="64" />
+            <ComboBoxItem Content="128" IsSelected="True" />
+        </ComboBox>
         <Label x:Name="MappedButton" HorizontalAlignment="Left" Margin="32,67,0,0" VerticalAlignment="Top" FontStyle="Italic" Height="28" Width="447"/>
         <Label x:Name="AwaitingInputs" HorizontalAlignment="Left" Margin="32,67,0,0" VerticalAlignment="Top" FontStyle="Italic" Height="28" Width="447"/>
         <Border BorderBrush="#D0191919" BorderThickness="1" HorizontalAlignment="Center" Height="28" Margin="32,67,33,0" VerticalAlignment="Top" Width="447"/>
@@ -46,7 +53,7 @@
         <Controls:ToggleSwitch x:Name="Select_PinkyShift" OnContent="SHIFTED" OffContent="Unshifted" HorizontalAlignment="Right" Margin="0,112,320,0" VerticalAlignment="Top" Width="160" Height="27" />
         <Controls:ToggleSwitch x:Name="Select_DX_Release" OnContent="ON RELEASE" OffContent="On Press" HorizontalAlignment="Right" Margin="0,144,320,0" VerticalAlignment="Top" Width="160"  Height="27"/>
         <Button x:Name="Save" Content="Save" HorizontalAlignment="Left" Margin="404,176,0,0" VerticalAlignment="Top" Width="75" Click="Save_Click"/>
-        <TextBlock TextWrapping="Wrap" Margin="32,46,33,174" FontSize="9"><Run Text="* Alternative Launcher only saves POV hat bindings for the Roll and/or Throttle devices"/></TextBlock>
+        <TextBlock TextWrapping="Wrap" Margin="205,40,33,180" FontSize="9"><Run Text="* Alternative Launcher only saves POV hat bindings for the Roll and/or Throttle devices"/></TextBlock>
         <TextBlock x:Name="CurrentlyMapped" Width="200" Height="45" TextWrapping="WrapWithOverflow" Margin="197,126,113,65" FontSize="10" FontWeight="Bold" Foreground="DarkRed"><Run Text="Input currently bound to Xxxxx"/></TextBlock>
     </Grid>
 </Controls:MetroWindow>

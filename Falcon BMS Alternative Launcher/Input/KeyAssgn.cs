@@ -329,14 +329,14 @@ namespace FalconBMS.Launcher.Input
             return sb.ToString();
         }
 
-        public string ReadJoyAssignment(int joyId, JoyAssgn[] joyAssgns)
+        public string ReadJoyAssignment(int joyId, JoyAssgn[] joyAssgns, int maxButtons = CommonConstants.DX_MAX_BUTTONS)
         {
             if (joyId >= joyAssgns.Length)
                 return "";
 
             StringBuilder sb = new StringBuilder();
 
-            string tmp1 = joyAssgns[joyId].KeyMappingPreviewDX(this);
+            string tmp1 = joyAssgns[joyId].KeyMappingPreviewDX(this, maxButtons);
             if (!string.IsNullOrEmpty(tmp1))
                 sb.Append("JOY " + joyId + " " + tmp1.Replace("\n", ", "));
 
