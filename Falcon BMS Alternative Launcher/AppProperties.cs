@@ -14,6 +14,13 @@ namespace FalconBMS.Launcher
 
             this.mainWindow = mainWindow;
 
+            int initialMaxButtons = SanitizeKeyMappingMaxButtons(Properties.Settings.Default.KeyMappingMaxButtons);
+            if (Properties.Settings.Default.KeyMappingMaxButtons != initialMaxButtons)
+            {
+                Properties.Settings.Default.KeyMappingMaxButtons = initialMaxButtons;
+                Properties.Settings.Default.Save();
+            }
+
             // Load Buttons
             mainWindow.CMD_ACMI.IsOn        = Properties.Settings.Default.CMD_ACMI;
             mainWindow.CMD_WINDOW.IsOn      = Properties.Settings.Default.CMD_WINDOW;
@@ -29,7 +36,7 @@ namespace FalconBMS.Launcher
             mainWindow.Misc_NaturalHeadMovement.IsChecked  = Properties.Settings.Default.Misc_NaturalHeadMovement;
             mainWindow.Misc_PilotModel.IsChecked           = Properties.Settings.Default.Misc_PilotModel;
 
-            SelectKeyMappingMaxButtons(Properties.Settings.Default.KeyMappingMaxButtons);
+            SelectKeyMappingMaxButtons(initialMaxButtons);
 
             // Button Status Default
             if (Properties.Settings.Default.VR_Option == "SteamVR")

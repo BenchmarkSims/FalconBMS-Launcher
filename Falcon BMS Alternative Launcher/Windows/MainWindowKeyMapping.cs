@@ -22,7 +22,21 @@ namespace FalconBMS.Launcher.Windows
     {
         private List<ButtonStateTracker> _buttonTrackers;
         private bool _isShiftButtonPressed = false;
-        private int _keyMappingMaxButtons = Properties.Settings.Default.KeyMappingMaxButtons;
+        private int _keyMappingMaxButtons = SanitizeKeyMappingMaxButtonsValue(Properties.Settings.Default.KeyMappingMaxButtons);
+
+        private static int SanitizeKeyMappingMaxButtonsValue(int maxButtons)
+        {
+            switch (maxButtons)
+            {
+                case 16:
+                case 32:
+                case 64:
+                case 128:
+                    return maxButtons;
+                default:
+                    return CommonConstants.DX_MAX_BUTTONS;
+            }
+        }
 
         private int GetSelectedKeyMappingMaxButtons()
         {
@@ -36,16 +50,7 @@ namespace FalconBMS.Launcher.Windows
 
         private int SanitizeKeyMappingMaxButtons(int maxButtons)
         {
-            switch (maxButtons)
-            {
-                case 16:
-                case 32:
-                case 64:
-                case 128:
-                    return maxButtons;
-                default:
-                    return CommonConstants.DX_MAX_BUTTONS;
-            }
+            return SanitizeKeyMappingMaxButtonsValue(maxButtons);
         }
 
         public void UpdateCategoryHeaders()
