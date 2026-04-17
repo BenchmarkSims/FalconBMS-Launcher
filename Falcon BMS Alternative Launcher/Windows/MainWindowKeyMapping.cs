@@ -442,6 +442,9 @@ namespace FalconBMS.Launcher.Windows
 
         private void KeyMappingMaxButtonsDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!(KeyMappingMaxButtonsDropdown.SelectedItem is ComboBoxItem))
+                return;
+
             _keyMappingMaxButtons = SanitizeKeyMappingMaxButtons(GetSelectedKeyMappingMaxButtons());
             Properties.Settings.Default.KeyMappingMaxButtons = _keyMappingMaxButtons;
             Properties.Settings.Default.Save();

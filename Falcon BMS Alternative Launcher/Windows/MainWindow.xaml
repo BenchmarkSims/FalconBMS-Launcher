@@ -570,7 +570,7 @@
                         <ComboBoxItem Content="16" />
                         <ComboBoxItem Content="32" />
                         <ComboBoxItem Content="64" />
-                        <ComboBoxItem Content="128" IsSelected="True" />
+                        <ComboBoxItem Content="128" />
                     </ComboBox>
 
                     <Label Content="* Double Click a cell to Assign keys." HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="0,0,9.666,30.334" VerticalAlignment="Bottom" Width="596" Height="29" Foreground="{StaticResource UiForegroundBrush}" Grid.Column="1"/>
