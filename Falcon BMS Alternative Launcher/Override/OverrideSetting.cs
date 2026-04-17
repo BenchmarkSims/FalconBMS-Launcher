@@ -86,43 +86,9 @@ namespace FalconBMS.Launcher.Override
             if (File.Exists(filename))
                 File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
-            // Read existing contents, modulo the lines we've added in the past.
-            List<string> lines = new List<string>(500);
-            using (StreamReader reader = new StreamReader(filename, Encoding.UTF8))
-            {
-                while (true)
-                {
-                    string line = reader.ReadLine();
-                    if (line == null) break;
-
-                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT_OLD))
-                        continue;
-                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT_NEW))
-                        continue;
-                    if (line.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
-                        break; // read no more below this cutoff line
-
-                    // Trim leading/trailing whitespace, collapse consecutive whitespace chars, and replace unicode smart-doublequotes.
-                    string lineTrimmed = line.Trim();
-                    if (lineTrimmed.StartsWith("set"))
-                    {
-                        line = lineTrimmed;
-                        while (line.Contains("  "))
-                            line = line.Replace("  ", " "); //consecutive spaces break BMS parser (as of 4.37)
-                        while (line.Contains("\x201C") || line.Contains("\x201D")) //unicode smart-doublequotes
-                            line = line.Replace("\x201C", "\x0022").Replace("\x201D", "\x0022");
-                    }
-
-                    lines.Add(line);
-                }
-            }
-
             // Recreate file contents; keep handle open.
             StreamWriter writer = Utils.CreateUtf8TextWihoutBom(filename);
             writer.NewLine = Environment.NewLine;
-
-            foreach (string line in lines)
-                writer.WriteLine(line);
 
             return writer;
         }
