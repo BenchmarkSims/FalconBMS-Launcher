@@ -239,15 +239,15 @@ namespace FalconBMS.Launcher.Input
         /// Get whole DX button assignment line to write a key file.
         /// DXnumber: total DXnumber per device BMS can handle.
         /// </summary>
-        public string GetKeyLineDX(int indexInDeviceSortingOrder, int countDevices)
+        public string GetKeyLineDX(int indexInDeviceSortingOrder, int countDevices, int buttonsPerDevice = CommonConstants.DX_MAX_BUTTONS)
         {
             _Debug_ValidateCurrentProfile();
 
-            const int DXnumber = CommonConstants.DX_MAX_BUTTONS;
+            int DXnumber = Math.Min(Math.Max(1, buttonsPerDevice), dx.Length);
 
             string assign = "";
             assign += "\n#======== " + GetSanitizedProductName() + " ========\n";
-            for (int i = 0; i < dx.Length; i++)
+            for (int i = 0; i < DXnumber; i++)
             {
                 for (int ii = 0; ii < dx[i].assign.Length; ii++)
                 {

@@ -334,5 +334,17 @@ namespace FalconBMS.Launcher.Properties {
                 this["Misc_bExportRTTTextures"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("128")]
+        public int KeyMappingMaxButtons {
+            get {
+                return ((int)(this["KeyMappingMaxButtons"]));
+            }
+            set {
+                this["KeyMappingMaxButtons"] = value;
+            }
+        }
     }
 }

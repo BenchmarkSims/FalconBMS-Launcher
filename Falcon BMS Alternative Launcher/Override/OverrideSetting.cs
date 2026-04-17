@@ -67,6 +67,14 @@ namespace FalconBMS.Launcher.Override
             }
         }
 
+        public void SaveConfigOverrides(Hashtable inGameAxis, DeviceControl deviceControl)
+        {
+            if (!Directory.Exists(appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER))
+                Directory.CreateDirectory(appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER);
+
+            SaveConfigfile(inGameAxis, deviceControl);
+        }
+
         private StreamWriter OverwriteCfg(string fname)
         {
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + fname;
@@ -123,11 +131,16 @@ namespace FalconBMS.Launcher.Override
 
         protected virtual void OverrideHotasPinkyShiftMagnitude(StreamWriter cfg, DeviceControl deviceControl) { }
 
+        protected virtual int GetButtonsPerDevice()
+        {
+            return CommonConstants.DX_MAX_BUTTONS_LEGACY;
+        }
+
         protected virtual void OverrideButtonsPerDevice(StreamWriter cfg, DeviceControl deviceControl)
         {
             cfg.Write(
                 "set g_nButtonsPerDevice "
-                + CommonConstants.DX_MAX_BUTTONS_LEGACY
+                + GetButtonsPerDevice()
                 + " " + CommonConstants.CFGOVERRIDECOMMENT_OLD + "\r\n");
         }
 
@@ -252,6 +265,8 @@ namespace FalconBMS.Launcher.Override
 
         protected virtual void WriteKeyLines(string filename, Hashtable inGameAxis, KeyFile keyFile, JoyAssgn[] joyAssgns)
         {
+            int buttonsPerDevice = GetButtonsPerDevice();
+
             using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(filename))
             {
                 sw.NewLine = "\n"; // probably not necessary, but for consistency with existing keyfile serialization code that hardcodes "\n" everywhere
@@ -263,7 +278,7 @@ namespace FalconBMS.Launcher.Override
                 {
                     InGameAxAssgn rollAxis = (InGameAxAssgn)inGameAxis[AxisName.Roll.ToString()];
 
-                    sw.Write(joyAssgns[i].GetKeyLineDX(i, joyAssgns.Length));
+                    sw.Write(joyAssgns[i].GetKeyLineDX(i, joyAssgns.Length, buttonsPerDevice));
                     // PRIMARY DEVICE POV
                     if (rollAxis.GetDeviceNumber() == i)
                         sw.Write(joyAssgns[i].GetKeyLinePOV(0, 0));

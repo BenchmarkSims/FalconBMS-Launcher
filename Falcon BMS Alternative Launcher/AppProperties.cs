@@ -29,6 +29,8 @@ namespace FalconBMS.Launcher
             mainWindow.Misc_NaturalHeadMovement.IsChecked  = Properties.Settings.Default.Misc_NaturalHeadMovement;
             mainWindow.Misc_PilotModel.IsChecked           = Properties.Settings.Default.Misc_PilotModel;
 
+            SelectKeyMappingMaxButtons(Properties.Settings.Default.KeyMappingMaxButtons);
+
             // Button Status Default
             if (Properties.Settings.Default.VR_Option == "SteamVR")
             {
@@ -96,7 +98,51 @@ namespace FalconBMS.Launcher
             Properties.Settings.Default.Misc_PilotModel           = (bool)mainWindow.Misc_PilotModel.IsChecked;
             Properties.Settings.Default.VR_Option = (bool)mainWindow.VR_SteamVR.IsChecked ? "SteamVR" : (bool)mainWindow.VR_OpenXR.IsChecked ? "OpenXR" : "NoVR";
             Properties.Settings.Default.Misc_bExportRTTTextures   = (mainWindow.RTT_Enable.IsChecked == true);
+            Properties.Settings.Default.KeyMappingMaxButtons      = GetSelectedKeyMappingMaxButtons();
             Properties.Settings.Default.Save();
+        }
+
+        private void SelectKeyMappingMaxButtons(int maxButtons)
+        {
+            int sanitizedMaxButtons = SanitizeKeyMappingMaxButtons(maxButtons);
+
+            for (int i = 0; i < mainWindow.KeyMappingMaxButtonsDropdown.Items.Count; i++)
+            {
+                System.Windows.Controls.ComboBoxItem comboItem = mainWindow.KeyMappingMaxButtonsDropdown.Items[i] as System.Windows.Controls.ComboBoxItem;
+                if (comboItem == null)
+                    continue;
+
+                int itemValue;
+                if (int.TryParse(comboItem.Content.ToString(), out itemValue) && itemValue == sanitizedMaxButtons)
+                {
+                    mainWindow.KeyMappingMaxButtonsDropdown.SelectedIndex = i;
+                    return;
+                }
+            }
+        }
+
+        private int GetSelectedKeyMappingMaxButtons()
+        {
+            System.Windows.Controls.ComboBoxItem selectedItem = mainWindow.KeyMappingMaxButtonsDropdown.SelectedItem as System.Windows.Controls.ComboBoxItem;
+            int maxButtons;
+            if (selectedItem != null && int.TryParse(selectedItem.Content.ToString(), out maxButtons))
+                return SanitizeKeyMappingMaxButtons(maxButtons);
+
+            return 128;
+        }
+
+        private static int SanitizeKeyMappingMaxButtons(int maxButtons)
+        {
+            switch (maxButtons)
+            {
+                case 16:
+                case 32:
+                case 64:
+                case 128:
+                    return maxButtons;
+                default:
+                    return 128;
+            }
         }
     }
 }

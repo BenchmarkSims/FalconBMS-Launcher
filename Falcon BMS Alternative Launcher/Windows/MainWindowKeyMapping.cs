@@ -22,7 +22,7 @@ namespace FalconBMS.Launcher.Windows
     {
         private List<ButtonStateTracker> _buttonTrackers;
         private bool _isShiftButtonPressed = false;
-        private int _keyMappingMaxButtons = CommonConstants.DX_MAX_BUTTONS;
+        private int _keyMappingMaxButtons = Properties.Settings.Default.KeyMappingMaxButtons;
 
         private int GetSelectedKeyMappingMaxButtons()
         {
@@ -32,6 +32,20 @@ namespace FalconBMS.Launcher.Windows
                 return maxButtons;
 
             return CommonConstants.DX_MAX_BUTTONS;
+        }
+
+        private int SanitizeKeyMappingMaxButtons(int maxButtons)
+        {
+            switch (maxButtons)
+            {
+                case 16:
+                case 32:
+                case 64:
+                case 128:
+                    return maxButtons;
+                default:
+                    return CommonConstants.DX_MAX_BUTTONS;
+            }
         }
 
         public void UpdateCategoryHeaders()
@@ -428,7 +442,12 @@ namespace FalconBMS.Launcher.Windows
 
         private void KeyMappingMaxButtonsDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _keyMappingMaxButtons = GetSelectedKeyMappingMaxButtons();
+            _keyMappingMaxButtons = SanitizeKeyMappingMaxButtons(GetSelectedKeyMappingMaxButtons());
+            Properties.Settings.Default.KeyMappingMaxButtons = _keyMappingMaxButtons;
+            Properties.Settings.Default.Save();
+
+            if (appReg != null && deviceControl != null)
+                appReg.getOverrideWriter().SaveConfigOverrides(MainWindow.inGameAxis, deviceControl);
         }
 
         private void ProfileSelect_SelectionChanged(object sender, SelectionChangedEventArgs e)
