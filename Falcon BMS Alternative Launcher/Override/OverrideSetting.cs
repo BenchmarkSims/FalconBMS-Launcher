@@ -56,8 +56,6 @@ namespace FalconBMS.Launcher.Override
 
             using (StreamWriter cfgUser = OverwriteCfg(CommonConstants.USERCFGFILE))
             {
-                cfgUser.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
-
                 OverrideButtonsPerDevice(cfgUser, deviceControl);
                 OverrideHotasPinkyShiftMagnitude(cfgUser, deviceControl);
                 OverridePovDeviceIDs(cfgUser, inGameAxis);
@@ -86,9 +84,36 @@ namespace FalconBMS.Launcher.Override
             if (File.Exists(filename))
                 File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 
+            List<string> lines = new List<string>(500);
+            if (File.Exists(filename))
+            {
+                using (StreamReader reader = new StreamReader(filename, Encoding.UTF8))
+                {
+                    while (true)
+                    {
+                        string line = reader.ReadLine();
+                        if (line == null) break;
+
+                        if (line.Contains(CommonConstants.CFGOVERRIDECOMMENTLINE))
+                            break;
+
+                        if (line.Contains(CommonConstants.CFGOVERRIDECOMMENT_OLD) ||
+                            line.Contains(CommonConstants.CFGOVERRIDECOMMENT_NEW))
+                            continue;
+
+                        lines.Add(line);
+                    }
+                }
+            }
+
             // Recreate file contents; keep handle open.
             StreamWriter writer = Utils.CreateUtf8TextWihoutBom(filename);
             writer.NewLine = Environment.NewLine;
+
+            foreach (string line in lines)
+                writer.WriteLine(line);
+
+            writer.WriteLine(CommonConstants.CFGOVERRIDECOMMENTLINE);
 
             return writer;
         }
