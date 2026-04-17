@@ -537,7 +537,7 @@
                         <ComboBoxItem Content="F-15" Tag="F15" />
                     </ComboBox>
                     <Label Content="Category:" HorizontalAlignment="Left" Margin="223,-43,0,0" VerticalAlignment="Top" Height="26" Width="64" HorizontalContentAlignment="Right" Foreground="White"/>
-                    <ComboBox x:Name="Category" ItemsSource="{Binding}" HorizontalAlignment="Left" Margin="300,-41,0,0" VerticalAlignment="Top" Width="220" BorderBrush="Black" Background="#80F0F0F0" Foreground="#FF191919" SelectionChanged="Category_SelectionChanged" Height="26" Grid.ColumnSpan="2">
+                    <ComboBox x:Name="Category" ItemsSource="{Binding}" HorizontalAlignment="Left" Margin="297,-41,0,0" VerticalAlignment="Top" Width="220" BorderBrush="Black" Background="#80F0F0F0" Foreground="#FF191919" SelectionChanged="Category_SelectionChanged" Height="26" Grid.ColumnSpan="2">
                     </ComboBox>
                     <DataGrid x:Name="KeyMappingGrid" HorizontalAlignment="Stretch" Height="auto" Margin="10,10,9.666,64.334" 
                               EnableColumnVirtualization="True" EnableRowVirtualization="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
