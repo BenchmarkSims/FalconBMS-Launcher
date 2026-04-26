@@ -156,7 +156,7 @@ namespace FalconBMS.Launcher.Windows
             {
                 Dispatcher thisDispatcher = (Dispatcher)state;
 
-                RSSReader.Read("https://www.falcon-bms.com/news/feed/", "https://www.falcon-bms.com");
+                RSSReader.Read("https://www.falcon-bms.com/rss.xml", "https://www.falcon-bms.com");
                 RSSReader.Read("https://www.falcon-lounge.com/news/feed/", "https://www.falcon-lounge.com");
 
                 Diagnostics.Log("Completed RSS fetch on background-thread.");
