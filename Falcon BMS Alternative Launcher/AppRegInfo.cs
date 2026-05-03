@@ -201,14 +201,6 @@ namespace FalconBMS.Launcher
 
             currentExeFourPartVersion = $"{major}.{minor}.{build}.{patch}";
 
-            this.has16kTerrainTilesInNeedOfProcessing = false;
-            if (major == 4 && minor == 38 && build == 1 && patch >= 3099)
-                ScanFor16K();
-
-            this.hasLowFreeSpaceOnDrive = false;
-            if (this.has16kTerrainTilesInNeedOfProcessing)
-                CheckDriveFreeSpace();
-
             return true;
         }
 
