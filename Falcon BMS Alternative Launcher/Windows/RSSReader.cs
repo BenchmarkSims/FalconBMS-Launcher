@@ -100,11 +100,12 @@ namespace FalconBMS.Launcher.Windows
             {
                 if (webSite != null)
                 {
-                    tb.Inlines.Add(new Run("from ") { FontStyle = FontStyles.Italic, FontSize = 12 });
-                    Hyperlink topLink = new Hyperlink() { NavigateUri = new Uri(link) };
-                    topLink.Inlines.Add(new Run(webSite.Replace("https://","")) { FontStyle = FontStyles.Italic, Foreground = new SolidColorBrush(Color.FromArgb(0x80, 0xff, 0xff, 0xff)), FontSize = 12 });
-                    topLink.RequestNavigate += Try_RequestNavigateTop;
-                    tb.Inlines.Add(topLink);
+                    tb.Inlines.Add(new Run(dateTime.ToString("MMMM d, yyyy"))
+                    {
+                        FontStyle = FontStyles.Italic,
+                        FontSize = 12,
+                        Foreground = new SolidColorBrush(Color.FromArgb(0x80, 0xff, 0xff, 0xff))
+                    });
                     tb.Inlines.Add("\n");
                 }
 
@@ -117,7 +118,7 @@ namespace FalconBMS.Launcher.Windows
                 tb.Inlines.Add("\n");
 
                 Hyperlink hyperLink = new Hyperlink() {NavigateUri = new Uri(link)};
-                hyperLink.Inlines.Add(new Run(">> Read More") { Foreground = Brushes.Aquamarine, FontSize = 12 });
+                hyperLink.Inlines.Add(new Run(">> Read More") { Foreground = (Brush)Application.Current.Resources["GridFocusedFgBrush"], FontSize = 12 });
                 hyperLink.RequestNavigate += Try_RequestNavigate;
                 tb.Inlines.Add(hyperLink);
 

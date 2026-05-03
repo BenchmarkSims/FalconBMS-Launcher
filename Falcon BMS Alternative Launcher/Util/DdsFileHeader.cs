@@ -11,9 +11,10 @@ namespace FalconBMS.Launcher
         {
             const uint sizeof_dds_header = 124;
 
-            using (MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(dds_path, FileMode.Open))
+            using (var mmf = MemoryMappedFile.CreateFromFile(dds_path, FileMode.Open))
+            using (var mmfva = mmf.CreateViewAccessor(0, sizeof_dds_header, MemoryMappedFileAccess.Read))
             {
-                var mmfva = mmf.CreateViewAccessor(0, sizeof_dds_header, MemoryMappedFileAccess.Read);
+                //var mmfva = mmf.CreateViewAccessor(0, sizeof_dds_header, MemoryMappedFileAccess.Read);
 
                 // Verify DDS file-header magic number.
                 uint dds_dwMagic = mmfva.ReadUInt32(0);
