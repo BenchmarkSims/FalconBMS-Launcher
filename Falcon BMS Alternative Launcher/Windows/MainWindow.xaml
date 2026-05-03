@@ -377,7 +377,7 @@
                                      HorizontalAlignment="Left" Margin="512,533,0,0" VerticalAlignment="Top"
                                      Height="18" Width="349"/>
                                 <Label Content="*Enabling this option disables Yaw axis." FontSize="11" HorizontalAlignment="Left" Margin="530,550,0,0" VerticalAlignment="Top" Height="25" Width="273" Foreground="{StaticResource UiForegroundBrush}"/>
-                                <TextBlock Margin="32,574,0,0" Height="36" Width="378" Style="{StaticResource HelpText}"><Run Text="&quot;Toe Brake&quot; works as &quot;"/><Run Text="Both Toe Brakes"/><Run Text="&quot;"/><Run Text=" "/><Run Text="as long as no axis are applied to &quot;Toe Brake Right"/><Run Text="&quot; "/><Run Text="or it "/><Run Text="will work as &quot;Throttle Left&quot; &quot;Toe Brake Left&quot;"/><LineBreak/></TextBlock>
+                                <TextBlock Margin="32,574,0,0" Height="36" Width="378" Style="{StaticResource HelpText}"><Run Text="&quot;Toe Brake&quot; works as &quot;"/><Run Text="Both Toe Brakes"/><Run Text="&quot;"/><Run Text=" "/><Run Text="as long as no axis are applied to &quot;Toe Brake Right"/><Run Text="&quot; "/><Run Text="or it "/><Run Text="will work as &quot;Toe Brake Left&quot;"/><LineBreak/></TextBlock>
                                 <TextBlock Margin="32,145,0,0" Height="35" Width="378" Style="{StaticResource HelpText}"><Run Text="FalconBMS implements real F-16 FLCS curve. "/><LineBreak/><Run Text="Disable any Deadzone and Saturation/Curve recommended"/></TextBlock>
                             </Grid>
                         </TabItem>
