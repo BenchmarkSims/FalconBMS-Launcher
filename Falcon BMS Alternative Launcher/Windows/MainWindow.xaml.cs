@@ -484,6 +484,9 @@ namespace FalconBMS.Launcher.Windows
         {
             try
             {
+                // Save UI Properties(Like Button Status)
+                appProperties.SaveUISetup();
+
                 if (appReg.IsUniqueNameDefined() == false)
                 {
                     CallsignWindow.ShowCallsignWindow(appReg);

@@ -149,7 +149,11 @@
                             <Label x:Name="Label_EDIT" Content="Editor&#xD;&#xA;" Margin="575,0,0,0"/>
                         </Grid>
                     </Border>
-                    <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
+                    
+                    <CheckBox x:Name="KeepLauncherOpen" Content="Reopen Launcher after exiting BMS" 
+                              HorizontalAlignment="Right" Margin="0,0,17,124" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
+                    <CheckBox x:Name="ApplicationOverride" Content="Launch without applying overrides" 
+                              HorizontalAlignment="Right" Margin="0,0,20,98" MinWidth="206" VerticalAlignment="Bottom" Background="#FFECFF71" Foreground="{StaticResource UiForegroundBrush}" />
 
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="72" Margin="48,0,0,20" VerticalAlignment="Bottom" Width="480" Style="{StaticResource LauncherStripBorder}">
                         <Grid HorizontalAlignment="Stretch" Height="auto" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="auto">
