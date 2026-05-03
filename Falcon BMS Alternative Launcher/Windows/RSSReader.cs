@@ -100,7 +100,9 @@ namespace FalconBMS.Launcher.Windows
             {
                 if (webSite != null)
                 {
-                    tb.Inlines.Add(new Run(dateTime.ToString("MMMM d, yyyy"))
+                    string topline = $"{dateTime.ToString("dd MMM yyyy")} - {webSite.Replace("https://", "")}";
+
+                    tb.Inlines.Add(new Run(topline)
                     {
                         FontStyle = FontStyles.Italic,
                         FontSize = 12,
