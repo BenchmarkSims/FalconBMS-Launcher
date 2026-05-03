@@ -821,8 +821,10 @@ namespace FalconBMS.Launcher.Windows
                 if (this.ListBox_BMS.SelectedIndex < 0)
                     return;
 
-                string newVersion = this.ListBox_BMS.SelectedItem.ToString();
-                Properties.Settings.Default.BMS_Version = newVersion;
+                var version = ListBox_BMS.SelectedValue as string; // real registry key, e.g. "Falcon BMS 4.38"
+                if (string.IsNullOrEmpty(version)) return;
+
+                Properties.Settings.Default.BMS_Version = version;
 
                 //// Don't lose user's recent changes!
                 //if (deviceControl != null)
@@ -831,7 +833,7 @@ namespace FalconBMS.Launcher.Windows
                 //    appReg.getOverrideWriter().SaveKeyMapping(inGameAxis, deviceControl);
                 //}
 
-                appReg.UpdateSelectedBMSVersion(newVersion);
+                appReg.UpdateSelectedBMSVersion(version);
 
                 ReloadDevicesAndXmlMappings();
                 ReloadKeyfilesTheatersAndUpdateUI();
