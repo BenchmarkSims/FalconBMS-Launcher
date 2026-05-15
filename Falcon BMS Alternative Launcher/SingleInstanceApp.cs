@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Windows.Threading;
+﻿using System.Threading;
 
 namespace FalconBMS.Launcher
 {
@@ -16,6 +13,5 @@ namespace FalconBMS.Launcher
             s_appGuardMutex = new Mutex(initiallyOwned: true, s_appGuardMutexName, out isNew);
             return (!isNew);
         }
-
     }
 }

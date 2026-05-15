@@ -11,7 +11,6 @@ using Microsoft.Win32;
 using FalconBMS.Launcher.Windows;
 using FalconBMS.Launcher.Override;
 using FalconBMS.Launcher.Starter;
-using FalconBMS.Launcher.Input;
 
 namespace FalconBMS.Launcher
 {
@@ -34,7 +33,6 @@ namespace FalconBMS.Launcher
         private MainWindow mainWindow;
 
         public string theaterOwnConfig = "";
-        private string currentExeFourPartVersion = "";
 
         // Method
         public string GetInstallDir() { return installDir; }
@@ -45,8 +43,8 @@ namespace FalconBMS.Launcher
         public BMS_Version getBMSVersion() { return bms_Version; }
         public AbstractStarter getLauncher() { return starter; }
 
-        // This will list teh available BMS versions to the launcher list.
-        public string[] availableBMSVersions =
+        // This will list the available BMS versions to the launcher list.
+        private readonly string[] availableBMSVersions =
         {
             "Falcon BMS 4.38",
             "Falcon BMS 4.38 (Internal)",
@@ -73,12 +71,10 @@ namespace FalconBMS.Launcher
             var foundVersions = new List<string>(10);
             foreach (string version in availableBMSVersions)
             {
-                if (Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\Benchmark Sims\\" + version, writable: false) == null)
-                    continue;
-
-                if (BMSExists(version))
+                if (IsFoundInRegistry(version))
                     foundVersions.Add(version);
             }
+
             if (foundVersions.Count == 0)
             {
                 MessageBox.Show(window, "Unable to locate any BMS installation(s)!", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -93,7 +89,7 @@ namespace FalconBMS.Launcher
             foreach (var v in foundVersions)
             {
                 // Ensure exeDir is set for this version
-                BMSExists(v);
+                IsExeFound(v);
 
                 // Read the real version parts from the EXE
                 int major = 0, minor = 0, build = 0, patch = 0;
@@ -110,18 +106,13 @@ namespace FalconBMS.Launcher
                     // If anything goes wrong, leave zeros
                 }
 
+                string label = $"Falcon BMS {major}.{minor}.{build}";
                 bool isInternal = v.EndsWith("(Internal)", StringComparison.Ordinal);
 
-                string label;
                 if (isInternal)
                 {
-                    // Internal: {major}.{minor}.{build} Build {patch} (Internal)
-                    label = $"Falcon BMS {major}.{minor}.{build} (Internal Build {patch})";
-                }
-                else
-                {
-                    // Non-Internal: {major}.{minor}.{build}
-                    label = $"Falcon BMS {major}.{minor}.{build}";
+                    // Internal: {major}.{minor}.{build} (Internal Build {patch})
+                    label += $" (Internal Build {patch})";
                 }
 
                 sortedItems.Add(new KeyValuePair<string, string>(v, label));
@@ -166,49 +157,54 @@ namespace FalconBMS.Launcher
 
             //TODO: refactor this innocent-looking boolean getter, which has side-effects to init many member fields for
             // the currently selected version.. in the meantime, we must call it again now that we have selectedVersion.
-            BMSExists(version);
+            IsExeFound(version);
 
             return;
         }
 
-        public bool BMSExists(string version)
+        private bool IsFoundInRegistry(string version)
         {
+            using (RegistryKey rk = GetRegistryKeyForVersion(version))
+            {
+                return rk != null;
+            }
+        }
+
+        private RegistryKey GetRegistryKeyForVersion(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version))
+                return null;
+
             string regName64 = "SOFTWARE\\Wow6432Node\\Benchmark Sims\\" + version;
+            RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName64, writable: false);
+            return rk;
+        }
 
-            RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName64, writable:false);
-            if (rk == null) return false;
+        private bool IsExeFound(string version)
+        {
+            using (RegistryKey rk = GetRegistryKeyForVersion(version))
+            {
+                if (rk == null) return false;
 
-            this.regName = regName64;
+                this.regName = rk.Name.Substring(rk.Name.IndexOf("SOFTWARE"));
 
-            this.installDir = (string)rk.GetValue("baseDir");
-            if (String.IsNullOrEmpty(installDir)) return false;
-            if (!Directory.Exists(installDir)) return false;
+                this.installDir = (string)rk.GetValue("baseDir");
+                if (String.IsNullOrEmpty(installDir)) return false;
+                if (!Directory.Exists(installDir)) return false;
 
-            this.currentTheater = ReadCurrentTheater();
-            this.pilotCallsign = ReadPilotCallsign();
+                this.currentTheater = ReadCurrentTheater(rk);
+                this.pilotCallsign = ReadPilotCallsign(rk);
+            }
 
-            //if (platform == Platform.OS_64bit)
             exeDir = installDir + "\\bin\\x64\\Falcon BMS.exe";
-            if (!File.Exists(exeDir)) return false;
-
-            FileVersionInfo exe_version_info = FileVersionInfo.GetVersionInfo(exeDir);
-            Diagnostics.Log(exe_version_info.ToString());
-
-            int major = exe_version_info.FileMajorPart;
-            int minor = exe_version_info.FileMinorPart;
-            int build = exe_version_info.FileBuildPart;
-            int patch = exe_version_info.FilePrivatePart;
-
-            currentExeFourPartVersion = $"{major}.{minor}.{build}.{patch}";
-
-            return true;
+            return File.Exists(exeDir);
         }
 
         public void ChangeCfgPath()
         {
             try
             {
-                RegistryKey regkeyCFG = Registry.CurrentUser.CreateSubKey("SOFTWARE\\F4Patch\\Settings", writable:true);
+                RegistryKey regkeyCFG = Registry.CurrentUser.CreateSubKey("SOFTWARE\\F4Patch\\Settings", writable: true);
                 regkeyCFG.SetValue("F4Exe", Path.Combine(installDir, "Launcher.exe"));
                 regkeyCFG.Close();
             }
@@ -229,9 +225,9 @@ namespace FalconBMS.Launcher
                     starter = new Starter438(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.38 (Internal)":
-                    bms_Version     = BMS_Version.BMS438I;
+                    bms_Version = BMS_Version.BMS438I;
                     overRideSetting = new OverrideSettingFor438(this.mainWindow, this);
-                    starter         = new Starter438Internal(this, this.mainWindow);
+                    starter = new Starter438Internal(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.37.6 (Internal)":
                     bms_Version = BMS_Version.BMS437I;
@@ -244,39 +240,39 @@ namespace FalconBMS.Launcher
                     starter = new Starter437Internal(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.37 (Internal)":
-                    bms_Version     = BMS_Version.BMS437I;
+                    bms_Version = BMS_Version.BMS437I;
                     overRideSetting = new OverrideSettingFor437(this.mainWindow, this);
-                    starter         = new Starter437Internal(this, this.mainWindow);
+                    starter = new Starter437Internal(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.37":
-                    bms_Version     = BMS_Version.BMS437;
+                    bms_Version = BMS_Version.BMS437;
                     overRideSetting = new OverrideSettingFor437(this.mainWindow, this);
-                    starter         = new Starter437(this, this.mainWindow);
+                    starter = new Starter437(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.36":
-                    bms_Version     = BMS_Version.BMS436;
+                    bms_Version = BMS_Version.BMS436;
                     overRideSetting = new OverrideSettingFor436(this.mainWindow, this);
-                    starter         = new Starter436(this, this.mainWindow);
+                    starter = new Starter436(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.35":
-                    bms_Version     = BMS_Version.BMS435;
+                    bms_Version = BMS_Version.BMS435;
                     overRideSetting = new OverrideSettingFor435(this.mainWindow, this);
-                    starter         = new Starter435(this, this.mainWindow);
+                    starter = new Starter435(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.34":
-                    bms_Version     = BMS_Version.BMS434U1;
+                    bms_Version = BMS_Version.BMS434U1;
                     overRideSetting = new OverrideSettingFor434U1(this.mainWindow, this);
-                    starter         = new Starter434(this, this.mainWindow);
+                    starter = new Starter434(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.33":
-                    bms_Version     = BMS_Version.BMS433;
+                    bms_Version = BMS_Version.BMS433;
                     overRideSetting = new OverrideSettingFor433(this.mainWindow, this);
-                    starter         = new Starter433(this, this.mainWindow);
+                    starter = new Starter433(this, this.mainWindow);
                     break;
                 case "Falcon BMS 4.32":
-                    bms_Version     = BMS_Version.BMS432;
+                    bms_Version = BMS_Version.BMS432;
                     overRideSetting = new OverrideSettingFor432(this.mainWindow, this);
-                    starter         = new Starter432(this, this.mainWindow);
+                    starter = new Starter432(this, this.mainWindow);
                     break;
                 default:
                     bms_Version = BMS_Version.UNDEFINED;
@@ -285,39 +281,33 @@ namespace FalconBMS.Launcher
             }
         }
 
-        public string ReadPilotCallsign()
+        private string ReadPilotCallsign(RegistryKey registryKey)
         {
-            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName, writable: false))
-            {
-                byte[] bits = (byte[])(rk.GetValue("PilotCallsign"));
-                if (bits == null || bits[0] == 0x00) return "Viper";
+            byte[] bits = (byte[])(registryKey.GetValue("PilotCallsign"));
+            if (bits == null || bits[0] == 0x00) return "Viper";
 
-                // Guard against possibility of embedded nullchars, and missing nullterm.
-                int n = Array.IndexOf<byte>(bits, 0x00);
-                if (n == -1) n = bits.Length;
+            // Guard against possibility of embedded nullchars, and missing nullterm.
+            int n = Array.IndexOf<byte>(bits, 0x00);
+            if (n == -1) n = bits.Length;
 
-                return Encoding.ASCII.GetString(bits, 0, n);
-            }
+            return Encoding.ASCII.GetString(bits, 0, n);
         }
 
-        public string ReadPilotName()
+        private string ReadPilotName(RegistryKey registryKey)
         {
-            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName, writable: false))
-            {
-                byte[] bits = (byte[])(rk.GetValue("PilotName"));
-                if (bits == null || bits[0] == 0x00) return "Joe Pilot";
+            byte[] bits = (byte[])(registryKey.GetValue("PilotName"));
+            if (bits == null || bits[0] == 0x00) return "Joe Pilot";
 
-                // Guard against possibility of embedded nullchars, and missing nullterm.
-                int n = Array.IndexOf<byte>(bits, 0x00);
-                if (n == -1) n = bits.Length;
+            // Guard against possibility of embedded nullchars, and missing nullterm.
+            int n = Array.IndexOf<byte>(bits, 0x00);
+            if (n == -1) n = bits.Length;
 
-                return Encoding.ASCII.GetString(bits, 0, n);
-            }
+            return Encoding.ASCII.GetString(bits, 0, n);
         }
 
         public bool IsUniqueNameDefined()
         {
-            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName, writable:false))
+            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName, writable: false))
             {
                 if (rk == null) return false;
 
@@ -325,9 +315,9 @@ namespace FalconBMS.Launcher
                     return false;
                 if (rk.GetValue("PilotName") == null)
                     return false;
-                if (ReadPilotCallsign() == "Viper")
+                if (ReadPilotCallsign(rk) == "Viper")
                     return false;
-                if (ReadPilotName() == "Joe Pilot")
+                if (ReadPilotName(rk) == "Joe Pilot")
                     return false;
 
                 return true;
@@ -367,15 +357,10 @@ namespace FalconBMS.Launcher
             return;
         }
 
-        public string ReadCurrentTheater()
+        private string ReadCurrentTheater(RegistryKey registryKey)
         {
-            using (RegistryKey regkey = Registry.LocalMachine.OpenSubKey(regName, writable: false))
-            {
-                string s = (string)(regkey.GetValue("curTheater"));
-                if (String.IsNullOrEmpty(s)) return "Korea KTO";
-
-                return s;
-            }
+            string s = (string)(registryKey.GetValue("curTheater"));
+            return String.IsNullOrEmpty(s) ? "Korea KTO" : s;
         }
 
         public void ChangeTheater(ComboBox combobox)
@@ -383,7 +368,7 @@ namespace FalconBMS.Launcher
             if (combobox.SelectedIndex == -1)
                 return;
 
-            RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName, writable:true);
+            RegistryKey rk = Registry.LocalMachine.OpenSubKey(regName, writable: true);
             if (rk == null)
                 return;
 

@@ -22,7 +22,7 @@ namespace FalconBMS.Launcher
         {
             if (SingleInstanceApp.IsAlreadyRunning())
             {
-                MessageBox.Show("Falcon BMS Launcher is already running", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Falcon BMS Launcher is already running.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
