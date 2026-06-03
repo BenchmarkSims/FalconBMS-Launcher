@@ -123,7 +123,7 @@
         </DirAssgn>
         <DirAssgn>
           <Callback>
-            <string>AFAileronTrimLeft</string>
+            <string>SimDoNothing</string>
             <string>SimDoNothing</string>
           </Callback>
           <SoundID>
