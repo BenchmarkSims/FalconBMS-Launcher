@@ -50,7 +50,7 @@
         <Button x:Name="SetAB" Content="AB DETENT" HorizontalAlignment="Left" Margin="320,144,0,0" VerticalAlignment="Top" Width="75" Click="SetAB_Click"/>
         <Button x:Name="Idle" Content="Idle DETENT" HorizontalAlignment="Left" Margin="400,144,0,0" VerticalAlignment="Top" Width="75" Click="SetIDLE_Click"/>
 
-        <CheckBox x:Name="Invert" Content="INVERT" HorizontalAlignment="Left" Margin="28,148,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="Invert" Content="INVERT" HorizontalAlignment="Left" Margin="28,148,0,0" VerticalAlignment="Top" Click="Invert_Click"/>
         <Label Content="Saturation" HorizontalAlignment="Left" Margin="225,144,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="Saturation" HorizontalAlignment="Left" Margin="210,177,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="Saturation_SelectionChanged">
             <TextBlock Text=" None"/>

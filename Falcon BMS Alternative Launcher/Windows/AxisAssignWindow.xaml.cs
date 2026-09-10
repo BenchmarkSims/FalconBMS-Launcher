@@ -1,67 +1,146 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Threading;
 
 using FalconBMS.Launcher.Input;
 
 namespace FalconBMS.Launcher.Windows
 {
-    /// <summary>
-    /// Interaction logic for AxisAssignWindow.xaml
-    /// </summary>
-    public partial class AxisAssignWindow : ITimerSink
+
+    public partial class AxisAssignWindow
     {
-        public AxisAssignWindow(MainWindow mainWindow, InGameAxAssgn axisAssign, object sender)
+        public static InGameAxAssgn ShowAxisAssignWindow( Window owner, InGameAxAssgn axisAssign, LogicalAxis log_axis )
         {
-            InitializeComponent();
-
-            this.Owner = mainWindow;
-
-            this.mainWindow = mainWindow;
-            this.axisAssign = axisAssign;
-
-            whoCalledWindow = ((System.Windows.Controls.Button)sender).Name;
-        }
-
-        public static InGameAxAssgn ShowAxisAssignWindow(MainWindow mainWindow, InGameAxAssgn axisAssign, object sender)
-        {
-            AxisAssignWindow ownWindow = new AxisAssignWindow(mainWindow, axisAssign, sender);
+            AxisAssignWindow ownWindow = new AxisAssignWindow(owner, axisAssign, log_axis);
             Program.ShowDialogAndMakeActive(ownWindow);
 
-            axisAssign = ownWindow.axisAssign;
+            axisAssign = ownWindow._curr_axis_assgn;
             return axisAssign;
         }
 
-        private JoyAxisNeutralValue[] Joynum;
-        public class JoyAxisNeutralValue
+        private AxisAssignWindow(Window owner, InGameAxAssgn axisAssign, LogicalAxis log_axis)
         {
-            public int[] NeutralValue = new int[8];
+            InitializeComponent();
+            this.Owner = owner;
+
+            this._logical_axis_id = log_axis;
+            this._curr_axis_assgn = axisAssign;
         }
 
-        private MainWindow mainWindow;
+        private List<DirectInputListener> _input_listeners;
+        private bool _awaiting_input = true;
 
-        private InGameAxAssgn axisAssign;
-        private string whoCalledWindow;
+        private LogicalAxis _logical_axis_id;
+        private InGameAxAssgn _curr_axis_assgn;
 
-        private int devNumTmp = -1;
-        private int phyAxNumTmp = -1;
-        private int invertNum;
+        // Local data-model for this dialog:
+        private InGameAxAssgn _dlg_axis_assgn;
 
-        private int AB   = CommonConstants.AXISMAX;
-        private int IDLE = CommonConstants.AXISMIN;
+        // Timer only for flashing UI elements.
+        private DispatcherTimer _timer;
+        bool _flash_on = true;
 
-        private Status status = Status.GetNeutralPosition;
-
-        private int TickCount_NextUIFlush1;
-        private int TickCount_NextUIFlush2;
-
-        private enum Status
+        protected override void OnInitialized( EventArgs e )
         {
-            GetNeutralPosition = -1,
-            WaitInput = 0,
-            ShowAxisStatus = 1
+            base.OnInitialized(e);
+
+            _timer = new DispatcherTimer();
+            _timer.Tick += new EventHandler(Timer_Tick);
+            _timer.Interval = TimeSpan.FromMilliseconds(500);
+            _timer.Start();
+
+            SubscribeToDirectInputEvents();
+        }
+
+        internal void SubscribeToDirectInputEvents( )
+        {
+            var dev_map = DirectInputDeviceMap.Singleton;
+
+            _input_listeners = new List<DirectInputListener>
+            {
+                dev_map.GetListenerForKeyboard()
+            };
+            foreach (Guid g in dev_map.GetDeviceInstanceGuids())
+            {
+                _input_listeners.Add(dev_map.GetListenerForJoystick(g));
+            }
+
+            foreach (var listener in _input_listeners)
+            {
+                listener.AxisInputReceived += AxisAssignWindow_AxisInputReceived;
+                listener.AxisCoarseInputReceived += AxisAssignWindow_AxisCoarseInputReceived;
+            }
+
+            return;
+        }
+
+        protected override void OnClosing( CancelEventArgs e )
+        {
+            base.OnClosing(e);
+
+            // Stop timers.
+            _timer.Stop();
+
+            // Unsubscribe the DirectInput listeners.
+            foreach (var listener in _input_listeners)
+            {
+                listener.AxisInputReceived -= AxisAssignWindow_AxisInputReceived;
+                listener.AxisCoarseInputReceived -= AxisAssignWindow_AxisCoarseInputReceived;
+            }
+        }
+
+        private void AxisAssignWindow_AxisInputReceived( Guid device_guid, int axis_id, int new_value )
+        {
+            if (!this.IsActive) return;
+            //Debug.WriteLine($"AxisAssignWindow_AxisInputReceived({device_guid}, {axis_id}, {new_value})");
+
+            if (_awaiting_input) return;
+
+            var joy = _dlg_axis_assgn.GetJoy();
+            if (device_guid != joy.GetInstanceGUID()) return;
+            if ((PhysicalAxis)axis_id != _dlg_axis_assgn.GetPhysicalAxisId()) return;
+
+            UpdateUI(new_value);
+            return;
+        }
+
+        private void AxisAssignWindow_AxisCoarseInputReceived( Guid device_guid, int axis_id, int new_value )
+        {
+            if (!this.IsActive) return;
+            if (_dlg_axis_assgn == null) return;
+            //Debug.WriteLine($"AxisAssignWindow_AxisCoarseInputReceived({device_guid}, {axis_id}, {new_value})");
+
+            if (!_awaiting_input) return;
+
+            // Engage this device and axis.
+            var joy = MainWindow.deviceControl.GetJoystickMappingForDeviceId(device_guid);
+
+            _dlg_axis_assgn = new InGameAxAssgn(
+                joy, (PhysicalAxis)axis_id,
+                _dlg_axis_assgn.GetInvert(),
+                _dlg_axis_assgn.GetDeadzone(),
+                _dlg_axis_assgn.GetSaturation()
+                );
+
+            _awaiting_input = false;
+            AssignedJoystick.Visibility = Visibility.Visible;
+
+            // Update UI.
+            UpdateUI(new_value);
+
+            Retry.Content = "RETRY";
+            Retry.Visibility = Visibility.Visible;
+
+            if (_logical_axis_id == LogicalAxis.Throttle)
+            {
+                SetAB.Visibility = Visibility.Visible;
+                Idle.Visibility = Visibility.Visible;
+            }
+
+            return;
         }
 
         private void AssignWindow_Loaded(object sender, RoutedEventArgs e)
@@ -72,96 +151,100 @@ namespace FalconBMS.Launcher.Windows
 
             check_ABIDLE.Visibility = Visibility.Hidden;
 
-            Label_AxisName.Content = whoCalledWindow.Replace("_", " ");
+            Label_AxisName.Content = _logical_axis_id.ToString().Replace("_", " ");
 
-            switch (whoCalledWindow)
+            _awaiting_input = true;
+            AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Visibility = Visibility.Visible;
+
+            switch (_logical_axis_id)
             {
-                case "Roll":
-                    DirectionDecrease.Content = "Left Wing Down";
-                    DirectionIncrease.Content = "Right Wing Down";
+                case LogicalAxis.Roll:
+                    DirectionDecrease.Content = "Roll Left";
+                    DirectionIncrease.Content = "Roll Right";
                     break;
-                case "Trim_Roll":
-                    DirectionDecrease.Content = "Left Wing Down";
-                    DirectionIncrease.Content = "Right Wing Down";
+                case LogicalAxis.Trim_Roll:
+                    DirectionDecrease.Content = "Roll Left";
+                    DirectionIncrease.Content = "Roll Right";
                     break;
-                case "Pitch":
+                case LogicalAxis.Pitch:
                     DirectionDecrease.Content = "Pitch Down";
                     DirectionIncrease.Content = "Pitch Up";
                     break;
-                case "Trim_Pitch":
+                case LogicalAxis.Trim_Pitch:
                     DirectionDecrease.Content = "Pitch Down";
                     DirectionIncrease.Content = "Pitch Up";
                     break;
-                case "Yaw":
-                case "Trim_Yaw":
+                case LogicalAxis.Yaw:
+                case LogicalAxis.Trim_Yaw:
                     DirectionDecrease.Content = "Yaw Left";
                     DirectionIncrease.Content = "Yaw Right";
                     break;
-                case "Throttle":
-                case "Throttle_Right":
+                case LogicalAxis.Throttle:
+                case LogicalAxis.Throttle_Right:
                     DirectionDecrease.Content = "Afterward";
                     DirectionIncrease.Content = "Forward";
                     DeadZone.Visibility = Visibility.Collapsed;
                     Label_DeadZone.Visibility = Visibility.Collapsed;
                     break;
-                case "Toe_Brake":
-                case "Toe_Brake_Right":
+                case LogicalAxis.Toe_Brake:
+                case LogicalAxis.Toe_Brake_Right:
                     DirectionDecrease.Content = "Release";
                     DirectionIncrease.Content = "Apply";
                     DeadZone.Visibility = Visibility.Collapsed;
                     Label_DeadZone.Visibility = Visibility.Collapsed;
                     break;
-                case "Radar_Antenna_Elevation":
+                case LogicalAxis.Radar_Antenna_Elevation:
                     DirectionDecrease.Content = "Elevation Down";
                     DirectionIncrease.Content = "Elevation Up";
                     break;
-                case "Cursor_X":
+                case LogicalAxis.Cursor_X:
                     DirectionDecrease.Content = "Cursor Left";
                     DirectionIncrease.Content = "Cursor Right";
                     break;
-                case "Cursor_Y":
+                case LogicalAxis.Cursor_Y:
                     DirectionDecrease.Content = "Cursor Afterward";
                     DirectionIncrease.Content = "Cursor Forward";
                     break;
-                case "Range_Knob":
+                case LogicalAxis.Range_Knob:
                     DirectionDecrease.Content = "Clock Wise";
                     DirectionIncrease.Content = "Counter CW";
                     break;
-                case "HMS_Brightness":
-                case "FLIR_Brightness":
-                case "HUD_Brightness":
-                case "Reticle_Depression":
+                case LogicalAxis.HMS_Brightness:
+                case LogicalAxis.FLIR_Brightness:
+                case LogicalAxis.HUD_Brightness:
+                case LogicalAxis.Reticle_Depression:
                     DirectionDecrease.Content = "Dark";
                     DirectionIncrease.Content = "Bright";
                     DeadZone.Visibility = Visibility.Collapsed;
                     Label_DeadZone.Visibility = Visibility.Collapsed;
                     break;
-                case "Intercom":
-                case "COMM_Channel_1":
-                case "COMM_Channel_2":
-                case "MSL_Volume":
-                case "Threat_Volume":
-                case "AI_vs_IVC":
+                case LogicalAxis.Intercom:
+                case LogicalAxis.COMM_Channel_1:
+                case LogicalAxis.COMM_Channel_2:
+                case LogicalAxis.MSL_Volume:
+                case LogicalAxis.Threat_Volume:
+                case LogicalAxis.AI_vs_IVC:
                     DirectionDecrease.Content = "Volume Down";
                     DirectionIncrease.Content = "Volume Up";
                     DeadZone.Visibility = Visibility.Collapsed;
                     Label_DeadZone.Visibility = Visibility.Collapsed;
                     break;
-                case "FOV":
+                case LogicalAxis.FOV:
                     DirectionDecrease.Content = "Narrow";
                     DirectionIncrease.Content = "Wide";
                     DeadZone.Visibility = Visibility.Collapsed;
                     Label_DeadZone.Visibility = Visibility.Collapsed;
                     break;
-                case "Camera_Distance":
+                case LogicalAxis.Camera_Distance:
                     DirectionDecrease.Content = "Close";
                     DirectionIncrease.Content = "Leave";
                     DeadZone.Visibility = Visibility.Collapsed;
                     Label_DeadZone.Visibility = Visibility.Collapsed;
                     break;
-                case "HSI_Course_Knob":
-                case "HSI_Heading_Knob":
-                case "Altimeter_Knob":
+                case LogicalAxis.HSI_Course_Knob:
+                case LogicalAxis.HSI_Heading_Knob:
+                case LogicalAxis.Altimeter_Knob:
                     DirectionDecrease.Content = "Decrease";
                     DirectionIncrease.Content = "Increase";
                     DeadZone.Visibility = Visibility.Collapsed;
@@ -181,202 +264,131 @@ namespace FalconBMS.Launcher.Windows
         {
             AxisValueProgress.Value = CommonConstants.AXISMIN;
 
-            axisAssign = (InGameAxAssgn)MainWindow.inGameAxis[whoCalledWindow];
+            _curr_axis_assgn = MainWindow.s_map_logical_axes[_logical_axis_id];
 
-            if (axisAssign.GetDeviceNumber() > -1 | axisAssign.GetDeviceNumber() == -2)
+            if (_curr_axis_assgn.IsAssigned())
             {
-                status = Status.ShowAxisStatus;
+                _awaiting_input = false;
                 Retry.Content = "CLEAR";
                 Retry.Visibility = Visibility.Visible;
-                if (whoCalledWindow == AxisName.Throttle.ToString())
+
+                if (_logical_axis_id == LogicalAxis.Throttle)
                 {
                     SetAB.Visibility = Visibility.Visible;
                     Idle.Visibility = Visibility.Visible;
-
-                    if (axisAssign.GetDeviceNumber() >= 0)
-                    {
-                        AB = MainWindow.deviceControl.GetJoystickMappings()[axisAssign.GetDeviceNumber()].detentPosition.GetAB();
-                        IDLE = MainWindow.deviceControl.GetJoystickMappings()[axisAssign.GetDeviceNumber()].detentPosition.GetIDLE();
-                    }
                 }
             }
 
-            Saturation.SelectedIndex = (int)axisAssign.GetSaturation();
-            DeadZone.SelectedIndex = (int)axisAssign.GetDeadzone();
-            Invert.IsChecked = axisAssign.GetInvert();
+            Saturation.SelectedIndex = (int)_curr_axis_assgn.GetSaturation();
+            DeadZone.SelectedIndex = (int)_curr_axis_assgn.GetDeadzone();
+            Invert.IsChecked = _curr_axis_assgn.GetInvert();
 
-            devNumTmp = axisAssign.GetDeviceNumber();
-            phyAxNumTmp = axisAssign.GetPhysicalNumber();
-
-            Joynum = new JoyAxisNeutralValue[MainWindow.deviceControl.GetJoystickMappings().Length];
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
-                Joynum[i] = new JoyAxisNeutralValue();
-
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
-                for (int ii = 0; ii < 8; ii++)
-                    Joynum[i].NeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii);
+            _dlg_axis_assgn = new InGameAxAssgn( //TODO: copy ctor?
+                joy: _curr_axis_assgn.GetJoy(), 
+                phys_axis: _curr_axis_assgn.GetPhysicalAxisId(),
+                invert: _curr_axis_assgn.GetInvert(),
+                deadzone: _curr_axis_assgn.GetDeadzone(),
+                saturation: _curr_axis_assgn.GetSaturation()
+                );
+            return;
         }
 
-        private void GetNeutralPosition()
+        private void InvertAxisDisp( int axis_val )
         {
-            Reset();
-
-            status = Status.WaitInput;
-            AssignedJoystick.Content = "   AWAITING INPUTS";
-        }
-
-        private void WaitInput()
-        {
-            if (Environment.TickCount > TickCount_NextUIFlush1)
-                AssignedJoystick.Content = "";
-            if (Environment.TickCount > TickCount_NextUIFlush2)
+            //NB: some logical axes are implicitly inverted.. who knows why
+            int invert_mul = (_dlg_axis_assgn.GetInvert() ? -1 : +1);
+            switch (_logical_axis_id) //TODO: dedupe this with MainWindow_AxisInputReceived
             {
-                AssignedJoystick.Content = "   AWAITING INPUTS";
-
-                TickCount_NextUIFlush1 = Environment.TickCount + CommonConstants.FLUSHTIME1;
-                TickCount_NextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
-            }
-
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
-            {
-                for (int ii = 0; ii < 8; ii++)
-                {
-                    if (MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) < Joynum[i].NeutralValue[ii] + CommonConstants.AXISMAX / 4 &
-                        MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) > Joynum[i].NeutralValue[ii] - CommonConstants.AXISMAX / 4)
-                        continue;
-                    devNumTmp = i;
-                    phyAxNumTmp = ii;
-                    status = Status.ShowAxisStatus;
-                    Retry.Content = "RETRY";
-                    Retry.Visibility = Visibility.Visible;
-
-                    if (whoCalledWindow != AxisName.Throttle.ToString())
-                        continue;
-                    SetAB.Visibility = Visibility.Visible;
-                    Idle.Visibility = Visibility.Visible;
-
-                    InGameAxAssgn axis = (InGameAxAssgn)MainWindow.inGameAxis[whoCalledWindow];
-                    if (axis.GetDeviceNumber() >= 0)
-                    {
-                        AB = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetAB();
-                        IDLE = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetIDLE();
-                    }
-                }
-            }
-        }
-
-        private void InvertAxisDisp()
-        {
-            switch (whoCalledWindow)
-            {
-                case "Throttle":
-                case "Throttle_Right":
-                case "Toe_Brake":
-                case "Toe_Brake_Right":
-                case "Intercom":
-                case "COMM_Channel_1":
-                case "COMM_Channel_2":
-                case "MSL_Volume":
-                case "Threat_Volume":
-                case "AI_vs_IVC":
-                    if (Invert.IsChecked == false || Invert.IsChecked == null)
-                        invertNum = -1;
-                    else
-                        invertNum = 1;
-                    break;
-                default:
-                    if (Invert.IsChecked == false || Invert.IsChecked == null)
-                        invertNum = 1;
-                    else
-                        invertNum = -1;
+                case LogicalAxis.Throttle:
+                case LogicalAxis.Throttle_Right:
+                case LogicalAxis.Toe_Brake:
+                case LogicalAxis.Toe_Brake_Right:
+                case LogicalAxis.Intercom:
+                case LogicalAxis.COMM_Channel_1:
+                case LogicalAxis.COMM_Channel_2:
+                case LogicalAxis.MSL_Volume:
+                case LogicalAxis.Threat_Volume:
+                case LogicalAxis.AI_vs_IVC:
+                case LogicalAxis.ILS_Volume_Knob:
+                    invert_mul *= -1;
                     break;
             }
 
-            if (invertNum == 1)
+            if (invert_mul > 0)
             {
                 AxisValueProgress.Minimum = CommonConstants.AXISMIN;
                 AxisValueProgress.Maximum = CommonConstants.AXISMAX;
             }
-            else
+            else // (invert_mul < 0)
             {
                 AxisValueProgress.Minimum = -CommonConstants.AXISMAX;
                 AxisValueProgress.Maximum = CommonConstants.AXISMIN;
             }
+
+            int adjusted_val = MainWindow.ApplyDeadZone(axis_val, _dlg_axis_assgn.GetDeadzone(), _dlg_axis_assgn.GetSaturation());
+
+            AxisValueProgress.Value = adjusted_val * invert_mul;
+            return;
         }
 
-        private void ShowAxisStatus()
+        private void UpdateUI( int axis_val )
         {
-            // no joystick assigned
-            if (devNumTmp == -1)
-            {
-                status = Status.GetNeutralPosition;
-                return;
-            }
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
 
-            InvertAxisDisp();
+            var joy = _dlg_axis_assgn.GetJoy();
+            if (joy == null) return;
 
-            int output = MainWindow.ApplyDeadZone
-                            (
-                                MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp),
-                                (AxCurve)DeadZone.SelectedIndex,
-                                (AxCurve)Saturation.SelectedIndex
-                            );
-            AxisValueProgress.Value = output * invertNum;
+            InvertAxisDisp(axis_val);
+            
             AssignedJoystick.Content = "   "
-                + ((AxisNumName)phyAxNumTmp).ToString().Replace('_', ' ') + " : "
-                + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].GetSanitizedProductName();
+                + _dlg_axis_assgn.GetPhysicalAxisId().ToString().Replace('_', ' ') + " : "
+                + joy.GetSanitizedProductName();
 
-            if (whoCalledWindow != AxisName.Throttle.ToString() & whoCalledWindow != AxisName.Throttle_Right.ToString())
+            if (_logical_axis_id != LogicalAxis.Throttle && _logical_axis_id != LogicalAxis.Throttle_Right)
                 return;
+
+            // Throttle specific stuff..
             AxisValueProgress.Foreground = CommonConstants.LIGHTBLUE;
             check_ABIDLE.Visibility = Visibility.Hidden;
-            if ( (Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value < IDLE) || (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value < IDLE))
+            var ab = _dlg_axis_assgn.GetJoy().detentPosition.AB;
+            var idle = _dlg_axis_assgn.GetJoy().detentPosition.IDLE;
+            if ((Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value < idle) || 
+                (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value < idle))
             {
                 AxisValueProgress.Foreground = CommonConstants.LIGHTRED;
                 check_ABIDLE.Visibility = Visibility.Visible;
                 check_ABIDLE.Content = "IDLE CUTOFF";
             }
-            if ( (Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value > AB) || (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value > AB) )
+            if ((Invert.IsChecked == false && CommonConstants.AXISMAX + AxisValueProgress.Value > ab) || 
+                (Invert.IsChecked == true && CommonConstants.AXISMIN + AxisValueProgress.Value > ab) )
             {
                 AxisValueProgress.Foreground = CommonConstants.LIGHTGREEN;
                 check_ABIDLE.Visibility = Visibility.Visible;
                 check_ABIDLE.Content = "AB";
             }
-        }
-
-        void ITimerSink.HandleTimerTick()
-        {
-            try
-            {
-                switch (status)
-                {
-                    case Status.GetNeutralPosition:
-                        GetNeutralPosition();
-                        break;
-
-                    case Status.WaitInput:
-                        WaitInput();
-                        break;
-
-                    case Status.ShowAxisStatus:
-                        ShowAxisStatus();
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-            }
             return;
         }
-        
+
+        private void Timer_Tick( object sender, EventArgs e )
+        {
+            if (!_awaiting_input) return;
+
+            _flash_on = (!_flash_on);
+
+            if (_flash_on)
+                AssignedJoystick.Visibility = Visibility.Visible;
+            else
+                AssignedJoystick.Visibility = Visibility.Hidden;
+
+            return;
+        }
+
         private void Retry_Click(object sender, RoutedEventArgs e)
         {
-            status = Status.GetNeutralPosition;
+            _awaiting_input = true;
             AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Visibility = Visibility.Visible;
 
             AxisValueProgress.Minimum = CommonConstants.AXISMIN;
             AxisValueProgress.Maximum = CommonConstants.AXISMAX;
@@ -385,104 +397,103 @@ namespace FalconBMS.Launcher.Windows
             Retry.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility  = Visibility.Hidden;
+
+            return;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (status == Status.WaitInput)
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
+
+            if (_awaiting_input)
             {
-                AxAssgn axisInfo = new AxAssgn();
-                axisAssign = new InGameAxAssgn(new JoyAssgn(), -1, axisInfo);
+                _curr_axis_assgn = new InGameAxAssgn();
             }
-            if (status == Status.ShowAxisStatus)
+            else
             {
-                if (devNumTmp > CommonConstants.JOYNUMUNASSIGNED)
-                {
-                    axisAssign = new InGameAxAssgn(
-                            MainWindow.deviceControl.GetJoystickMappings()[devNumTmp],
-                            phyAxNumTmp,
-                            (bool)Invert.IsChecked,
-                            (AxCurve)DeadZone.SelectedIndex,
-                            (AxCurve)Saturation.SelectedIndex
-                        );
-                    if (whoCalledWindow == AxisName.Throttle.ToString())
-                        MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].detentPosition = new DetentPosition(AB, IDLE);
-                }
+                _curr_axis_assgn = _dlg_axis_assgn;
             }
 
             Close();
+            return;
         }
 
-        //private void Detect_MouseWheel(object sender, MouseWheelEventArgs e)
-        //{
-        //    if (status == Status.WaitInput)
-        //    {
-        //        switch (whoCalledWindow)
-        //        {
-        //            case "Roll":
-        //            case "Pitch":
-        //            case "Yaw":
-        //            case "Throttle":
-        //            case "Throttle_Right":
-        //                return;
-        //        }
-        //        devNumTmp = -2;
-        //        status = Status.ShowAxisStatus;
-        //        Retry.Content = "RETRY";
-        //        Retry.Visibility = Visibility.Visible;
-        //    }
-        //    if (status == Status.ShowAxisStatus)
-        //    {
-        //        if (devNumTmp == -2)
-        //        {
-        //            wheelValue += e.Delta;
-        //            // (32768 * 120 / 1240 ) = 3840 
-        //            if (wheelValue < -3840)
-        //                wheelValue = -3840;
-        //            if (wheelValue > 3840)
-        //                wheelValue = 3840;
-        //        }
-        //    }
-        //}
-        
-        private void Saturation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Invert_Click( object sender, RoutedEventArgs e )
         {
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
+            JoyAssgn joy = _dlg_axis_assgn.GetJoy();
+            if (joy == null) return;
+
+            _dlg_axis_assgn.SetInvert(this.Invert.IsChecked == true);
+            return;
         }
-        
-        private void DeadZone_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        private void DeadZone_SelectionChanged( object sender, System.Windows.Controls.SelectionChangedEventArgs e )
         {
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
+            JoyAssgn joy = _dlg_axis_assgn.GetJoy();
+            if (joy == null) return;
+
+            _dlg_axis_assgn.SetDeadzone((AxCurve)this.DeadZone.SelectedIndex);
+            return;
+        }
+
+        private void Saturation_SelectionChanged( object sender, System.Windows.Controls.SelectionChangedEventArgs e )
+        {
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
+            JoyAssgn joy = _dlg_axis_assgn.GetJoy();
+            if (joy == null) return;
+
+            _dlg_axis_assgn.SetSaturation((AxCurve)this.Saturation.SelectedIndex);
+            return;
         }
 
         private void SetAB_Click(object sender, RoutedEventArgs e)
         {
-            if (status != Status.ShowAxisStatus)
-                return;
-            
-            if (Invert.IsChecked == true)
-                AB = CommonConstants.AXISMIN + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
-            else
-                AB = CommonConstants.AXISMAX - MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
+            JoyAssgn joy = _dlg_axis_assgn.GetJoy();
+            if (joy == null) return;
 
-            if (AB > CommonConstants.AXISMAX)
-                AB = CommonConstants.AXISMAX;
-            if (AB < CommonConstants.AXISMIN)
-                AB = CommonConstants.AXISMIN;
+            var buffer = DirectInputDeviceMap.Singleton.GetListenerForJoystick(joy.GetInstanceGUID()) as DirectInputListener_Joystick;
+            int axis_val = buffer.GetAxisValue((int)_dlg_axis_assgn.GetPhysicalAxisId());
+
+            //NB: this looks backward but throttle axis is one of the implicitly inverted ones.. so it's double-backward.
+            if (_dlg_axis_assgn.GetInvert())
+                axis_val = CommonConstants.AXISMIN + axis_val;
+            else
+                axis_val = CommonConstants.AXISMAX - axis_val;
+
+            axis_val = Math.Min(Math.Max(CommonConstants.AXISMIN, axis_val), CommonConstants.AXISMAX);
+
+            joy.detentPosition.AB = axis_val;
+            return;
         }
 
         private void SetIDLE_Click(object sender, RoutedEventArgs e)
         {
-            if (status != Status.ShowAxisStatus)
-                return;
+            if (_awaiting_input) return;
+            if (_dlg_axis_assgn == null) return;
+            JoyAssgn joy = _dlg_axis_assgn.GetJoy();
+            if (joy == null) return;
 
-            if (Invert.IsChecked == true)
-                IDLE = CommonConstants.AXISMIN + MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
+            var buffer = DirectInputDeviceMap.Singleton.GetListenerForJoystick(joy.GetInstanceGUID()) as DirectInputListener_Joystick;
+            int axis_val = buffer.GetAxisValue((int)_dlg_axis_assgn.GetPhysicalAxisId());
+
+            //NB: this looks backward but throttle axis is one of the implicitly inverted ones.. so it's double-backward.
+            if (_dlg_axis_assgn.GetInvert())
+                axis_val = CommonConstants.AXISMIN + axis_val;
             else
-                IDLE = CommonConstants.AXISMAX - MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].JoyAxisState(phyAxNumTmp);
+                axis_val = CommonConstants.AXISMAX - axis_val;
 
-            if (IDLE > CommonConstants.AXISMAX)
-                IDLE = CommonConstants.AXISMAX;
-            if (IDLE < CommonConstants.AXISMIN)
-                IDLE = CommonConstants.AXISMIN;
+            axis_val = Math.Min(Math.Max(CommonConstants.AXISMIN, axis_val), CommonConstants.AXISMAX);
+
+            joy.detentPosition.IDLE = axis_val;
+            return;
         }
     }
 }

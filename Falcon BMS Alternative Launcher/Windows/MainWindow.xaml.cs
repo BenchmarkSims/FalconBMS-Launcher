@@ -10,16 +10,16 @@ using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 
-using FalconBMS.Launcher.Input;
-
 using MahApps.Metro.Controls;
+
+using FalconBMS.Launcher.Input;
 
 namespace FalconBMS.Launcher.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : ITimerSink
+    public partial class MainWindow
     {
         static SteamVR steamVR = new SteamVR();
 
@@ -44,8 +44,8 @@ namespace FalconBMS.Launcher.Windows
 
         internal static bool bmsHasBeenLaunched = false;
 
-        private DispatcherTimer InputPollingTimer;
         private DispatcherTimer DeviceScanTimer;
+        List<DirectInputListener> _input_listeners;
 
         protected override void OnInitialized(EventArgs e)
         {
@@ -61,20 +61,6 @@ namespace FalconBMS.Launcher.Windows
             {
                 System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
                 System.Version ver = asm.GetName().Version;
-
-                //// Defer auto-update check until after main window UI finishes initial layout and render.
-                //this.Dispatcher.BeginInvoke(new Action(() => {
-
-                //    // NB: the AutoUpdaterDotNET library will create its own background (UI) thread, to do network I/O and display UI if necessary.
-                //    string autoUpdateManifestUrl = $"https://cdn.falcon-bits.net/AutoUpdate/AL/v{ver}/AutoUpdate.xml";
-
-                //    AutoUpdater.Mandatory = true;
-                //    AutoUpdater.Synchronous = false;
-                //    //AutoUpdater.Start("https://raw.githubusercontent.com/chihirobelmo/FalconBMS-Alternative-Launcher/master/Falcon%20BMS%20Alternative%20Launcher/AutoUpdate.xml", asm);
-                //    AutoUpdater.Start(autoUpdateManifestUrl, asm);
-
-                //    Diagnostics.Log("AutoUpdate-check initiated.");
-                //}));
 
                 string versionLabel = "FalconBMS Launcher v" + ver.ToString();
                 AL_Version_Number.Content = versionLabel;
@@ -103,7 +89,6 @@ namespace FalconBMS.Launcher.Windows
                 }
 
                 StartVR();
-                StartTimers();
             }
             catch (Exception exclose)
             {
@@ -115,12 +100,61 @@ namespace FalconBMS.Launcher.Windows
             Diagnostics.Log("Post_OnInitialized complete.");
         }
 
+        // Deferred init for things that require HWND interop.
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
 
+            // Setup hook for WM_DEVICECHANGED.
             HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
             source.AddHook(_WndProc);
+
+            // Begin listening to buffered (queued) DirectInput messages.
+            var dev_map = DirectInputDeviceMap.Singleton;
+            dev_map.RefreshDeviceList();
+
+            SubscribeToDirectInputEvents();
+
+            return;
+        }
+
+        internal void SubscribeToDirectInputEvents( )
+        {
+            var dev_map = DirectInputDeviceMap.Singleton;
+
+            if (_input_listeners != null)
+            {
+                // First unsub from existing listeners.
+                foreach (var listener in _input_listeners)
+                {
+                    listener.KeyboardInputReceived -= MainWindow_KeyboardInputReceived;
+
+                    listener.AxisInputReceived -= MainWindow_AxisInputReceived;
+                    listener.PovInputReceived -= MainWindow_PovInputReceived;
+                    listener.ButtonInputReceived -= MainWindow_ButtonInputReceived;
+                }
+            }
+
+            // Re-establish listeners for keybd and all joysticks.
+            _input_listeners = new List<DirectInputListener>
+            {
+                dev_map.GetListenerForKeyboard()
+            };
+            foreach (Guid g in dev_map.GetDeviceInstanceGuids(include_keybd:false))
+            {
+                _input_listeners.Add(dev_map.GetListenerForJoystick(g));
+            }
+
+            foreach (var listener in _input_listeners)
+            {
+                listener.KeyboardInputReceived += MainWindow_KeyboardInputReceived;
+
+                listener.AxisInputReceived += MainWindow_AxisInputReceived;
+                listener.PovInputReceived += MainWindow_PovInputReceived;
+                listener.ButtonInputReceived += MainWindow_ButtonInputReceived;
+            }
+
+            return;
         }
 
         private IntPtr _WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -141,7 +175,8 @@ namespace FalconBMS.Launcher.Windows
                         if (DeviceScanTimer != null)
                             DeviceScanTimer.Stop();
 
-                        DeviceScanTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, DeviceScanTimer_Tick, this.Dispatcher);
+                        DeviceScanTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, 
+                            DeviceScanTimer_Tick, this.Dispatcher);
                     }
                 break;
             }
@@ -183,16 +218,6 @@ namespace FalconBMS.Launcher.Windows
             Diagnostics.Log("RSS update finished.");
         }
 
-        private void StartTimers()
-        {
-            Diagnostics.Log("Starting timer.");
-
-            InputPollingTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(20), DispatcherPriority.Input, MainTimer_Tick, this.Dispatcher);
-            InputPollingTimer.Start();
-
-            DeviceScanTimer = null; //initiated via WM_DEVICECHANGE notification
-        }
-
         private void StartVR()
         {
             Diagnostics.Log("Start VR Check.");
@@ -206,22 +231,14 @@ namespace FalconBMS.Launcher.Windows
 
         private void InitDevices()
         {
-            Diagnostics.Log("Start Init Devices.");
+            Diagnostics.Log("Start Init -- detect Theaters, load Key file, enum Devices and load XMLs");
 
-            ReloadDevicesAndXmlMappings();
-            ReloadKeyfilesTheatersAndUpdateUI();
+            ReloadTheatersKeysJoysAndXml();
 
-            Diagnostics.Log("Finished Init Devices.");
+            Diagnostics.Log("Finished Init");
         }
 
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-
-            Program.activeWin = this;
-        }
-
-        private void ReloadKeyfilesTheatersAndUpdateUI()
+        private void ReloadTheatersKeysJoysAndXml()
         {
             try
             {
@@ -230,14 +247,16 @@ namespace FalconBMS.Launcher.Windows
 
                 appReg.ChangeCfgPath();
 
-                // Read BMS-FULL.key file(s)
+                // Enum devices and load xml files.
+                deviceControl = DeviceControl.EnumerateAttachedDevicesAndLoadXml(appReg);
+                UpdateInGameAxisMapping();
+
+                // Read key file(s)
                 deviceControl.LoadKeyBindingsFromUserOrStockKeyfiles(appReg);
 
-                // Write Data Grid
-                UpdateDataGridBindingSource();
-
-                // Update category headers.
+                // Update category headers, and data-binding -- the grid displays both keyfile records (rows) and joys (columns).
                 UpdateCategoryHeaders();
+                UpdateDataGridBindingSource();
             }
             catch (Exception ex)
             {
@@ -247,37 +266,13 @@ namespace FalconBMS.Launcher.Windows
             }
         }
 
-        public void ReloadDevicesAndXmlMappings()
-        {
-            try
-            {
-                deviceControl = DeviceControl.EnumerateAttachedDevicesAndLoadXml(appReg);
-
-                // Aquire joySticks
-                AquireAll();
-
-                RefreshDevices();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-                Diagnostics.ShowErrorMsgbox(ex);
-                Close();
-            }
-        }
-
-        public void RefreshDevices()
+        private void UpdateInGameAxisMapping()
         {
             try
             {
                 // Reset All Axis Settings
-                foreach (AxisName nme in axisNameList)
-                    inGameAxis[nme.ToString()] = new InGameAxAssgn();
-
                 joyAssign_2_inGameAxis();
-                ResetAssgnWindow();
-
-                UpdateDataGridBindingSource();
+                ResetMainWindow_Axis();
             }
             catch (Exception ex)
             {
@@ -285,26 +280,6 @@ namespace FalconBMS.Launcher.Windows
                 Diagnostics.ShowErrorMsgbox(ex);
                 Close();
             }
-        }
-
-        private void MainTimer_Tick(object sender, EventArgs e)
-        {
-            // Route event to the currently active window (dialog/popups).
-            Window activeWin = Program.activeWin;
-
-            ITimerSink timerSink = activeWin as ITimerSink;
-            if (timerSink == null) return;
-
-            try
-            {
-                timerSink.HandleTimerTick();
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex); 
-            }
-
-            return;
         }
 
         private void DeviceScanTimer_Tick(object sender, EventArgs e)
@@ -313,37 +288,17 @@ namespace FalconBMS.Launcher.Windows
             this.DeviceScanTimer = null;
 
             Diagnostics.Log("Scanning for new/removed devices..");
-            ScanForNewDevices();
-        }
+            var dev_map = DirectInputDeviceMap.Singleton;
+            bool updated = dev_map.RefreshDeviceList();
 
-        void ITimerSink.HandleTimerTick()
-        {
-            switch (LargeTab.SelectedIndex)
-            {
-                case 0:
-                    return;
-                case 1:
-                    MainWindowAxisAssign_HandleTimerTick();
-                    return;
-                case 2:
-                    MainWindowKeyMapping_HandleTimerTick();
-                    return;
-            }
-
-            throw new InvalidProgramException();
-        }
-
-        void ScanForNewDevices()
-        {
             try
             {
-                if (deviceControl.DeviceListNeedsRefresh())
+                if (updated)
                 {
-                    Diagnostics.Log("Device list needs refresh - RELOADING", Diagnostics.LogLevels.Info);
-                    ReloadDevicesAndXmlMappings();
+                    Diagnostics.Log("Device list refreshed - RELOADING", Diagnostics.LogLevels.Info);
+                    ReloadTheatersKeysJoysAndXml();
 
-                    if (LargeTab.SelectedIndex == 2)
-                        KeyMappingGrid.Items.Refresh();
+                    SubscribeToDirectInputEvents(); //un-sub and re-sub to events, as needed
                 }
             }
             catch (Exception ex)
@@ -363,7 +318,7 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e)
         {
-            InputPollingTimer.Stop();
+            DirectInputDeviceMap.Singleton.ShutdownAllListeners();
 
             try
             {
@@ -372,19 +327,6 @@ namespace FalconBMS.Launcher.Windows
 
                 // Save UI Properties(Like Button Status).
                 appProperties.SaveUISetup();
-
-                //// Save axes, buttons and hats, and key mapping.
-                //if (deviceControl == null)
-                //    return;
-
-                //deviceControl.SaveXml();
-
-                ////HACK: This is necessary to avoid the double-write race condition (viz. overwriting the keyfile twice 
-                ////in quick succession, while BMS process is starting up and reading it).  We don't have a single
-                ////"Document" class to encapsulate a conventional "dirty" flag, to know when we need to save user's
-                ////work.  So for now, this ugly hackery.
-                //if (bmsHasBeenLaunched == false)
-                //    appReg.getOverrideWriter().SaveKeyMapping(inGameAxis, deviceControl);
             }
             catch (Exception ex)
             {
@@ -404,6 +346,11 @@ namespace FalconBMS.Launcher.Windows
             {
                 if (!e.Source.Equals(LargeTab))
                     return;
+
+                if (LargeTab.SelectedIndex == 1)
+                {
+                    this._UpdateUI_Axes();
+                }
 
                 if (LargeTab.SelectedIndex == 2)
                 {
@@ -523,7 +470,7 @@ namespace FalconBMS.Launcher.Windows
                 }
                 else
                 {
-                    appReg.getOverrideWriter().Execute(inGameAxis, deviceControl);
+                    appReg.getOverrideWriter().Execute(s_map_logical_axes, deviceControl);
                 }
             }
             catch (Exception ex)
@@ -774,12 +721,6 @@ namespace FalconBMS.Launcher.Windows
             }
         }
 
-        private void Apply_YAME64(object sender, RoutedEventArgs e)
-        {
-            //appReg.getOverrideWriter().Execute(inGameAxis, deviceControl, keyFile);
-            Close();
-        }
-
         private void WDP_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             try
@@ -804,11 +745,6 @@ namespace FalconBMS.Launcher.Windows
             }
         }
 
-        private void CMD_WINDOW_Click(object sender, RoutedEventArgs e)
-        {
-            return;
-        }
-
         private void ListBox_BMS_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -826,17 +762,9 @@ namespace FalconBMS.Launcher.Windows
 
                 Properties.Settings.Default.BMS_Version = version;
 
-                //// Don't lose user's recent changes!
-                //if (deviceControl != null)
-                //{
-                //    deviceControl.SaveXml();
-                //    appReg.getOverrideWriter().SaveKeyMapping(inGameAxis, deviceControl);
-                //}
-
                 appReg.UpdateSelectedBMSVersion(version);
 
-                ReloadDevicesAndXmlMappings();
-                ReloadKeyfilesTheatersAndUpdateUI();
+                ReloadTheatersKeysJoysAndXml();
             }
             catch (Exception ex)
             {

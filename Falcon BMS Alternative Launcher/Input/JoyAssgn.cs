@@ -1,19 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
-
-using System.Text.RegularExpressions;
-
-using Microsoft.DirectX.DirectInput;
-using System.Diagnostics;
 
 namespace FalconBMS.Launcher.Input
 {
     public class JoyAssgn
     {
-        protected Device hwDevice = null;
-
         // Member
         protected string productName = null;
         protected Guid productGUID = Guid.Empty;
@@ -79,8 +73,8 @@ namespace FalconBMS.Launcher.Input
 
         public JoyAssgn()
         {
-            Console.WriteLine();
-        } //parameterless ctor needed for XML deserialization
+            //parameterless ctor needed for XML deserialization
+        }
 
         public JoyAssgn(bool allocStorage)
         {
@@ -110,16 +104,11 @@ namespace FalconBMS.Launcher.Input
             _Debug_ValidateCurrentProfile();
         }
 
-        public JoyAssgn(Device device) : this(allocStorage:true)
+        public JoyAssgn(Guid device_instance) : this(allocStorage:true)
         {
-            this.hwDevice = device;
-
-            // Bugfix note: some device product-name strings have newlines and other unwelcome chars
-            DeviceInstance deviceInstance = device.DeviceInformation;
-            productName = Regex.Replace(deviceInstance.ProductName, @"[^A-Za-z0-9\~\`\[\]\{\}\-_\=\'\x20]", String.Empty);
-
-            productGUID = deviceInstance.ProductGuid;
-            instanceGUID = deviceInstance.InstanceGuid;
+            instanceGUID = device_instance;
+            productGUID = DirectInputHelper.GetDeviceProductGuid(device_instance);
+            productName = DirectInputHelper.GetDeviceProductName(device_instance, sanitized: true);
         }
 
         public void SelectAvionicsProfile(string avionicsProfile = null)
@@ -153,49 +142,6 @@ namespace FalconBMS.Launcher.Input
             currentProfile = avionicsProfile;
             _Debug_ValidateCurrentProfile();
             return;
-        }
-
-        public int JoyAxisState(int joyAxisNumber)
-        {
-            int input = 0;
-            if (hwDevice == null)
-                return 0;
-            try
-            {
-                switch (joyAxisNumber)
-                {
-                    case 0:
-                        input = hwDevice.CurrentJoystickState.X;
-                        break;
-                    case 1:
-                        input = hwDevice.CurrentJoystickState.Y;
-                        break;
-                    case 2:
-                        input = hwDevice.CurrentJoystickState.Z;
-                        break;
-                    case 3:
-                        input = hwDevice.CurrentJoystickState.Rx;
-                        break;
-                    case 4:
-                        input = hwDevice.CurrentJoystickState.Ry;
-                        break;
-                    case 5:
-                        input = hwDevice.CurrentJoystickState.Rz;
-                        break;
-                    case 6:
-                        input = hwDevice.CurrentJoystickState.GetSlider()[0];
-                        break;
-                    case 7:
-                        input = hwDevice.CurrentJoystickState.GetSlider()[1];
-                        break;
-                }
-                return input;
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-                return 0;
-            }
         }
 
         /// <summary>
@@ -278,17 +224,17 @@ namespace FalconBMS.Launcher.Input
 
                     assign += dx[i].assign[ii].GetCallback();
 
-                    if (ii == CommonConstants.DX_PRESS | ii == CommonConstants.DX_RELEASE)
+                    if (ii == CommonConstants.DX_PRESS || ii == CommonConstants.DX_RELEASE)
                         assign += " " + (indexInDeviceSortingOrder * DXnumber + i);
-                    if (ii == CommonConstants.DX_PRESS_SHIFT | ii == CommonConstants.DX_RELEASE_SHIFT)
+                    if (ii == CommonConstants.DX_PRESS_SHIFT || ii == CommonConstants.DX_RELEASE_SHIFT)
                         assign += " " + (countDevices * DXnumber + indexInDeviceSortingOrder * DXnumber + i);
 
                     assign += " " + (int)dx[i].assign[ii].GetInvoke();
                     assign += " " + "-2";
 
-                    if (ii == CommonConstants.DX_PRESS | ii == CommonConstants.DX_PRESS_SHIFT)
+                    if (ii == CommonConstants.DX_PRESS || ii == CommonConstants.DX_PRESS_SHIFT)
                         assign += " " + "0";
-                    if (ii == CommonConstants.DX_RELEASE | ii == CommonConstants.DX_RELEASE_SHIFT)
+                    if (ii == CommonConstants.DX_RELEASE || ii == CommonConstants.DX_RELEASE_SHIFT)
                         assign += " " + "0x42";
 
                     assign += " " + "0x0";
@@ -328,13 +274,10 @@ namespace FalconBMS.Launcher.Input
             return povBlock.ToString();
         }
 
-        /// <summary>
-        /// Reset Physical axis which has assigned to "sender.name"
-        /// </summary>
-        public void ResetPreviousAxis(string axisname)
+        public void ResetPreviousAxis(LogicalAxis log_axis)
         {
             for (int i = 0; i < axis.Length; i++)
-                if (axis[i].GetAxisName() == axisname)
+                if (axis[i].GetLogicalAxis() == log_axis)
                     axis[i] = new AxAssgn();
         }
 
@@ -506,71 +449,18 @@ namespace FalconBMS.Launcher.Input
             joy.CopyButtonsAndHatsFromCurrentProfile(this);
             joy.currentProfile = "temp";
 
-            joy.hwDevice = this.hwDevice;
+            //joy.hwDevice = this.hwDevice;
+            joy.instanceGUID = this.instanceGUID;
             joy.productName = this.productName;
             joy.productGUID = this.productGUID;
 
             return joy;
         }
 
-        public Device GetDevice()
-        {
-            return hwDevice;
-        }
-
-        public JoystickState GetDeviceState()
-        {
-            try
-            {
-                return hwDevice.CurrentJoystickState;
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.Log(ex);
-
-                return new JoystickState();
-            }
-        }
-
-        public byte[] GetButtons()
-        {
-            try
-            {
-                byte[] buttonStates = hwDevice.CurrentJoystickState.GetButtons();
-                if (buttonStates.Length == CommonConstants.DX_MAX_BUTTONS) return buttonStates;
-
-                byte[] buttonStates128 = new byte[CommonConstants.DX_MAX_BUTTONS];
-                Array.Copy(buttonStates, buttonStates128, Math.Min(buttonStates.Length, buttonStates128.Length));
-                return buttonStates128;
-            }
-            catch (Exception ex)
-            {
-                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
-                Diagnostics.Log(ex);
-
-                return new byte[CommonConstants.DX_MAX_BUTTONS];
-            }
-        }
-
-        public int[] GetPointOfView()
-        {
-            try
-            {
-                int[] hatStates = hwDevice.CurrentJoystickState.GetPointOfView();
-                if (hatStates.Length == CommonConstants.DX_MAX_HATS) return hatStates;
-
-                int[] hatStates4 = new int[CommonConstants.DX_MAX_HATS];
-                Array.Copy(hatStates, hatStates4, Math.Min(hatStates.Length, hatStates4.Length));
-                return hatStates4;
-            }
-            catch (Exception ex)
-            {
-                // Microsoft.DirectX.DirectInput.InputLostException happens on some systems - reasons unclear.
-                Diagnostics.Log(ex);
-
-                return new int[CommonConstants.DX_MAX_HATS];
-            }
-        }
+        //public Device GetDevice()
+        //{
+        //    return hwDevice;
+        //}
 
         private void PatchDX32ButtonArray()
         {

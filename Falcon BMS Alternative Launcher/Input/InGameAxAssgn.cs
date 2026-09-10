@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
 using FalconBMS.Launcher.Windows;
-using Microsoft.DirectX.DirectInput;
 
 namespace FalconBMS.Launcher.Input
 {
+
     public class InGameAxAssgn
     {
-        protected JoyAssgn joy;      // DeviceNumber(-2=MouseWheel)
-        protected int phyAxNum = -1;    // PhysicalAxisNumber
-                                        // 0=X 1=Y 2=Z 3=Rx 4=Ry 5=Rz 6=Slider0 7=Slider1
+        protected JoyAssgn joy = null; //null == unassigned
+        protected PhysicalAxis phys_axis_id = (PhysicalAxis)(-1);
+
         protected bool invert;
         protected AxCurve saturation = AxCurve.None;
         protected AxCurve deadzone = AxCurve.None;
@@ -16,57 +17,64 @@ namespace FalconBMS.Launcher.Input
 
         public InGameAxAssgn() { }
 
-        public InGameAxAssgn(JoyAssgn joy, int phyAxNum, AxAssgn axis)
+        public InGameAxAssgn(JoyAssgn joy, PhysicalAxis phys_axis, AxAssgn axis)
         {
             this.joy = joy;
-            this.phyAxNum = phyAxNum;
+            this.phys_axis_id = phys_axis;
+
             invert = axis.GetInvert();
             saturation = axis.GetSaturation();
             deadzone = axis.GetDeadZone();
             assgnDate = axis.GetAssignDate();
         }
 
-        public InGameAxAssgn(JoyAssgn joy, int phyAxNum, bool invert, AxCurve deadzone, AxCurve saturation)
+        public InGameAxAssgn(JoyAssgn joy, PhysicalAxis phys_axis, bool invert, AxCurve deadzone, AxCurve saturation)
         {
             this.joy = joy;
-            this.phyAxNum = phyAxNum;
+            this.phys_axis_id = phys_axis;
+
             this.invert = invert;
             this.deadzone = deadzone;
             this.saturation = saturation;
+            this.assgnDate = DateTime.UtcNow;
         }
 
         public bool IsAssigned()
         {
-            return GetDeviceNumber() != CommonConstants.JOYNUMUNASSIGNED;
-        }
-        public bool IsJoyAssigned()
-        {
-            return GetDeviceNumber() > CommonConstants.JOYNUMUNASSIGNED;
+            Debug.Assert((joy != null) == ((int)phys_axis_id >= 0));
+            return (this.joy != null);
         }
 
         public int GetDeviceNumber() 
         {
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
-                if (MainWindow.deviceControl.GetJoystickMappings()[i] == joy)
-                    return i;
+            return MainWindow.deviceControl.GetDeviceNumberForJoy(joy);
+        }
 
-            return CommonConstants.JOYNUMUNASSIGNED;
-        }
-        public Device GetDevice()
-        {
-            for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
-                if (MainWindow.deviceControl.GetJoystickMappings()[i] == joy)
-                    return joy.GetDevice();
-            return null;
-        }
         public JoyAssgn GetJoy()
         {
             return joy;
         }
-        public int GetPhysicalNumber() { return phyAxNum; }
+        public PhysicalAxis GetPhysicalAxisId() { return phys_axis_id; }
         public bool GetInvert() { return invert; }
         public AxCurve GetDeadzone() { return deadzone; }
         public AxCurve GetSaturation() { return saturation; }
         public DateTime getDate() { return assgnDate; }
+
+        public void SetInvert(bool invert)
+        {
+            this.invert = invert;
+            this.joy.axis[(int)phys_axis_id].Invert = invert;
+        }
+        public void SetDeadzone( AxCurve dz )
+        {
+            this.deadzone = dz;
+            this.joy.axis[(int)phys_axis_id].Deadzone = dz;
+        }
+        public void SetSaturation( AxCurve sat )
+        {
+            this.saturation = sat;
+            this.joy.axis[(int)phys_axis_id].Saturation = sat;
+        }
     }
+
 }

@@ -1,10 +1,11 @@
-﻿using FalconBMS.Launcher.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+
+using FalconBMS.Launcher.Input;
 
 namespace FalconBMS.Launcher
 {
@@ -20,7 +21,7 @@ namespace FalconBMS.Launcher
 
             string filename = appReg.GetInstallDir() + "/Data/Terrdata/TheaterDefinition/theater.lst";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "theater.lst";
-            if (!File.Exists(fbackupname) & File.Exists(filename))
+            if (!File.Exists(fbackupname) && File.Exists(filename))
                 File.Copy(filename, fbackupname, false);
             File.SetAttributes(filename, File.GetAttributes(filename) & ~FileAttributes.ReadOnly);
 

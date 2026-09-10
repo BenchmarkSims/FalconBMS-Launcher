@@ -111,71 +111,71 @@ namespace FalconBMS.Launcher.Override
             fs.Close();
         }
 
-        public override AxisName[] getAxisMappingList() { return axisMappingList; }
-        public override AxisName[] getJoystickCalList() { return joystickCalList; }
+        public override LogicalAxis[] getAxisMappingList() { return axisMappingList; }
+        public override LogicalAxis[] getJoystickCalList() { return joystickCalList; }
 
         /// <summary>
         /// Axis information order for AxisMapping.dat
         /// </summary>
-        private AxisName[] axisMappingList = {
-            AxisName.Pitch,
-            AxisName.Roll,
-            AxisName.Yaw,
-            AxisName.Throttle,
-            AxisName.Throttle_Right,
-            AxisName.Toe_Brake,
-            AxisName.Toe_Brake_Right,
-            AxisName.FOV,
-            AxisName.Trim_Pitch,
-            AxisName.Trim_Yaw,
-            AxisName.Trim_Roll,
-            AxisName.Radar_Antenna_Elevation,
-            AxisName.Range_Knob,
-            AxisName.Cursor_X,
-            AxisName.Cursor_Y,
-            AxisName.COMM_Channel_1,
-            AxisName.COMM_Channel_2,
-            AxisName.MSL_Volume,
-            AxisName.Threat_Volume,
-            AxisName.Intercom,
-            AxisName.AI_vs_IVC,
-            AxisName.HUD_Brightness,
-            AxisName.FLIR_Brightness,
-            AxisName.HMS_Brightness,
-            AxisName.Reticle_Depression,
-            AxisName.Camera_Distance
+        private LogicalAxis[] axisMappingList = {
+            LogicalAxis.Pitch,
+            LogicalAxis.Roll,
+            LogicalAxis.Yaw,
+            LogicalAxis.Throttle,
+            LogicalAxis.Throttle_Right,
+            LogicalAxis.Toe_Brake,
+            LogicalAxis.Toe_Brake_Right,
+            LogicalAxis.FOV,
+            LogicalAxis.Trim_Pitch,
+            LogicalAxis.Trim_Yaw,
+            LogicalAxis.Trim_Roll,
+            LogicalAxis.Radar_Antenna_Elevation,
+            LogicalAxis.Range_Knob,
+            LogicalAxis.Cursor_X,
+            LogicalAxis.Cursor_Y,
+            LogicalAxis.COMM_Channel_1,
+            LogicalAxis.COMM_Channel_2,
+            LogicalAxis.MSL_Volume,
+            LogicalAxis.Threat_Volume,
+            LogicalAxis.Intercom,
+            LogicalAxis.AI_vs_IVC,
+            LogicalAxis.HUD_Brightness,
+            LogicalAxis.FLIR_Brightness,
+            LogicalAxis.HMS_Brightness,
+            LogicalAxis.Reticle_Depression,
+            LogicalAxis.Camera_Distance
         };
 
         /// <summary>
         /// Axis information order for JoyStick.cal
         /// </summary>
-        private AxisName[] joystickCalList = {
-            AxisName.Pitch,
-            AxisName.Roll,
-            AxisName.Yaw,
-            AxisName.Throttle,
-            AxisName.Throttle_Right,
-            AxisName.Trim_Pitch,
-            AxisName.Trim_Yaw,
-            AxisName.Trim_Roll,
-            AxisName.Toe_Brake,
-            AxisName.Toe_Brake_Right,
-            AxisName.FOV,
-            AxisName.Radar_Antenna_Elevation,
-            AxisName.Cursor_X,
-            AxisName.Cursor_Y,
-            AxisName.Range_Knob,
-            AxisName.COMM_Channel_1,
-            AxisName.COMM_Channel_2,
-            AxisName.MSL_Volume,
-            AxisName.Threat_Volume,
-            AxisName.HUD_Brightness,
-            AxisName.Reticle_Depression,
-            AxisName.Camera_Distance,
-            AxisName.Intercom,
-            AxisName.HMS_Brightness,
-            AxisName.AI_vs_IVC,
-            AxisName.FLIR_Brightness
+        private LogicalAxis[] joystickCalList = {
+            LogicalAxis.Pitch,
+            LogicalAxis.Roll,
+            LogicalAxis.Yaw,
+            LogicalAxis.Throttle,
+            LogicalAxis.Throttle_Right,
+            LogicalAxis.Trim_Pitch,
+            LogicalAxis.Trim_Yaw,
+            LogicalAxis.Trim_Roll,
+            LogicalAxis.Toe_Brake,
+            LogicalAxis.Toe_Brake_Right,
+            LogicalAxis.FOV,
+            LogicalAxis.Radar_Antenna_Elevation,
+            LogicalAxis.Cursor_X,
+            LogicalAxis.Cursor_Y,
+            LogicalAxis.Range_Knob,
+            LogicalAxis.COMM_Channel_1,
+            LogicalAxis.COMM_Channel_2,
+            LogicalAxis.MSL_Volume,
+            LogicalAxis.Threat_Volume,
+            LogicalAxis.HUD_Brightness,
+            LogicalAxis.Reticle_Depression,
+            LogicalAxis.Camera_Distance,
+            LogicalAxis.Intercom,
+            LogicalAxis.HMS_Brightness,
+            LogicalAxis.AI_vs_IVC,
+            LogicalAxis.FLIR_Brightness
         };
     }
 

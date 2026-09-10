@@ -2,21 +2,19 @@
 
 namespace FalconBMS.Launcher.Input
 {
-    /// <summary>
-    /// Means each physical axis on a joystick.
-    /// </summary>
+
     public class AxAssgn : ICloneable
     {
         // Member
-        protected string axisName = "";     // ex:Roll, Pitch, Yaw etc...
+        protected LogicalAxis logical_axis;
         protected DateTime assgnDate = new DateTime(1998, 12, 12, 12, 0, 0);
         protected bool invert;
         protected AxCurve saturation = 0;
         protected AxCurve deadzone = 0;
 
         // Property for XML
-        public string AxisName { get => axisName;
-            set => axisName = value;
+        public string AxisName { get => logical_axis.ToString();
+            set => logical_axis = (LogicalAxis)Enum.Parse(typeof(LogicalAxis), value);
         }
         public DateTime AssgnDate { get => assgnDate;
             set => assgnDate = value;
@@ -33,17 +31,19 @@ namespace FalconBMS.Launcher.Input
 
         // Constructor
         public AxAssgn() { }
-        public AxAssgn(string axisName, InGameAxAssgn axisassign)
+        public AxAssgn( LogicalAxis logical_axis, InGameAxAssgn axisassign)
         {
-            this.axisName = axisName;
+            this.logical_axis = logical_axis;
+
             assgnDate = DateTime.Now;
             invert = axisassign.GetInvert();
             saturation = axisassign.GetSaturation();
             deadzone = axisassign.GetDeadzone();
         }
-        public AxAssgn(string axisName, DateTime assgnDate, bool invert, AxCurve saturation, AxCurve deadzone)
+        public AxAssgn( LogicalAxis logical_axis, DateTime assgnDate, bool invert, AxCurve saturation, AxCurve deadzone)
         {
-            this.axisName = axisName;
+            this.logical_axis = logical_axis;
+
             this.assgnDate = assgnDate;
             this.invert = invert;
             this.saturation = saturation;
@@ -51,7 +51,7 @@ namespace FalconBMS.Launcher.Input
         }
 
         // Method
-        public string GetAxisName() { return axisName; }
+        public LogicalAxis GetLogicalAxis() { return logical_axis; }
         public DateTime GetAssignDate() { return assgnDate; }
         public bool GetInvert() { return invert; }
         public AxCurve GetDeadZone() { return deadzone; }
@@ -61,7 +61,7 @@ namespace FalconBMS.Launcher.Input
 
         public AxAssgn Clone()
         {
-            return new AxAssgn(axisName, assgnDate, invert, saturation, deadzone);
+            return new AxAssgn(logical_axis, assgnDate, invert, saturation, deadzone);
         }
     }
 
@@ -72,4 +72,5 @@ namespace FalconBMS.Launcher.Input
         Medium,
         Large
     }
+
 }

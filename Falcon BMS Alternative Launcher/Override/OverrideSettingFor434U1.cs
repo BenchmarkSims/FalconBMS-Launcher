@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
@@ -15,10 +16,10 @@ namespace FalconBMS.Launcher.Override
         {
         }
 
-        protected override void OverridePovDeviceIDs(StreamWriter cfg, Hashtable inGameAxis)
+        protected override void OverridePovDeviceIDs(StreamWriter cfg, Dictionary<LogicalAxis, InGameAxAssgn> axis_map)
         {
-            InGameAxAssgn rollAxis = (InGameAxAssgn)inGameAxis[AxisName.Roll.ToString()];
-            InGameAxAssgn throttleAxis = (InGameAxAssgn)inGameAxis[AxisName.Throttle.ToString()];
+            InGameAxAssgn rollAxis = axis_map[LogicalAxis.Roll];
+            InGameAxAssgn throttleAxis = axis_map[LogicalAxis.Throttle];
 
             if (rollAxis.IsAssigned() == false)
                 return;
@@ -44,7 +45,7 @@ namespace FalconBMS.Launcher.Override
             return;
         }
 
-        protected override void WriteKeyLines(string filename, Hashtable inGameAxis, KeyFile keyFile, JoyAssgn[] joyAssgns)
+        protected override void WriteKeyLines(string filename, Dictionary<LogicalAxis, InGameAxAssgn> axis_map, KeyFile keyFile, JoyAssgn[] joyAssgns)
         {
             using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(filename))
             {
@@ -71,8 +72,8 @@ namespace FalconBMS.Launcher.Override
                 // [pass] 0 analog axes (eg. new startup)
 
                 // Write pov-hat bindings, for the primary steering and/or throttle device(s).  See notes above, in OverridePovDeviceIDs().
-                InGameAxAssgn rollAxis = (InGameAxAssgn)inGameAxis[AxisName.Roll.ToString()];
-                InGameAxAssgn throttleAxis = (InGameAxAssgn)inGameAxis[AxisName.Throttle.ToString()];
+                InGameAxAssgn rollAxis = axis_map[LogicalAxis.Roll];
+                InGameAxAssgn throttleAxis = axis_map[LogicalAxis.Throttle];
 
                 if (rollAxis.IsAssigned() == false)
                     return;

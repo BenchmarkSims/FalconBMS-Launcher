@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -16,12 +17,12 @@ namespace FalconBMS.Launcher.Override
         {
         }
 
-        protected override void SaveJoystickCal(Hashtable inGameAxis, DeviceControl deviceControl)
+        protected override void SaveJoystickCal( Dictionary<LogicalAxis, InGameAxAssgn> axis_map, DeviceControl deviceControl)
         {
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "joystick.cal";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "joystick.cal";
 
-            if (!File.Exists(fbackupname) & File.Exists(filename))
+            if (!File.Exists(fbackupname) && File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
@@ -29,43 +30,43 @@ namespace FalconBMS.Launcher.Override
 
             FileStream fs = File.Create(filename);
 
-            AxisName[] localJoystickCalList = appReg.getOverrideWriter().getJoystickCalList();
-            foreach (AxisName nme in localJoystickCalList)
+            LogicalAxis[] localJoystickCalList = appReg.getOverrideWriter().getJoystickCalList();
+            foreach (LogicalAxis log_axis in localJoystickCalList)
             {
-                InGameAxAssgn currentAxis = (InGameAxAssgn)inGameAxis[nme.ToString()];
+                InGameAxAssgn currentAxis = axis_map[log_axis];
 
                 byte[] bs = { 
                     0x00, 0x00, 0x00, 0x00, 0x98, 0x3A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
                 };
 
-                if (currentAxis.IsAssigned() && !isRollLinkedNWSEnabled(nme))
+                if (currentAxis.IsAssigned() && !isYawAxisWithRollLinkedNWS(log_axis))
                 {
                     bs[20] = 0x01;
                     bs[21] = (byte)(currentAxis.GetInvert() ? 0x01 : 0x00);
 
-                    if ((nme == AxisName.Throttle || nme == AxisName.Throttle_Right) && currentAxis.IsJoyAssigned())
+                    if ((log_axis == LogicalAxis.Throttle || log_axis == LogicalAxis.Throttle_Right) && currentAxis.IsAssigned())
                     {
-                        // Scale: [0,65535] logical (0==fully-idle; 65536==max-burner; regardless of normal vs reverse)
-                        double fAB = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetAB();
-                        double fIdle = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        // Scale: [0,65535] logical (0==fully-idle; 65535==max-burner; regardless of normal vs reverse)
+                        double fAB = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.AB;
+                        double fIdle = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.IDLE;
 
                         //BUGFIX: right-throttle needs to mirror the identical idle/ab detents, from primary throttle.
-                        if (nme == AxisName.Throttle_Right)
+                        if (log_axis == LogicalAxis.Throttle_Right)
                         {
-                            InGameAxAssgn leftThrottleAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Throttle.ToString()];
+                            InGameAxAssgn leftThrottleAxis = MainWindow.s_map_logical_axes[LogicalAxis.Throttle];
 
-                            fAB = deviceControl.GetJoystickMappings()[leftThrottleAxis.GetDeviceNumber()].detentPosition.GetAB();
-                            fIdle = deviceControl.GetJoystickMappings()[leftThrottleAxis.GetDeviceNumber()].detentPosition.GetIDLE();
+                            fAB = deviceControl.GetJoystickMappings()[leftThrottleAxis.GetDeviceNumber()].detentPosition.AB;
+                            fIdle = deviceControl.GetJoystickMappings()[leftThrottleAxis.GetDeviceNumber()].detentPosition.IDLE;
                         }
 
                         // Adjust logical scale to [0,15000]
                         fAB = fAB * CommonConstants.BINAXISMAX / CommonConstants.AXISMAX;
                         fIdle = fIdle * CommonConstants.BINAXISMAX / CommonConstants.AXISMAX;
 
-                        InGameAxAssgn axis = (InGameAxAssgn)MainWindow.inGameAxis[nme.ToString()];
+                        InGameAxAssgn axis = MainWindow.s_map_logical_axes[log_axis];
 
                         //NB: as of 4.37.3, the detent values in joystick.cal are logical-scale -- they don't vary normal vs reverse.
-                        //But, notably, they are still recorded in inverse-scale.. [0,65536] => [15000,0]
+                        //But, notably, they are still recorded in inverse-scale.. [0,65535] => [15000,0]
                         fAB = CommonConstants.BINAXISMAX - fAB;
                         fIdle = CommonConstants.BINAXISMAX - fIdle;
 

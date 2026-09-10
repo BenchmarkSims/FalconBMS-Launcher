@@ -32,25 +32,21 @@ namespace FalconBMS.Launcher.Override
         /// <summary>
         /// Execute setting override.
         /// </summary>
-        /// <param name="inGameAxis"></param>
-        /// <param name="deviceControl"></param>
-        /// <param name="keyFile"></param>
-        /// <param name="visualAcuity"></param>
-        public void Execute(Hashtable inGameAxis, DeviceControl deviceControl)
+        public void Execute( Dictionary<LogicalAxis, InGameAxAssgn> axis_map, DeviceControl deviceControl)
         {
             if (!Directory.Exists(appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER))
                 Directory.CreateDirectory(appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER);
 
-            SaveAxisMapping(inGameAxis, deviceControl);
-            SaveJoystickCal(inGameAxis, deviceControl);
+            SaveAxisMapping(axis_map, deviceControl);
+            SaveJoystickCal(axis_map, deviceControl);
             SaveDeviceSorting(deviceControl);
-            SaveConfigfile(inGameAxis, deviceControl);
-            SaveKeyMapping(inGameAxis, deviceControl);
+            SaveConfigfile(axis_map, deviceControl);
+            SaveKeyMapping(axis_map, deviceControl);
             //SavePlcLbk();
             SavePop();
         }
 
-        protected virtual void SaveConfigfile(Hashtable inGameAxis, DeviceControl deviceControl)
+        protected virtual void SaveConfigfile( Dictionary<LogicalAxis, InGameAxAssgn> axis_map, DeviceControl deviceControl)
         {
             Diagnostics.Log("Ammending Falcon BMS User.cfg..", Diagnostics.LogLevels.Info);
 
@@ -60,7 +56,7 @@ namespace FalconBMS.Launcher.Override
 
                 OverrideButtonsPerDevice(cfgUser, deviceControl);
                 OverrideHotasPinkyShiftMagnitude(cfgUser, deviceControl);
-                OverridePovDeviceIDs(cfgUser, inGameAxis);
+                OverridePovDeviceIDs(cfgUser, axis_map);
 
                 ApplyVROverrides(cfgUser);
                 ApplyMiscOverrides(cfgUser);
@@ -72,7 +68,7 @@ namespace FalconBMS.Launcher.Override
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + fname;
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + fname;
 
-            if (!File.Exists(fbackupname) & File.Exists(filename))
+            if (!File.Exists(fbackupname) && File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
@@ -119,7 +115,7 @@ namespace FalconBMS.Launcher.Override
             return writer;
         }
 
-        protected virtual void OverridePovDeviceIDs(StreamWriter cfg, Hashtable inGameAxis) { }
+        protected virtual void OverridePovDeviceIDs(StreamWriter cfg, Dictionary<LogicalAxis, InGameAxAssgn> axis_map ) { }
 
         protected virtual void OverrideHotasPinkyShiftMagnitude(StreamWriter cfg, DeviceControl deviceControl) { }
 
@@ -188,7 +184,7 @@ namespace FalconBMS.Launcher.Override
             // BMS overwrites DeviceSorting.txt if was written in UTF-8.
             string filename = appReg.GetInstallDir() + "/User/Config/DeviceSorting.txt";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "DeviceSorting.txt";
-            if (!File.Exists(fbackupname) & File.Exists(filename))
+            if (!File.Exists(fbackupname) && File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
@@ -203,7 +199,7 @@ namespace FalconBMS.Launcher.Override
             }
         }
 
-        public virtual void SaveKeyMapping(Hashtable inGameAxis, DeviceControl deviceControl)
+        public virtual void SaveKeyMapping(Dictionary<LogicalAxis, InGameAxAssgn> axis_map, DeviceControl deviceControl)
         {
             Diagnostics.Log("Emitting BMS - Auto.key and BMS - Auto-F15ABCD.key..", Diagnostics.LogLevels.Info);
 
@@ -221,11 +217,11 @@ namespace FalconBMS.Launcher.Override
             try
             {
                 deviceControl.UpdateAvionicsProfile(null);
-                WriteKeyLines(filename, inGameAxis,
+                WriteKeyLines(filename, axis_map,
                     deviceControl.GetKeyBindings(),
                     deviceControl.GetJoystickMappings());
                 deviceControl.UpdateAvionicsProfile(CommonConstants.F15_TAG);
-                WriteKeyLines(filenameF15, inGameAxis,
+                WriteKeyLines(filenameF15, axis_map,
                     deviceControl.GetKeyBindings(),
                     deviceControl.GetJoystickMappings());
             }
@@ -250,7 +246,7 @@ namespace FalconBMS.Launcher.Override
             return;
         }
 
-        protected virtual void WriteKeyLines(string filename, Hashtable inGameAxis, KeyFile keyFile, JoyAssgn[] joyAssgns)
+        protected virtual void WriteKeyLines(string filename, Dictionary<LogicalAxis, InGameAxAssgn> axis_map, KeyFile keyFile, JoyAssgn[] joyAssgns)
         {
             using (StreamWriter sw = Utils.CreateUtf8TextWihoutBom(filename))
             {
@@ -261,7 +257,7 @@ namespace FalconBMS.Launcher.Override
 
                 for (int i = 0; i < joyAssgns.Length; i++)
                 {
-                    InGameAxAssgn rollAxis = (InGameAxAssgn)inGameAxis[AxisName.Roll.ToString()];
+                    InGameAxAssgn rollAxis = axis_map[LogicalAxis.Roll];
 
                     sw.Write(joyAssgns[i].GetKeyLineDX(i, joyAssgns.Length));
                     // PRIMARY DEVICE POV
@@ -278,17 +274,14 @@ namespace FalconBMS.Launcher.Override
         {
         }
 
-        /// <summary>
-        /// As the name inplies...
-        /// </summary>
-        protected void SaveAxisMapping(Hashtable inGameAxis, DeviceControl deviceControl)
+        protected void SaveAxisMapping(Dictionary<LogicalAxis, InGameAxAssgn> axis_map, DeviceControl deviceControl)
         {
             Diagnostics.Log("Overwriting AxisMapping.dat..", Diagnostics.LogLevels.Info);
 
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "axismapping.dat";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "axismapping.dat";
 
-            if (!File.Exists(fbackupname) & File.Exists(filename))
+            if (!File.Exists(fbackupname) && File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
@@ -299,9 +292,9 @@ namespace FalconBMS.Launcher.Override
 
             byte[] bs;
 
-            InGameAxAssgn pitchAxis = (InGameAxAssgn)inGameAxis[AxisName.Pitch.ToString()];
+            InGameAxAssgn pitchAxis = axis_map[LogicalAxis.Pitch];
 
-            if (pitchAxis.GetDeviceNumber() > CommonConstants.JOYNUMUNASSIGNED)
+            if (pitchAxis.IsAssigned())
             {
                 bs = new byte[] 
                 {
@@ -328,13 +321,13 @@ namespace FalconBMS.Launcher.Override
                 fs.Write(bs, 0, bs.Length);
             }
 
-            AxisName[] localAxisMappingList = getAxisMappingList();
+            LogicalAxis[] localAxisMappingList = getAxisMappingList();
 
-            foreach (AxisName nme in localAxisMappingList)
+            foreach (LogicalAxis log_axis in localAxisMappingList)
             {
-                InGameAxAssgn currentAxis = (InGameAxAssgn)inGameAxis[nme.ToString()];
+                InGameAxAssgn currentAxis = axis_map[log_axis];
 
-                if (!currentAxis.IsAssigned() || isRollLinkedNWSEnabled(nme))
+                if (!currentAxis.IsAssigned() || isYawAxisWithRollLinkedNWS(log_axis))
                 {
                     bs = new byte[] 
                     {
@@ -346,8 +339,7 @@ namespace FalconBMS.Launcher.Override
                     fs.Write(bs, 0, bs.Length);
                     continue;
                 }
-                if (currentAxis.IsJoyAssigned() && 
-                    !isRollLinkedNWSEnabled(nme))
+                if (currentAxis.IsAssigned() && !isYawAxisWithRollLinkedNWS(log_axis))
                 {
                     bs = new byte[] 
                     {
@@ -357,19 +349,19 @@ namespace FalconBMS.Launcher.Override
                     fs.Write(bs, 0, bs.Length);
                     bs = new byte[] 
                     {
-                        (byte)currentAxis.GetPhysicalNumber(),
+                        (byte)currentAxis.GetPhysicalAxisId(),
                         0x00, 0x00, 0x00
                     };
                     fs.Write(bs, 0, bs.Length);
                 }
 
-                bs = isRollLinkedNWSEnabled(nme) ?
+                bs = isYawAxisWithRollLinkedNWS(log_axis) ?
                     new byte[] { 0x00, 0x00, 0x00, 0x00 } :
                     GetAxDeadZoneByte(currentAxis.GetDeadzone());
 
                 fs.Write(bs, 0, bs.Length);
 
-                bs = isRollLinkedNWSEnabled(nme) ? 
+                bs = isYawAxisWithRollLinkedNWS(log_axis) ? 
                     new byte[] { 0x00, 0x00, 0x00, 0x00 } :
                     GetAxSaturationByte(currentAxis.GetSaturation());
 
@@ -423,14 +415,14 @@ namespace FalconBMS.Launcher.Override
         /// <summary>
         /// As the name implies...
         /// </summary>
-        protected virtual void SaveJoystickCal(Hashtable inGameAxis, DeviceControl deviceControl)
+        protected virtual void SaveJoystickCal( Dictionary<LogicalAxis, InGameAxAssgn> axis_map, DeviceControl deviceControl)
         {
             Diagnostics.Log("Overwriting Joystick.cal..", Diagnostics.LogLevels.Info);
 
             string filename = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + "joystick.cal";
             string fbackupname = appReg.GetInstallDir() + CommonConstants.BACKUPFOLDER + "joystick.cal";
 
-            if (!File.Exists(fbackupname) & File.Exists(filename))
+            if (!File.Exists(fbackupname) && File.Exists(filename))
                 File.Copy(filename, fbackupname, true);
 
             if (File.Exists(filename))
@@ -441,27 +433,27 @@ namespace FalconBMS.Launcher.Override
 
             byte[] bs = new byte[] { 0x00 };
 
-            AxisName[] localJoystickCalList = appReg.getOverrideWriter().getJoystickCalList();
+            LogicalAxis[] localJoystickCalList = appReg.getOverrideWriter().getJoystickCalList();
 
-            foreach (AxisName nme in localJoystickCalList)
+            foreach (LogicalAxis log_axis in localJoystickCalList)
             {
-                InGameAxAssgn currentAxis = (InGameAxAssgn)inGameAxis[nme.ToString()];
+                InGameAxAssgn currentAxis = axis_map[log_axis];
 
                 SetJoyCalDefaultByte(ref bs);
 
-                if (currentAxis.IsAssigned() && !isRollLinkedNWSEnabled(nme))
+                if (currentAxis.IsAssigned() && !isYawAxisWithRollLinkedNWS(log_axis))
                 {
                     bs[12] = 0x01;
 
-                    if (nme == AxisName.Throttle && currentAxis.IsJoyAssigned())
+                    if (log_axis == LogicalAxis.Throttle && currentAxis.IsAssigned())
                     {
-                        double iAB = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetAB();
-                        double iIdle = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        double iAB = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.AB;
+                        double iIdle = deviceControl.GetJoystickMappings()[currentAxis.GetDeviceNumber()].detentPosition.IDLE;
 
                         iAB = iAB * CommonConstants.BINAXISMAX / CommonConstants.AXISMAX;
                         iIdle = iIdle * CommonConstants.BINAXISMAX / CommonConstants.AXISMAX;
 
-                        InGameAxAssgn axis = (InGameAxAssgn)MainWindow.inGameAxis[nme.ToString()];
+                        InGameAxAssgn axis = MainWindow.s_map_logical_axes[log_axis];
                         if (axis.GetInvert() == false)
                         {
                             iAB = CommonConstants.BINAXISMAX - iAB;
@@ -502,23 +494,23 @@ namespace FalconBMS.Launcher.Override
             bs[20] = 0x01;
         }
 
-        protected bool isRollLinkedNWSEnabled(AxisName nme)
+        protected bool isYawAxisWithRollLinkedNWS(LogicalAxis log_axis)
         {
-            return mainWindow.Misc_RollLinkedNWS.IsChecked == true && ( nme == AxisName.Yaw );
+            return mainWindow.Misc_RollLinkedNWS.IsChecked == true && ( log_axis == LogicalAxis.Yaw );
         }
 
-        public virtual AxisName[] getAxisMappingList() { return axisMappingList; }
-        public virtual AxisName[] getJoystickCalList() { return joystickCalList; }
+        public virtual LogicalAxis[] getAxisMappingList() { return axisMappingList; }
+        public virtual LogicalAxis[] getJoystickCalList() { return joystickCalList; }
 
         /// <summary>
         /// Axis information order for AxisMapping.dat
         /// </summary>
-        private AxisName[] axisMappingList = { };
+        private LogicalAxis[] axisMappingList = { };
 
         /// <summary>
         /// Axis information order for JoyStick.cal
         /// </summary>
-        private AxisName[] joystickCalList = { };
+        private LogicalAxis[] joystickCalList = { };
     }
     
 

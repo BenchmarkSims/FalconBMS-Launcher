@@ -1,6 +1,6 @@
 ﻿namespace FalconBMS.Launcher.Input
 {
-    public enum AxisName
+    public enum LogicalAxis
     {
         Roll,
         Pitch,
@@ -34,7 +34,7 @@
         ILS_Volume_Knob
     }
 
-    public enum AxisNumName
+    public enum PhysicalAxis
     {
         Axis_X = 0,
         Axis_Y = 1,
@@ -45,4 +45,5 @@
         Slider_0 = 6,
         Slider_1 = 7
     }
+
 }

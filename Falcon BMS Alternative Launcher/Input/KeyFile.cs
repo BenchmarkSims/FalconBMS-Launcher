@@ -147,12 +147,10 @@ namespace FalconBMS.Launcher.Input
             return null;
         }
 
-        public KeyAssgn ReverseLookupKeyboardInput(int catchedScanCode, bool shift, bool ctrl, bool alt)
+        public KeyAssgn ReverseLookupKeyboardInput(int scancode, int modflags)
         {
-            int modflags = 0 + ( shift ? 1 : 0 ) + ( ctrl ? 2 : 0 ) + ( alt ? 4 : 0 );
-
             foreach (KeyAssgn ka in this.keyAssign)
-                if (ka.GetScancode() == catchedScanCode && ka.GetModFlags() == modflags && ka.GetKeycombo() == "0")
+                if (ka.GetScancode() == scancode && ka.GetModFlags() == modflags && ka.GetKeycombo() == "0")
                     return ka;
 
             return null;

@@ -2,11 +2,11 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-
-using Microsoft.DirectX.DirectInput;
+using System.Diagnostics;
 
 namespace FalconBMS.Launcher.Input
 {
+
     public class DeviceControl
     {
         // For keys, hats and buttons, this field tracks which airframe/avionics-profile we're viewing and modifying.
@@ -18,7 +18,6 @@ namespace FalconBMS.Launcher.Input
         private KeyFile keyFileDefaultF16;
         private KeyFile keyFileF15ABCD;
 
-        private List<Device> hwDevices;
         private List<JoyAssgn> joyAssign;
 
         private DeviceSuppressList suppressList;
@@ -33,36 +32,34 @@ namespace FalconBMS.Launcher.Input
             this.appReg = appReg;
 
             // Make Joystick Instances.
-            DeviceList devList = Manager.GetDevices(DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly);
+            var joy_ids = DirectInputDeviceMap.Singleton.GetDeviceInstanceGuids(include_keybd:false);
 
             this.suppressList = new DeviceSuppressList();
 
-            hwDevices = new List<Device>(devList.Count);
-            joyAssign = new List<JoyAssgn>(devList.Count);
+            joyAssign = new List<JoyAssgn>(16);
 
             string pathToUserXml;
             string pathToStockXml;
 
             int i = 0;
-            foreach (DeviceInstance dev in devList)
+            foreach (Guid joy_id in joy_ids)
             {
-                if (suppressList.IsDeviceSuppressed(dev.InstanceGuid) ||
-                    suppressList.IsDeviceSuppressed(dev.ProductGuid))
+                Guid pidvid = DirectInputHelper.GetDeviceProductGuid(joy_id);
+                if (suppressList.IsDeviceSuppressed(joy_id) ||
+                    suppressList.IsDeviceSuppressed(pidvid))
                 {
-                    Diagnostics.Log($"Ignoring suppressed device: pidvid {dev.ProductGuid}; instance {dev.InstanceGuid}", Diagnostics.LogLevels.Info);
+                    Diagnostics.Log($"Ignoring suppressed device: pidvid {pidvid}; instance {joy_id}", Diagnostics.LogLevels.Info);
                     continue;
                 }
 
-                Diagnostics.Log($"Found device: {dev.ProductName}; pidvid {dev.ProductGuid}; instance {dev.InstanceGuid}", Diagnostics.LogLevels.Info);
+                string name = DirectInputHelper.GetDeviceProductName(joy_id, sanitized: true);
+                Diagnostics.Log($"Found device: {name}; pidvid {pidvid}; instance {joy_id}", Diagnostics.LogLevels.Info);
 
-                Device hwdev = new Device(dev.InstanceGuid);
-                JoyAssgn joy = new JoyAssgn(hwdev);
-
-                hwDevices.Add(hwdev);
+                JoyAssgn joy = new JoyAssgn(joy_id);
                 joyAssign.Add(joy);
 
-                pathToUserXml = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + joy.GetSanitizedProductName()
-                + " {" + joy.GetInstanceGUID().ToString().ToUpper() + "}.xml";
+                pathToUserXml = appReg.GetInstallDir() + CommonConstants.CONFIGFOLDER + CommonConstants.SETUPV100 + name
+                + " {" + joy_id.ToString().ToUpper() + "}.xml";
 
                 // Load existing .xml files.
                 if (File.Exists(pathToUserXml))
@@ -91,34 +88,7 @@ namespace FalconBMS.Launcher.Input
 
                 i += 1;
             }
-            
-            // Load key bindings from keyfiles.
-            LoadKeyBindingsFromUserOrStockKeyfiles(appReg);
-        }
-
-        public bool DeviceListNeedsRefresh()
-        {
-            var tmpDevices = new List<Device>();
-            DeviceList devList = Manager.GetDevices(DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly);
-            foreach (DeviceInstance dev in devList)
-            {
-                if (suppressList.IsDeviceSuppressed(dev.InstanceGuid) ||
-                    suppressList.IsDeviceSuppressed(dev.ProductGuid))
-                    continue;
-
-                tmpDevices.Add(new Device(dev.InstanceGuid));
-            }
-
-            if (tmpDevices.Count != this.hwDevices.Count) return true;
-
-            for (int i = 0; i < tmpDevices.Count; ++i)
-            {
-                if (tmpDevices[i].DeviceInformation.InstanceGuid !=
-                    this.hwDevices[i].DeviceInformation.InstanceGuid)
-                    return true;
-            }
-
-            return false;
+            return;
         }
 
         public void LoadKeyBindingsFromUserOrStockKeyfiles(AppRegInfo appReg)
@@ -157,16 +127,6 @@ namespace FalconBMS.Launcher.Input
             throw new ArgumentException("avionicsProfile");
         }
 
-        public Device[] GetHwDeviceList()
-        {
-            return this.hwDevices.ToArray();
-        }
-
-        public Device GetHwDevice(int i)
-        {
-            return this.hwDevices[i];
-        }
-
         public KeyFile GetKeyBindings()
         {
             if (string.IsNullOrEmpty(avionicsProfile))
@@ -183,6 +143,27 @@ namespace FalconBMS.Launcher.Input
         public JoyAssgn[] GetJoystickMappings()
         {
             return joyAssign.ToArray();
+        }
+
+        public JoyAssgn GetJoystickMappingForDeviceId(Guid device_guid)
+        {
+            foreach (JoyAssgn joy in joyAssign)
+                if (joy.GetInstanceGUID() == device_guid)
+                    return joy;
+
+            throw new KeyNotFoundException();
+        }
+
+        //NB: Used for AxisMapping.dat/Joystick.cal serializaiton.
+        public int GetDeviceNumberForJoy(JoyAssgn joy)
+        {
+            if (joy == null) return -1;
+
+            for (int i = 0; i < joyAssign.Count; ++i)
+                if (joyAssign[i] == joy) return i;
+
+            Debug.Assert(false); //Unexpected: non-null joy, but not found in deviceControl list?
+            return -1;
         }
 
         public void UpdateAvionicsProfile(string profile)
@@ -235,4 +216,5 @@ namespace FalconBMS.Launcher.Input
         }
 
     }
+
 }

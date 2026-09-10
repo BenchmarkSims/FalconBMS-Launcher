@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace FalconBMS.Launcher.Input
@@ -28,10 +24,8 @@ namespace FalconBMS.Launcher.Input
         public static readonly int POV45    = 36000 / 8;
 
         public static readonly int AXISMIN = 0;
-        public static readonly int AXISMAX = 65536;
-
-        public static readonly int FLUSHTIME1 = 900;
-        public static readonly int FLUSHTIME2 = 1500;
+        public static readonly int AXISMAX = 65535;
+        public static readonly int AXISMAX_PLUS1 = 65536;
 
         public static readonly int BINAXISMIN = 0;
         public static readonly int BINAXISMAX = 15000;
@@ -41,7 +35,6 @@ namespace FalconBMS.Launcher.Input
 
         public static readonly int JOYNUMOFFSET = 2;
         public static readonly int JOYNUMUNASSIGNED = -1;
-//        public static readonly int JOYNUMMOUSEWHEEL = -2;
 
         public static readonly string CFGOVERRIDECOMMENT_OLD = "// SETUP OVERRIDE";
         public static readonly string CFGOVERRIDECOMMENT_NEW = "// LAUNCHER OVERRIDE";
@@ -52,7 +45,7 @@ namespace FalconBMS.Launcher.Input
 
         public static readonly string SETUPV100 = "Setup.v100.";
         public static readonly string STOCKXML = " {Stock}.xml";
-//REVIEW: dead code? //public static readonly string MOUSEXML = " Mousewheel.xml";
+
         public static readonly string LOGCAT = "bms-logcat.exe";
         public static readonly string CFGFILE = "Falcon BMS.cfg";
         public static readonly string USERCFGFILE = "Falcon BMS User.cfg";

@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using FalconBMS.Launcher.Windows;
-
-using Microsoft.DirectX.DirectInput;
 
 namespace FalconBMS.Launcher.Input
 {
@@ -37,8 +36,6 @@ namespace FalconBMS.Launcher.Input
 
         public int GetScancode() { return numericScancode; }
         public int GetModFlags() { return numericModFlags; }
-
-        public KeyAssgn() { }
 
         public KeyAssgn(params string[] stringParams)
         {
@@ -135,52 +132,21 @@ namespace FalconBMS.Launcher.Input
             return line;
         }
 
-        /// <summary>
-        /// Convert keyboard input to KEY file line format.
-        /// </summary>
-        /// <param name="scancode10"></param>
-        /// <param name="shift"></param>
-        /// <param name="ctrl"></param>
-        /// <param name="alt"></param>
-        public void SetKeyboard(int scancode10, bool shift, bool ctrl, bool alt)
+        public void SetKeyboard(int scancode, int modflags)
         {
-            int code = 0;
-            if (shift)
-                code += 1;
-            if (ctrl)
-                code += 2;
-            if (alt)
-                code += 4;
-            modifier = code.ToString();
+            keyboard = "0x" + scancode.ToString("X2");
 
-            keyboard = "0x" + scancode10.ToString("X");
+            modifier = modflags.ToString();
 
-            numericScancode = scancode10;
-            numericModFlags = code;
+            numericScancode = scancode;
+            numericModFlags = modflags;
         }
 
-        /// <summary>
-        /// Convert Shift/Ctrl/Alt key combination to KEY file line format.
-        /// </summary>
-        /// <param name="scancode10"></param>
-        /// <param name="shift"></param>
-        /// <param name="ctrl"></param>
-        /// <param name="alt"></param>
-        public void Setkeycombo(int scancode10, bool shift, bool ctrl, bool alt)
+        public void SetKeyboardComboPrefix( int scancode, int modflags )
         {
-            //if (this.keyboard == "0xFFFFFFFF")
-                //return;
+            keycomboMod = modflags.ToString();
 
-            int code = 0;
-            if (shift)
-                code += 1;
-            if (ctrl)
-                code += 2;
-            if (alt)
-                code += 4;
-            keycomboMod = code.ToString();
-
-            keycombo = "0x" + scancode10.ToString("X");
+            keycombo = "0x" + scancode.ToString("X2");
         }
 
         /// <summary>
@@ -237,11 +203,7 @@ namespace FalconBMS.Launcher.Input
                 }
 
                 int scancode10 = Convert.ToInt32(keycombo, fromBase:16);
-
-                // int -> enum
-                Key int2enum = (Key)scancode10;
-
-                assignmentStatus += int2enum + "\t: ";
+                assignmentStatus += DirectInputHelper.GetKeyboardKeyText(scancode10) + "\t: ";
             }
 
             if (keyboard != "0xFFFFFFFF")
@@ -276,20 +238,18 @@ namespace FalconBMS.Launcher.Input
                 }
 
                 int scancode10 = Convert.ToInt32(keyboard, fromBase:16);
+                string scancode10_txt = DirectInputHelper.GetKeyboardKeyText(scancode10);
 
-                // int -> enum
-                Key int2enum = (Key)scancode10;
-
-                if (int2enum.ToString() == "-1")
+                if (scancode10_txt == "-1")
                 { return assignmentStatus; }
 
-                assignmentStatus += int2enum.ToString();
+                assignmentStatus += scancode10_txt;
             }
 
             return assignmentStatus;
         }
 
-        // Z_Joy_<asssigned joystick number> = "DX1 DX16 POV1UP" //
+        //NB: This is not deadcode -- the databinding uses it for the joystick columns
         public string Z_Joy_0 => ReadJoyAssignment(0);
         public string Z_Joy_1 => ReadJoyAssignment(1);
         public string Z_Joy_2 => ReadJoyAssignment(2);
@@ -307,7 +267,7 @@ namespace FalconBMS.Launcher.Input
         public string Z_Joy_14 => ReadJoyAssignment(14);
         public string Z_Joy_15 => ReadJoyAssignment(15);
 
-        public string ReadJoyAssignment(int joyId)
+        public string ReadJoyAssignment( int joyId )
         {
             JoyAssgn[] joyAssgns = MainWindow.deviceControl.GetJoystickMappings();
 
@@ -318,34 +278,34 @@ namespace FalconBMS.Launcher.Input
             sb.Append(joyAssgns[joyId].KeyMappingPreviewDX(this));
 
             // PRIMARY DEVICE POV
-            InGameAxAssgn rollAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Roll.ToString()];
-            InGameAxAssgn throttleAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Throttle.ToString()];
+            InGameAxAssgn rollAxis = MainWindow.s_map_logical_axes[LogicalAxis.Roll];
+            InGameAxAssgn throttleAxis = MainWindow.s_map_logical_axes[LogicalAxis.Throttle];
             if (rollAxis.GetDeviceNumber() == joyId || throttleAxis.GetDeviceNumber() == joyId)
             {
                 string tmp = joyAssgns[joyId].KeyMappingPreviewPOV(this);
                 if (!string.IsNullOrEmpty(tmp))
-                    sb.Append("\n"+tmp);
+                    sb.Append("\n" + tmp);
             }
             return sb.ToString();
         }
 
-        public string ReadJoyAssignment(int joyId, JoyAssgn[] joyAssgns)
+        // Called from KeyMappingWindow dialog (with a tmp joy) to construct the DX/POV string.
+        public string ReadJoyAssignment( JoyAssgn joy, int joyId )
         {
-            if (joyId >= joyAssgns.Length)
-                return "";
+            if (joy == null) return String.Empty;
 
             StringBuilder sb = new StringBuilder();
 
-            string tmp1 = joyAssgns[joyId].KeyMappingPreviewDX(this);
+            string tmp1 = joy.KeyMappingPreviewDX(this);
             if (!string.IsNullOrEmpty(tmp1))
                 sb.Append("JOY " + joyId + " " + tmp1.Replace("\n", ", "));
 
             // PRIMARY DEVICE POV
-            InGameAxAssgn rollAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Roll.ToString()];
-            InGameAxAssgn throttleAxis = (InGameAxAssgn)MainWindow.inGameAxis[AxisName.Throttle.ToString()];
-            if (rollAxis.GetDeviceNumber() == joyId || throttleAxis.GetDeviceNumber() == joyId) 
+            InGameAxAssgn rollAxis = MainWindow.s_map_logical_axes[LogicalAxis.Roll];
+            InGameAxAssgn throttleAxis = MainWindow.s_map_logical_axes[LogicalAxis.Throttle];
+            if (rollAxis.GetDeviceNumber() == joyId || throttleAxis.GetDeviceNumber() == joyId)
             {
-                string tmp2 = joyAssgns[joyId].KeyMappingPreviewPOV(this);
+                string tmp2 = joy.KeyMappingPreviewPOV(this);
                 if (!string.IsNullOrEmpty(tmp2))
                     sb.Append("; " + "JOY " + joyId + " " + tmp2.Replace("\n", ", "));
             }

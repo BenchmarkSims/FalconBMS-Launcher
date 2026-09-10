@@ -19,9 +19,5 @@ namespace FalconBMS.Launcher.Input
         // Constructor
         public DetentPosition(int aB, int iDLE) { this.aB = aB; this.iDLE = iDLE; }
         public DetentPosition() { }
-
-        // Method
-        public int GetAB() { return aB; }
-        public int GetIDLE() { return iDLE; }
     }
 }
