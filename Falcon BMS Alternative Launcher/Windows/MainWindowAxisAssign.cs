@@ -35,21 +35,24 @@ namespace FalconBMS.Launcher.Windows
             foreach (LogicalAxis log_axis_id in Enum.GetValues(typeof(LogicalAxis)))
                 _UpdateUI_Axes(log_axis_id);
         }
-        private void _UpdateUI_Axes( LogicalAxis log_axis_id )
+        private void _UpdateUI_Axes( LogicalAxis? log_axis_id )
         {
-            InGameAxAssgn axis = s_map_logical_axes[log_axis_id];
+            if (!log_axis_id.HasValue) return;
+
+            var log_axis = log_axis_id.Value;
+            InGameAxAssgn axis = s_map_logical_axes[log_axis];
             if (!axis.IsAssigned()) return;
 
             // Update text-label and progress-bar visuals.
-            tblabel = FindName($"Label_{log_axis_id}") as Label;
-            tbprogressbar = FindName($"Axis_{log_axis_id}") as ProgressBar;
+            tblabel = FindName($"Label_{log_axis}") as Label;
+            tbprogressbar = FindName($"Axis_{log_axis}") as ProgressBar;
 
             if (tblabel == null || tbprogressbar == null) 
                 throw new InvalidProgramException();
 
             //NB: some logical axes are implicitly inverted.. who knows why
             int invert_mul = (axis.GetInvert() ? -1 : +1);
-            switch (log_axis_id)
+            switch (log_axis)
             {
                 case LogicalAxis.Throttle:
                 case LogicalAxis.Throttle_Right:
@@ -98,11 +101,11 @@ namespace FalconBMS.Launcher.Windows
             tblabel.Content = label_text;
 
             // Special handling for throttle axes, below..
-            if (log_axis_id != LogicalAxis.Throttle && 
-                log_axis_id != LogicalAxis.Throttle_Right)
+            if (log_axis != LogicalAxis.Throttle && 
+                log_axis != LogicalAxis.Throttle_Right)
                 return;
 
-            tblabelab = FindName($"AB_{log_axis_id}") as Label;
+            tblabelab = FindName($"AB_{log_axis}") as Label;
             tblabelab.Visibility = Visibility.Hidden;
 
             tbprogressbar.Foreground = CommonConstants.LIGHTBLUE;
@@ -247,9 +250,9 @@ namespace FalconBMS.Launcher.Windows
                 foreach (PhysicalAxis phys in Enum.GetValues(typeof(PhysicalAxis)))
                 {
                     int i = (int)phys;
-                    LogicalAxis log_axis = joy.axis[i].GetLogicalAxis();
-
-                    s_map_logical_axes[log_axis] = new InGameAxAssgn(joy, phys, joy.axis[i]);
+                    LogicalAxis? log_axis = joy.axis[i].GetLogicalAxis();
+                    if (log_axis.HasValue)
+                        s_map_logical_axes[log_axis.Value] = new InGameAxAssgn(joy, phys, joy.axis[i]);
                 }
             }
         }

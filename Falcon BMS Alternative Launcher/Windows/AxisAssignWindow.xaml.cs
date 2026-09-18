@@ -403,17 +403,9 @@ namespace FalconBMS.Launcher.Windows
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (_awaiting_input) return;
             if (_dlg_axis_assgn == null) return;
 
-            if (_awaiting_input)
-            {
-                _curr_axis_assgn = new InGameAxAssgn();
-            }
-            else
-            {
-                _curr_axis_assgn = _dlg_axis_assgn;
-            }
+            _curr_axis_assgn = _dlg_axis_assgn;
 
             Close();
             return;

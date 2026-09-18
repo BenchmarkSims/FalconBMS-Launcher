@@ -13,7 +13,6 @@ namespace FalconBMS.Launcher.Input
         protected bool invert;
         protected AxCurve saturation = AxCurve.None;
         protected AxCurve deadzone = AxCurve.None;
-        protected DateTime assgnDate = new DateTime(1998, 12, 12, 12, 0, 0);
 
         public InGameAxAssgn() { }
 
@@ -25,7 +24,6 @@ namespace FalconBMS.Launcher.Input
             invert = axis.GetInvert();
             saturation = axis.GetSaturation();
             deadzone = axis.GetDeadZone();
-            assgnDate = axis.GetAssignDate();
         }
 
         public InGameAxAssgn(JoyAssgn joy, PhysicalAxis phys_axis, bool invert, AxCurve deadzone, AxCurve saturation)
@@ -36,7 +34,6 @@ namespace FalconBMS.Launcher.Input
             this.invert = invert;
             this.deadzone = deadzone;
             this.saturation = saturation;
-            this.assgnDate = DateTime.UtcNow;
         }
 
         public bool IsAssigned()
@@ -58,7 +55,6 @@ namespace FalconBMS.Launcher.Input
         public bool GetInvert() { return invert; }
         public AxCurve GetDeadzone() { return deadzone; }
         public AxCurve GetSaturation() { return saturation; }
-        public DateTime getDate() { return assgnDate; }
 
         public void SetInvert(bool invert)
         {
