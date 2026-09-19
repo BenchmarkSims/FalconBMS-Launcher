@@ -126,12 +126,11 @@ namespace FalconBMS.Launcher.Windows
                 );
 
             _awaiting_input = false;
-            AssignedJoystick.Visibility = Visibility.Visible;
+            UpdateUI_State();
 
             // Update UI.
             UpdateUI(new_value);
 
-            Retry.Content = "RETRY";
             Retry.Visibility = Visibility.Visible;
 
             if (_logical_axis_id == LogicalAxis.Throttle)
@@ -256,11 +255,12 @@ namespace FalconBMS.Launcher.Windows
             AxisValueProgress.Minimum = CommonConstants.AXISMIN;
             AxisValueProgress.Maximum = CommonConstants.AXISMAX;
 
-            Reset();
+            Init_State();
+            UpdateUI_State();
             return;
         }
 
-        public void Reset()
+        public void Init_State()
         {
             AxisValueProgress.Value = CommonConstants.AXISMIN;
 
@@ -269,14 +269,21 @@ namespace FalconBMS.Launcher.Windows
             if (_curr_axis_assgn.IsAssigned())
             {
                 _awaiting_input = false;
-                Retry.Content = "CLEAR";
-                Retry.Visibility = Visibility.Visible;
+                Clear.Visibility = Visibility.Visible;
 
                 if (_logical_axis_id == LogicalAxis.Throttle)
                 {
                     SetAB.Visibility = Visibility.Visible;
                     Idle.Visibility = Visibility.Visible;
                 }
+            }
+            else // log axis not currently assigned
+            {
+                Clear.Visibility = Visibility.Hidden;
+
+                _awaiting_input = true;
+                AssignedJoystick.Content = "   AWAITING INPUTS";
+                AssignedJoystick.Visibility = Visibility.Visible;
             }
 
             Saturation.SelectedIndex = (int)_curr_axis_assgn.GetSaturation();
@@ -331,6 +338,37 @@ namespace FalconBMS.Launcher.Windows
             return;
         }
 
+        private void UpdateUI_State( )
+        {
+            if (_dlg_axis_assgn.IsAssigned())
+            {
+                JoyAssgn joy = _dlg_axis_assgn.GetJoy();
+
+                Clear.Visibility = Visibility.Visible;
+
+                AssignedJoystick.Visibility = Visibility.Visible;
+                string phys = _dlg_axis_assgn.GetPhysicalAxisId().ToString().Replace('_', ' ');
+                string joy_label = $"   {phys} : {joy.GetSanitizedProductName()}";
+                AssignedJoystick.Content = joy_label;
+
+                if (_logical_axis_id == LogicalAxis.Throttle)
+                {
+                    SetAB.Visibility = Visibility.Visible;
+                    Idle.Visibility = Visibility.Visible;
+                }
+            }
+            else // log axis not currently assigned
+            {
+                Clear.Visibility = Visibility.Hidden;
+
+                _awaiting_input = true;
+                AssignedJoystick.Content = "   AWAITING INPUTS";
+                AssignedJoystick.Visibility = Visibility.Visible;
+            }
+
+            return;
+        }
+
         private void UpdateUI( int axis_val )
         {
             if (_awaiting_input) return;
@@ -340,15 +378,11 @@ namespace FalconBMS.Launcher.Windows
             if (joy == null) return;
 
             InvertAxisDisp(axis_val);
-            
-            AssignedJoystick.Content = "   "
-                + _dlg_axis_assgn.GetPhysicalAxisId().ToString().Replace('_', ' ') + " : "
-                + joy.GetSanitizedProductName();
 
+            // Throttle specific stuff..
             if (_logical_axis_id != LogicalAxis.Throttle && _logical_axis_id != LogicalAxis.Throttle_Right)
                 return;
 
-            // Throttle specific stuff..
             AxisValueProgress.Foreground = CommonConstants.LIGHTBLUE;
             check_ABIDLE.Visibility = Visibility.Hidden;
             var ab = _dlg_axis_assgn.GetJoy().detentPosition.AB;
@@ -384,8 +418,43 @@ namespace FalconBMS.Launcher.Windows
             return;
         }
 
+        private void Clear_Click( object sender, RoutedEventArgs e )
+        {
+            // Null out the _dlg_axis_assgn.
+            _dlg_axis_assgn = new InGameAxAssgn(null, (PhysicalAxis)(-1),
+                invert: this.Invert.IsChecked ?? false,
+                deadzone: (AxCurve)this.DeadZone.SelectedIndex,
+                saturation: (AxCurve)this.Saturation.SelectedIndex);
+
+            // Engage the awaiting-input UX mode.
+            _awaiting_input = true;
+            AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Visibility = Visibility.Visible;
+
+            AxisValueProgress.Minimum = CommonConstants.AXISMIN;
+            AxisValueProgress.Maximum = CommonConstants.AXISMAX;
+            AxisValueProgress.Value = CommonConstants.AXISMIN;
+
+            Retry.Visibility = Visibility.Hidden;
+            SetAB.Visibility = Visibility.Hidden;
+            Idle.Visibility = Visibility.Hidden;
+
+            UpdateUI_State();
+            return;
+        }
+
         private void Retry_Click(object sender, RoutedEventArgs e)
         {
+            // Reset/restore original binding (joy may be null/unassigned).
+            _dlg_axis_assgn = new InGameAxAssgn( //TODO: blank assignment
+                joy: _curr_axis_assgn.GetJoy(),
+                phys_axis: _curr_axis_assgn.GetPhysicalAxisId(),
+                invert: _curr_axis_assgn.GetInvert(),
+                deadzone: _curr_axis_assgn.GetDeadzone(),
+                saturation: _curr_axis_assgn.GetSaturation()
+                );
+
+            // Engage the awaiting-input UX mode.
             _awaiting_input = true;
             AssignedJoystick.Content = "   AWAITING INPUTS";
             AssignedJoystick.Visibility = Visibility.Visible;
@@ -398,6 +467,7 @@ namespace FalconBMS.Launcher.Windows
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility  = Visibility.Hidden;
 
+            UpdateUI_State();
             return;
         }
 
