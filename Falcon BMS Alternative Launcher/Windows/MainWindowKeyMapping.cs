@@ -93,22 +93,29 @@ namespace FalconBMS.Launcher.Windows
         }
 
         /// <summary>
-        /// Unassign keyboard key or joystick button when double clicked a Datagrid cell.
+        /// Open the assignment dialog when a binding cell is double-clicked.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DataGrid_MouseButtonDoubleClick(object sender, MouseButtonEventArgs e)
+        private void DataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            KeyAssgn selectedItem = (KeyAssgn)KeyMappingGrid.SelectedItem;
-            if (selectedItem == null)
+            if (e.ClickCount != 2)
                 return;
-            if (KeyMappingGrid.CurrentColumn == null)
+
+            DependencyObject source = e.OriginalSource as DependencyObject;
+            while (source != null && !(source is DataGridCell))
+                source = source is Visual ? VisualTreeHelper.GetParent(source) : (source as FrameworkContentElement)?.Parent;
+
+            DataGridCell cell = source as DataGridCell;
+            KeyAssgn selectedItem = cell?.DataContext as KeyAssgn;
+            if (selectedItem == null)
                 return;
             if (selectedItem.GetVisibility() != "White")
                 return;
             if (selectedItem.GetCallback() == CommonConstants.SIMDONOTHING)
                 return;
 
+            e.Handled = true;
             KeyMappingWindow.ShowKeyMappingWindow(this, deviceControl, selectedItem);
 
             KeyMappingGrid.Items.Refresh();

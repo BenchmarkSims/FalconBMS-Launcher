@@ -613,7 +613,7 @@
                               SelectionMode="Single"
                               GridLinesVisibility="Vertical"
                               VerticalGridLinesBrush="LightGray" Background="#7F202020"
-                              MouseDoubleClick="DataGrid_MouseButtonDoubleClick" Grid.ColumnSpan="2">
+                              PreviewMouseLeftButtonDown="DataGrid_PreviewMouseLeftButtonDown" Grid.ColumnSpan="2">
                         <!-- Below column is needed to refresh datagrid because of the following BUG: 
                         https://connect.microsoft.com/VisualStudio/feedback/details/778456/click-on-datagridrowheader-raise-an-argumentoutofrange-exception-when-there-is-no-columns -->
                         <DataGrid.Columns>
