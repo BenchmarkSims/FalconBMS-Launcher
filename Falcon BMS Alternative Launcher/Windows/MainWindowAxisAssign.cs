@@ -82,6 +82,8 @@ namespace FalconBMS.Launcher.Windows
             {
                 if (inGameAxis.Count == 0)
                     return;
+                foreach (JoyAssgn joy in deviceControl.GetJoystickMappings())
+                    joy.TryPollDevice();
                 invertNum = 0;
                 foreach (AxisName nme in axisNameList)
                 {

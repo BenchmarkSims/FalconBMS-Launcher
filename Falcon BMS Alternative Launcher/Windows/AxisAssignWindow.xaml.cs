@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -38,6 +39,7 @@ namespace FalconBMS.Launcher.Windows
         public class JoyAxisNeutralValue
         {
             public int[] NeutralValue = new int[8];
+            public bool[] HasNeutralValue = new bool[8];
         }
 
         private MainWindow mainWindow;
@@ -56,17 +58,26 @@ namespace FalconBMS.Launcher.Windows
 
         private int TickCount_NextUIFlush1;
         private int TickCount_NextUIFlush2;
+        private bool deviceFilterReady;
+        private readonly System.Diagnostics.Stopwatch neutralTimer = new System.Diagnostics.Stopwatch();
 
         private enum Status
         {
             GetNeutralPosition = -1,
             WaitInput = 0,
-            ShowAxisStatus = 1
+            ShowAxisStatus = 1,
+            Cleared = 2
         }
 
         private void AssignWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            DeviceFilter.Items.Add("All devices (automatic detection)");
+            foreach (JoyAssgn joy in MainWindow.deviceControl.GetJoystickMappings())
+                DeviceFilter.Items.Add(joy.GetSanitizedProductName());
+            DeviceFilter.SelectedIndex = 0;
+            deviceFilterReady = true;
             Retry.Visibility = Visibility.Hidden;
+            Clear.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility = Visibility.Hidden;
 
@@ -174,6 +185,11 @@ namespace FalconBMS.Launcher.Windows
             AxisValueProgress.Maximum = CommonConstants.AXISMAX;
 
             Reset();
+            if (status == Status.GetNeutralPosition)
+            {
+                status = Status.WaitInput;
+                AssignedJoystick.Content = "   HOLD CONTROLS STILL";
+            }
             return;
         }
 
@@ -186,8 +202,9 @@ namespace FalconBMS.Launcher.Windows
             if (axisAssign.GetDeviceNumber() > -1 | axisAssign.GetDeviceNumber() == -2)
             {
                 status = Status.ShowAxisStatus;
-                Retry.Content = "CLEAR";
+                Retry.Content = "RETRY";
                 Retry.Visibility = Visibility.Visible;
+                Clear.Visibility = Visibility.Visible;
                 if (whoCalledWindow == AxisName.Throttle.ToString())
                 {
                     SetAB.Visibility = Visibility.Visible;
@@ -213,8 +230,17 @@ namespace FalconBMS.Launcher.Windows
                 Joynum[i] = new JoyAxisNeutralValue();
 
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
+            {
+                if (DeviceFilter.SelectedIndex > 0 && DeviceFilter.SelectedIndex != i + 1)
+                    continue;
+                if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
+                    continue;
                 for (int ii = 0; ii < 8; ii++)
-                    Joynum[i].NeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii);
+                    Joynum[i].HasNeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i]
+                        .TryGetJoyAxisState(ii, out Joynum[i].NeutralValue[ii]);
+            }
+            // Start settling on the first sampling tick, after the window is ready.
+            neutralTimer.Reset();
         }
 
         private void GetNeutralPosition()
@@ -222,14 +248,19 @@ namespace FalconBMS.Launcher.Windows
             Reset();
 
             status = Status.WaitInput;
-            AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Content = "   HOLD CONTROLS STILL";
         }
 
         private void WaitInput()
         {
-            if (Environment.TickCount > TickCount_NextUIFlush1)
+            if (!neutralTimer.IsRunning)
+                neutralTimer.Start();
+            bool settling = neutralTimer.ElapsedMilliseconds < 750;
+            if (settling)
+                AssignedJoystick.Content = "   HOLD CONTROLS STILL";
+            else if (Environment.TickCount > TickCount_NextUIFlush1)
                 AssignedJoystick.Content = "";
-            if (Environment.TickCount > TickCount_NextUIFlush2)
+            if (!settling && Environment.TickCount > TickCount_NextUIFlush2)
             {
                 AssignedJoystick.Content = "   AWAITING INPUTS";
 
@@ -237,31 +268,66 @@ namespace FalconBMS.Launcher.Windows
                 TickCount_NextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
             }
 
+            int largestMovement = CommonConstants.AXISMAX / 4;
+            int detectedDevice = -1;
+            int detectedAxis = -1;
+            var diagnostics = new StringBuilder();
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
+                if (DeviceFilter.SelectedIndex > 0 && DeviceFilter.SelectedIndex != i + 1)
+                    continue;
+                if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
+                {
+                    if (DeviceFilter.SelectedIndex > 0)
+                        diagnostics.Append("Unable to read device");
+                    continue;
+                }
                 for (int ii = 0; ii < 8; ii++)
                 {
-                    if (MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) < Joynum[i].NeutralValue[ii] + CommonConstants.AXISMAX / 4 &
-                        MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) > Joynum[i].NeutralValue[ii] - CommonConstants.AXISMAX / 4)
+                    if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryGetJoyAxisState(ii, out int value))
                         continue;
-                    devNumTmp = i;
-                    phyAxNumTmp = ii;
-                    status = Status.ShowAxisStatus;
-                    Retry.Content = "RETRY";
-                    Retry.Visibility = Visibility.Visible;
-
-                    if (whoCalledWindow != AxisName.Throttle.ToString())
-                        continue;
-                    SetAB.Visibility = Visibility.Visible;
-                    Idle.Visibility = Visibility.Visible;
-
-                    InGameAxAssgn axis = (InGameAxAssgn)MainWindow.inGameAxis[whoCalledWindow];
-                    if (axis.GetDeviceNumber() >= 0)
+                    if (settling || !Joynum[i].HasNeutralValue[ii])
                     {
-                        AB = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetAB();
-                        IDLE = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        Joynum[i].NeutralValue[ii] = value;
+                        Joynum[i].HasNeutralValue[ii] = true;
+                    }
+                    int movement = Math.Abs(value - Joynum[i].NeutralValue[ii]);
+                    if (DeviceFilter.SelectedIndex > 0)
+                        diagnostics.AppendFormat("{0}: {1} (d{2})  ", (AxisNumName)ii, value, movement);
+                    if (!settling && movement >= CommonConstants.AXISMAX / 4 && (detectedDevice < 0 || movement > largestMovement))
+                    {
+                        largestMovement = movement;
+                        detectedDevice = i;
+                        detectedAxis = ii;
                     }
                 }
+                if (DeviceFilter.SelectedIndex > 0)
+                {
+                    byte[] buttons = MainWindow.deviceControl.GetJoystickMappings()[i].GetButtons();
+                    diagnostics.Append("\nButtons:");
+                    for (int button = 0; button < buttons.Length; button++)
+                        if ((buttons[button] & 0x80) != 0)
+                            diagnostics.AppendFormat(" {0}", button + 1);
+                }
+            }
+            InputDiagnostics.Text = DeviceFilter.SelectedIndex > 0 ? diagnostics.ToString() : "Select a device to see input values.";
+            if (detectedDevice < 0)
+                return;
+
+            devNumTmp = detectedDevice;
+            phyAxNumTmp = detectedAxis;
+            status = Status.ShowAxisStatus;
+            Retry.Content = "RETRY";
+            Retry.Visibility = Visibility.Visible;
+            Clear.Visibility = Visibility.Visible;
+
+            if (whoCalledWindow == AxisName.Throttle.ToString())
+            {
+                SetAB.Visibility = Visibility.Visible;
+                Idle.Visibility = Visibility.Visible;
+                var detents = MainWindow.deviceControl.GetJoystickMappings()[detectedDevice].detentPosition;
+                AB = detents.GetAB();
+                IDLE = detents.GetIDLE();
             }
         }
 
@@ -314,6 +380,9 @@ namespace FalconBMS.Launcher.Windows
             }
 
             InvertAxisDisp();
+
+            if (!MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].TryPollDevice())
+                return;
 
             int output = MainWindow.ApplyDeadZone
                             (
@@ -376,20 +445,42 @@ namespace FalconBMS.Launcher.Windows
         private void Retry_Click(object sender, RoutedEventArgs e)
         {
             status = Status.GetNeutralPosition;
-            AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Content = "   HOLD CONTROLS STILL";
 
             AxisValueProgress.Minimum = CommonConstants.AXISMIN;
             AxisValueProgress.Maximum = CommonConstants.AXISMAX;
             AxisValueProgress.Value   = CommonConstants.AXISMIN;
 
             Retry.Visibility = Visibility.Hidden;
+            Clear.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility  = Visibility.Hidden;
         }
 
+        private void DeviceFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (deviceFilterReady)
+                Retry_Click(sender, e);
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            status = Status.Cleared;
+            devNumTmp = -1;
+            phyAxNumTmp = -1;
+            AssignedJoystick.Content = "   UNASSIGNED - PRESS SAVE";
+            AxisValueProgress.Value = AxisValueProgress.Minimum;
+            Clear.Visibility = Visibility.Hidden;
+            Retry.Visibility = Visibility.Visible;
+            SetAB.Visibility = Visibility.Hidden;
+            Idle.Visibility = Visibility.Hidden;
+            check_ABIDLE.Visibility = Visibility.Hidden;
+            InputDiagnostics.Text = "";
+        }
+
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (status == Status.WaitInput)
+            if (status == Status.WaitInput || status == Status.Cleared)
             {
                 AxAssgn axisInfo = new AxAssgn();
                 axisAssign = new InGameAxAssgn(new JoyAssgn(), -1, axisInfo);

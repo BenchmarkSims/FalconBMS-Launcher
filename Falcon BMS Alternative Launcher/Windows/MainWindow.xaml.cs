@@ -767,6 +767,16 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         private void MetroWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            // A click on an already selected DataGrid cell can bubble to the
+            // window. Starting a window drag there interrupts the double-click.
+            DependencyObject source = e.OriginalSource as DependencyObject;
+            while (source != null)
+            {
+                if (source is DataGrid)
+                    return;
+                source = source is Visual ? VisualTreeHelper.GetParent(source) : (source as FrameworkContentElement)?.Parent;
+            }
+
             if (e.ChangedButton == MouseButton.Left &&
                 e.LeftButton == MouseButtonState.Pressed)
             {
