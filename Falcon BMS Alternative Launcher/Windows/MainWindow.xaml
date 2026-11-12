@@ -539,11 +539,60 @@
                     <Label Content="Category:" HorizontalAlignment="Left" Margin="223,-43,0,0" VerticalAlignment="Top" Height="26" Width="64" HorizontalContentAlignment="Right" Foreground="White"/>
                     <ComboBox x:Name="Category" ItemsSource="{Binding}" HorizontalAlignment="Left" Margin="300,-41,0,0" VerticalAlignment="Top" Width="256" BorderBrush="Black" Background="#80F0F0F0" Foreground="#FF191919" SelectionChanged="Category_SelectionChanged" Height="26" Grid.ColumnSpan="2">
                         <ComboBox.ItemContainerStyle>
-                            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="Background" Value="Black"/>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="Foreground" Value="#FF191919"/>
+                                <Setter Property="Padding" Value="6,4"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ComboBoxItem">
+                                            <Border x:Name="ItemBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsHighlighted" Value="True">
+                                                    <Setter TargetName="ItemBorder" Property="Background" Value="#FFB8D8EE"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Foreground" Value="Gray"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
                             </Style>
                         </ComboBox.ItemContainerStyle>
+                        <ComboBox.Template>
+                            <ControlTemplate TargetType="ComboBox">
+                                <Grid>
+                                    <ToggleButton x:Name="DropDownToggle" Focusable="False"
+                                                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                                  Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="Stretch" Padding="0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="20"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter Margin="4,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                              Content="{TemplateBinding SelectionBoxItem}"
+                                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                                            <TextBlock Grid.Column="1" Text="▼" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Grid>
+                                    </ToggleButton>
+                                    <Popup x:Name="PART_Popup" Placement="Bottom" PlacementTarget="{Binding ElementName=DropDownToggle}"
+                                           IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="False" Focusable="False">
+                                        <Border Background="White" BorderBrush="#FF777777" BorderThickness="1"
+                                                MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                                MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                            <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Popup>
+                                </Grid>
+                            </ControlTemplate>
+                        </ComboBox.Template>
                     </ComboBox>
                     <DataGrid x:Name="KeyMappingGrid" HorizontalAlignment="Stretch" Height="auto" Margin="10,10,9.666,64.334" 
                               EnableColumnVirtualization="True" EnableRowVirtualization="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
