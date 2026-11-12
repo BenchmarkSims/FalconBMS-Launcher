@@ -57,6 +57,7 @@ namespace FalconBMS.Launcher.Windows
 
         private int TickCount_NextUIFlush1;
         private int TickCount_NextUIFlush2;
+        private bool deviceFilterReady;
 
         private enum Status
         {
@@ -68,6 +69,11 @@ namespace FalconBMS.Launcher.Windows
 
         private void AssignWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            DeviceFilter.Items.Add("All devices (automatic detection)");
+            foreach (JoyAssgn joy in MainWindow.deviceControl.GetJoystickMappings())
+                DeviceFilter.Items.Add(joy.GetSanitizedProductName());
+            DeviceFilter.SelectedIndex = 0;
+            deviceFilterReady = true;
             Retry.Visibility = Visibility.Hidden;
             Clear.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
@@ -223,6 +229,8 @@ namespace FalconBMS.Launcher.Windows
 
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
+                if (DeviceFilter.SelectedIndex > 0 && DeviceFilter.SelectedIndex != i + 1)
+                    continue;
                 if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
                     continue;
                 for (int ii = 0; ii < 8; ii++)
@@ -256,6 +264,8 @@ namespace FalconBMS.Launcher.Windows
             int detectedAxis = -1;
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
+                if (DeviceFilter.SelectedIndex > 0 && DeviceFilter.SelectedIndex != i + 1)
+                    continue;
                 if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
                     continue;
                 for (int ii = 0; ii < 8; ii++)
@@ -421,6 +431,12 @@ namespace FalconBMS.Launcher.Windows
             Clear.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility  = Visibility.Hidden;
+        }
+
+        private void DeviceFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (deviceFilterReady)
+                Retry_Click(sender, e);
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)

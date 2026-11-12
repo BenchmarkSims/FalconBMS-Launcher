@@ -6,7 +6,7 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d" 
         GlowBrush="Black" BorderThickness="0"
-        Title="Axis Assign" Height="236" Width="512" 
+        Title="Axis Assign" Height="270" Width="512"
         WindowStartupLocation="CenterScreen"
         Loaded="AssignWindow_Loaded" 
         ResizeMode="NoResize" SizeToContent="Width" Topmost="True" 
@@ -24,6 +24,64 @@
             <Setter Property="BorderBrush" Value="#D0191919" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
+                        <Style x:Key="KeyMappingComboBoxItem" TargetType="ComboBoxItem">
+                                <Setter Property="Foreground" Value="#FF191919"/>
+                                <Setter Property="Padding" Value="6,4"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ComboBoxItem">
+                                            <Border x:Name="ItemBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsHighlighted" Value="True">
+                                                    <Setter TargetName="ItemBorder" Property="Background" Value="#FFB8D8EE"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Foreground" Value="Gray"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        <Style x:Key="KeyMappingComboBox" TargetType="ComboBox">
+                            <Setter Property="ItemContainerStyle" Value="{StaticResource KeyMappingComboBoxItem}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ComboBox">
+                                <Grid>
+                                    <ToggleButton x:Name="DropDownToggle" Focusable="False"
+                                                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                                  Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="Stretch" Padding="0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="20"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter Margin="4,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                              Content="{TemplateBinding SelectionBoxItem}"
+                                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                                            <Path Grid.Column="1" Data="M 0 0 L 6 0 L 3 3 Z" Fill="#FF191919" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Grid>
+                                    </ToggleButton>
+                                    <Popup x:Name="PART_Popup" Placement="Bottom" PlacementTarget="{Binding ElementName=DropDownToggle}"
+                                           IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="False" Focusable="False">
+                                        <Border Background="White" BorderBrush="#FF777777" BorderThickness="1"
+                                                MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                                MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                            <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Popup>
+                                </Grid>
+                            </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
     </Window.Resources>
     <Grid>
         <Grid.Background>
@@ -45,22 +103,24 @@
         <Label x:Name="AssignedJoystick" HorizontalAlignment="Left" Margin="32,95,0,0" VerticalAlignment="Top" FontStyle="Italic" Height="28" Width="447"/>
         <Border BorderBrush="#FF191919" BorderThickness="1" HorizontalAlignment="Center" Height="28" Margin="28,95,29,0" VerticalAlignment="Top" Width="447"/>
 
-        <Button x:Name="Clear" Content="Clear" HorizontalAlignment="Left" Margin="14,176,0,0" VerticalAlignment="Top" Width="75" Click="Clear_Click"/>
-        <Button x:Name="Retry" Content="Retry" HorizontalAlignment="Left" Margin="320,176,0,0" VerticalAlignment="Top" Width="75" Click="Retry_Click"/>
-        <Button x:Name="Save" Content="Save" HorizontalAlignment="Left" Margin="400,176,0,0" VerticalAlignment="Top" Width="75" Click="Save_Click"/>
-        <Button x:Name="SetAB" Content="AB DETENT" HorizontalAlignment="Left" Margin="320,144,0,0" VerticalAlignment="Top" Width="75" Click="SetAB_Click"/>
-        <Button x:Name="Idle" Content="Idle DETENT" HorizontalAlignment="Left" Margin="400,144,0,0" VerticalAlignment="Top" Width="75" Click="SetIDLE_Click"/>
+        <ComboBox x:Name="DeviceFilter" Style="{StaticResource KeyMappingComboBox}" HorizontalAlignment="Left" Margin="28,132,0,0" VerticalAlignment="Top" Width="447" Height="26" Background="#FFF0F0F0" Foreground="#FF191919" BorderBrush="Black" SelectionChanged="DeviceFilter_SelectionChanged"/>
 
-        <CheckBox x:Name="Invert" Content="INVERT" HorizontalAlignment="Left" Margin="28,148,0,0" VerticalAlignment="Top"/>
-        <Label Content="Saturation" HorizontalAlignment="Left" Margin="225,144,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="Saturation" HorizontalAlignment="Left" Margin="210,177,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="Saturation_SelectionChanged">
+        <Button x:Name="Clear" Content="Clear" HorizontalAlignment="Left" Margin="14,210,0,0" VerticalAlignment="Top" Width="75" Click="Clear_Click"/>
+        <Button x:Name="Retry" Content="Retry" HorizontalAlignment="Left" Margin="320,210,0,0" VerticalAlignment="Top" Width="75" Click="Retry_Click"/>
+        <Button x:Name="Save" Content="Save" HorizontalAlignment="Left" Margin="400,210,0,0" VerticalAlignment="Top" Width="75" Click="Save_Click"/>
+        <Button x:Name="SetAB" Content="AB DETENT" HorizontalAlignment="Left" Margin="320,178,0,0" VerticalAlignment="Top" Width="75" Click="SetAB_Click"/>
+        <Button x:Name="Idle" Content="Idle DETENT" HorizontalAlignment="Left" Margin="400,178,0,0" VerticalAlignment="Top" Width="75" Click="SetIDLE_Click"/>
+
+        <CheckBox x:Name="Invert" Content="INVERT" HorizontalAlignment="Left" Margin="28,182,0,0" VerticalAlignment="Top"/>
+        <Label Content="Saturation" HorizontalAlignment="Left" Margin="225,178,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="Saturation" HorizontalAlignment="Left" Margin="210,211,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="Saturation_SelectionChanged">
             <TextBlock Text=" None"/>
             <TextBlock Text=" Small"/>
             <TextBlock Text=" Medium"/>
             <TextBlock Text=" Large"/>
         </ComboBox>
-        <Label x:Name="Label_DeadZone" Content="DeadZone" HorizontalAlignment="Left" Margin="115,144,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="DeadZone" HorizontalAlignment="Left" Margin="99,177,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="DeadZone_SelectionChanged">
+        <Label x:Name="Label_DeadZone" Content="DeadZone" HorizontalAlignment="Left" Margin="115,178,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="DeadZone" HorizontalAlignment="Left" Margin="99,211,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="DeadZone_SelectionChanged">
             <TextBlock Text=" None"/>
             <TextBlock Text=" Small"/>
             <TextBlock Text=" Medium"/>
