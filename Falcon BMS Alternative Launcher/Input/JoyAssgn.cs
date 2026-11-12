@@ -157,9 +157,14 @@ namespace FalconBMS.Launcher.Input
 
         public int JoyAxisState(int joyAxisNumber)
         {
-            int input = 0;
+            return TryGetJoyAxisState(joyAxisNumber, out int input) ? input : 0;
+        }
+
+        public bool TryGetJoyAxisState(int joyAxisNumber, out int input)
+        {
+            input = 0;
             if (hwDevice == null)
-                return 0;
+                return false;
             try
             {
                 switch (joyAxisNumber)
@@ -189,12 +194,12 @@ namespace FalconBMS.Launcher.Input
                         input = hwDevice.CurrentJoystickState.GetSlider()[1];
                         break;
                 }
-                return input;
+                return true;
             }
             catch (Exception ex)
             {
                 Diagnostics.Log(ex);
-                return 0;
+                return false;
             }
         }
 

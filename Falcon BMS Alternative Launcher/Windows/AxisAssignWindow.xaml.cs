@@ -38,6 +38,7 @@ namespace FalconBMS.Launcher.Windows
         public class JoyAxisNeutralValue
         {
             public int[] NeutralValue = new int[8];
+            public bool[] HasNeutralValue = new bool[8];
         }
 
         private MainWindow mainWindow;
@@ -174,6 +175,11 @@ namespace FalconBMS.Launcher.Windows
             AxisValueProgress.Maximum = CommonConstants.AXISMAX;
 
             Reset();
+            if (status == Status.GetNeutralPosition)
+            {
+                status = Status.WaitInput;
+                AssignedJoystick.Content = "   AWAITING INPUTS";
+            }
             return;
         }
 
@@ -214,7 +220,8 @@ namespace FalconBMS.Launcher.Windows
 
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
                 for (int ii = 0; ii < 8; ii++)
-                    Joynum[i].NeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii);
+                    Joynum[i].HasNeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i]
+                        .TryGetJoyAxisState(ii, out Joynum[i].NeutralValue[ii]);
         }
 
         private void GetNeutralPosition()
@@ -237,31 +244,46 @@ namespace FalconBMS.Launcher.Windows
                 TickCount_NextUIFlush2 = Environment.TickCount + CommonConstants.FLUSHTIME2;
             }
 
+            int largestMovement = CommonConstants.AXISMAX / 4;
+            int detectedDevice = -1;
+            int detectedAxis = -1;
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
                 for (int ii = 0; ii < 8; ii++)
                 {
-                    if (MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) < Joynum[i].NeutralValue[ii] + CommonConstants.AXISMAX / 4 &
-                        MainWindow.deviceControl.GetJoystickMappings()[i].JoyAxisState(ii) > Joynum[i].NeutralValue[ii] - CommonConstants.AXISMAX / 4)
+                    if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryGetJoyAxisState(ii, out int value))
                         continue;
-                    devNumTmp = i;
-                    phyAxNumTmp = ii;
-                    status = Status.ShowAxisStatus;
-                    Retry.Content = "RETRY";
-                    Retry.Visibility = Visibility.Visible;
-
-                    if (whoCalledWindow != AxisName.Throttle.ToString())
-                        continue;
-                    SetAB.Visibility = Visibility.Visible;
-                    Idle.Visibility = Visibility.Visible;
-
-                    InGameAxAssgn axis = (InGameAxAssgn)MainWindow.inGameAxis[whoCalledWindow];
-                    if (axis.GetDeviceNumber() >= 0)
+                    if (!Joynum[i].HasNeutralValue[ii])
                     {
-                        AB = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetAB();
-                        IDLE = MainWindow.deviceControl.GetJoystickMappings()[axis.GetDeviceNumber()].detentPosition.GetIDLE();
+                        Joynum[i].NeutralValue[ii] = value;
+                        Joynum[i].HasNeutralValue[ii] = true;
+                        continue;
+                    }
+                    int movement = Math.Abs(value - Joynum[i].NeutralValue[ii]);
+                    if (movement >= CommonConstants.AXISMAX / 4 && (detectedDevice < 0 || movement > largestMovement))
+                    {
+                        largestMovement = movement;
+                        detectedDevice = i;
+                        detectedAxis = ii;
                     }
                 }
+            }
+            if (detectedDevice < 0)
+                return;
+
+            devNumTmp = detectedDevice;
+            phyAxNumTmp = detectedAxis;
+            status = Status.ShowAxisStatus;
+            Retry.Content = "RETRY";
+            Retry.Visibility = Visibility.Visible;
+
+            if (whoCalledWindow == AxisName.Throttle.ToString())
+            {
+                SetAB.Visibility = Visibility.Visible;
+                Idle.Visibility = Visibility.Visible;
+                var detents = MainWindow.deviceControl.GetJoystickMappings()[detectedDevice].detentPosition;
+                AB = detents.GetAB();
+                IDLE = detents.GetIDLE();
             }
         }
 
