@@ -62,12 +62,14 @@ namespace FalconBMS.Launcher.Windows
         {
             GetNeutralPosition = -1,
             WaitInput = 0,
-            ShowAxisStatus = 1
+            ShowAxisStatus = 1,
+            Cleared = 2
         }
 
         private void AssignWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Retry.Visibility = Visibility.Hidden;
+            Clear.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility = Visibility.Hidden;
 
@@ -192,8 +194,9 @@ namespace FalconBMS.Launcher.Windows
             if (axisAssign.GetDeviceNumber() > -1 | axisAssign.GetDeviceNumber() == -2)
             {
                 status = Status.ShowAxisStatus;
-                Retry.Content = "CLEAR";
+                Retry.Content = "RETRY";
                 Retry.Visibility = Visibility.Visible;
+                Clear.Visibility = Visibility.Visible;
                 if (whoCalledWindow == AxisName.Throttle.ToString())
                 {
                     SetAB.Visibility = Visibility.Visible;
@@ -219,9 +222,13 @@ namespace FalconBMS.Launcher.Windows
                 Joynum[i] = new JoyAxisNeutralValue();
 
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
+            {
+                if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
+                    continue;
                 for (int ii = 0; ii < 8; ii++)
                     Joynum[i].HasNeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i]
                         .TryGetJoyAxisState(ii, out Joynum[i].NeutralValue[ii]);
+            }
         }
 
         private void GetNeutralPosition()
@@ -249,6 +256,8 @@ namespace FalconBMS.Launcher.Windows
             int detectedAxis = -1;
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
+                if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
+                    continue;
                 for (int ii = 0; ii < 8; ii++)
                 {
                     if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryGetJoyAxisState(ii, out int value))
@@ -276,6 +285,7 @@ namespace FalconBMS.Launcher.Windows
             status = Status.ShowAxisStatus;
             Retry.Content = "RETRY";
             Retry.Visibility = Visibility.Visible;
+            Clear.Visibility = Visibility.Visible;
 
             if (whoCalledWindow == AxisName.Throttle.ToString())
             {
@@ -336,6 +346,9 @@ namespace FalconBMS.Launcher.Windows
             }
 
             InvertAxisDisp();
+
+            if (!MainWindow.deviceControl.GetJoystickMappings()[devNumTmp].TryPollDevice())
+                return;
 
             int output = MainWindow.ApplyDeadZone
                             (
@@ -405,13 +418,28 @@ namespace FalconBMS.Launcher.Windows
             AxisValueProgress.Value   = CommonConstants.AXISMIN;
 
             Retry.Visibility = Visibility.Hidden;
+            Clear.Visibility = Visibility.Hidden;
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility  = Visibility.Hidden;
         }
 
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            status = Status.Cleared;
+            devNumTmp = -1;
+            phyAxNumTmp = -1;
+            AssignedJoystick.Content = "   UNASSIGNED - PRESS SAVE";
+            AxisValueProgress.Value = AxisValueProgress.Minimum;
+            Clear.Visibility = Visibility.Hidden;
+            Retry.Visibility = Visibility.Visible;
+            SetAB.Visibility = Visibility.Hidden;
+            Idle.Visibility = Visibility.Hidden;
+            check_ABIDLE.Visibility = Visibility.Hidden;
+        }
+
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (status == Status.WaitInput)
+            if (status == Status.WaitInput || status == Status.Cleared)
             {
                 AxAssgn axisInfo = new AxAssgn();
                 axisAssign = new InGameAxAssgn(new JoyAssgn(), -1, axisInfo);

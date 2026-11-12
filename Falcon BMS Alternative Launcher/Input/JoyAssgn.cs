@@ -160,6 +160,22 @@ namespace FalconBMS.Launcher.Input
             return TryGetJoyAxisState(joyAxisNumber, out int input) ? input : 0;
         }
 
+        public bool TryPollDevice()
+        {
+            if (hwDevice == null)
+                return false;
+            try
+            {
+                hwDevice.Poll();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.Log(ex);
+                return false;
+            }
+        }
+
         public bool TryGetJoyAxisState(int joyAxisNumber, out int input)
         {
             input = 0;
