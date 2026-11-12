@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -262,12 +263,17 @@ namespace FalconBMS.Launcher.Windows
             int largestMovement = CommonConstants.AXISMAX / 4;
             int detectedDevice = -1;
             int detectedAxis = -1;
+            var diagnostics = new StringBuilder();
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
             {
                 if (DeviceFilter.SelectedIndex > 0 && DeviceFilter.SelectedIndex != i + 1)
                     continue;
                 if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryPollDevice())
+                {
+                    if (DeviceFilter.SelectedIndex > 0)
+                        diagnostics.Append("Unable to read device");
                     continue;
+                }
                 for (int ii = 0; ii < 8; ii++)
                 {
                     if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryGetJoyAxisState(ii, out int value))
@@ -276,9 +282,10 @@ namespace FalconBMS.Launcher.Windows
                     {
                         Joynum[i].NeutralValue[ii] = value;
                         Joynum[i].HasNeutralValue[ii] = true;
-                        continue;
                     }
                     int movement = Math.Abs(value - Joynum[i].NeutralValue[ii]);
+                    if (DeviceFilter.SelectedIndex > 0)
+                        diagnostics.AppendFormat("{0}: {1} (d{2})  ", (AxisNumName)ii, value, movement);
                     if (movement >= CommonConstants.AXISMAX / 4 && (detectedDevice < 0 || movement > largestMovement))
                     {
                         largestMovement = movement;
@@ -286,7 +293,16 @@ namespace FalconBMS.Launcher.Windows
                         detectedAxis = ii;
                     }
                 }
+                if (DeviceFilter.SelectedIndex > 0)
+                {
+                    byte[] buttons = MainWindow.deviceControl.GetJoystickMappings()[i].GetButtons();
+                    diagnostics.Append("\nButtons:");
+                    for (int button = 0; button < buttons.Length; button++)
+                        if ((buttons[button] & 0x80) != 0)
+                            diagnostics.AppendFormat(" {0}", button + 1);
+                }
             }
+            InputDiagnostics.Text = DeviceFilter.SelectedIndex > 0 ? diagnostics.ToString() : "Select a device to see input values.";
             if (detectedDevice < 0)
                 return;
 
@@ -451,6 +467,7 @@ namespace FalconBMS.Launcher.Windows
             SetAB.Visibility = Visibility.Hidden;
             Idle.Visibility = Visibility.Hidden;
             check_ABIDLE.Visibility = Visibility.Hidden;
+            InputDiagnostics.Text = "";
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)

@@ -6,7 +6,7 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d" 
         GlowBrush="Black" BorderThickness="0"
-        Title="Axis Assign" Height="270" Width="512"
+        Title="Axis Assign" Height="330" Width="512"
         WindowStartupLocation="CenterScreen"
         Loaded="AssignWindow_Loaded" 
         ResizeMode="NoResize" SizeToContent="Width" Topmost="True" 
@@ -105,22 +105,24 @@
 
         <ComboBox x:Name="DeviceFilter" Style="{StaticResource KeyMappingComboBox}" HorizontalAlignment="Left" Margin="28,132,0,0" VerticalAlignment="Top" Width="447" Height="26" Background="#FFF0F0F0" Foreground="#FF191919" BorderBrush="Black" SelectionChanged="DeviceFilter_SelectionChanged"/>
 
-        <Button x:Name="Clear" Content="Clear" HorizontalAlignment="Left" Margin="14,210,0,0" VerticalAlignment="Top" Width="75" Click="Clear_Click"/>
-        <Button x:Name="Retry" Content="Retry" HorizontalAlignment="Left" Margin="320,210,0,0" VerticalAlignment="Top" Width="75" Click="Retry_Click"/>
-        <Button x:Name="Save" Content="Save" HorizontalAlignment="Left" Margin="400,210,0,0" VerticalAlignment="Top" Width="75" Click="Save_Click"/>
-        <Button x:Name="SetAB" Content="AB DETENT" HorizontalAlignment="Left" Margin="320,178,0,0" VerticalAlignment="Top" Width="75" Click="SetAB_Click"/>
-        <Button x:Name="Idle" Content="Idle DETENT" HorizontalAlignment="Left" Margin="400,178,0,0" VerticalAlignment="Top" Width="75" Click="SetIDLE_Click"/>
+        <TextBlock x:Name="InputDiagnostics" Margin="28,164,28,0" Height="70" VerticalAlignment="Top" Foreground="#FF191919" FontSize="11" TextWrapping="Wrap"/>
 
-        <CheckBox x:Name="Invert" Content="INVERT" HorizontalAlignment="Left" Margin="28,182,0,0" VerticalAlignment="Top"/>
-        <Label Content="Saturation" HorizontalAlignment="Left" Margin="225,178,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="Saturation" HorizontalAlignment="Left" Margin="210,211,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="Saturation_SelectionChanged">
+        <Button x:Name="Clear" Content="Clear" HorizontalAlignment="Left" Margin="14,270,0,0" VerticalAlignment="Top" Width="75" Click="Clear_Click"/>
+        <Button x:Name="Retry" Content="Retry" HorizontalAlignment="Left" Margin="320,270,0,0" VerticalAlignment="Top" Width="75" Click="Retry_Click"/>
+        <Button x:Name="Save" Content="Save" HorizontalAlignment="Left" Margin="400,270,0,0" VerticalAlignment="Top" Width="75" Click="Save_Click"/>
+        <Button x:Name="SetAB" Content="AB DETENT" HorizontalAlignment="Left" Margin="320,238,0,0" VerticalAlignment="Top" Width="75" Click="SetAB_Click"/>
+        <Button x:Name="Idle" Content="Idle DETENT" HorizontalAlignment="Left" Margin="400,238,0,0" VerticalAlignment="Top" Width="75" Click="SetIDLE_Click"/>
+
+        <CheckBox x:Name="Invert" Content="INVERT" HorizontalAlignment="Left" Margin="28,242,0,0" VerticalAlignment="Top"/>
+        <Label Content="Saturation" HorizontalAlignment="Left" Margin="225,238,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="Saturation" HorizontalAlignment="Left" Margin="210,271,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="Saturation_SelectionChanged">
             <TextBlock Text=" None"/>
             <TextBlock Text=" Small"/>
             <TextBlock Text=" Medium"/>
             <TextBlock Text=" Large"/>
         </ComboBox>
-        <Label x:Name="Label_DeadZone" Content="DeadZone" HorizontalAlignment="Left" Margin="115,178,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="DeadZone" HorizontalAlignment="Left" Margin="99,211,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="DeadZone_SelectionChanged">
+        <Label x:Name="Label_DeadZone" Content="DeadZone" HorizontalAlignment="Left" Margin="115,238,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="DeadZone" HorizontalAlignment="Left" Margin="99,271,0,0" VerticalAlignment="Top" Width="100" SelectionChanged="DeadZone_SelectionChanged">
             <TextBlock Text=" None"/>
             <TextBlock Text=" Small"/>
             <TextBlock Text=" Medium"/>
