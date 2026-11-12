@@ -59,6 +59,7 @@ namespace FalconBMS.Launcher.Windows
         private int TickCount_NextUIFlush1;
         private int TickCount_NextUIFlush2;
         private bool deviceFilterReady;
+        private readonly System.Diagnostics.Stopwatch neutralTimer = new System.Diagnostics.Stopwatch();
 
         private enum Status
         {
@@ -225,6 +226,7 @@ namespace FalconBMS.Launcher.Windows
             phyAxNumTmp = axisAssign.GetPhysicalNumber();
 
             Joynum = new JoyAxisNeutralValue[MainWindow.deviceControl.GetJoystickMappings().Length];
+            neutralTimer.Restart();
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
                 Joynum[i] = new JoyAxisNeutralValue();
 
@@ -250,9 +252,12 @@ namespace FalconBMS.Launcher.Windows
 
         private void WaitInput()
         {
-            if (Environment.TickCount > TickCount_NextUIFlush1)
+            bool settling = neutralTimer.ElapsedMilliseconds < 750;
+            if (settling)
+                AssignedJoystick.Content = "   HOLD CONTROLS STILL";
+            else if (Environment.TickCount > TickCount_NextUIFlush1)
                 AssignedJoystick.Content = "";
-            if (Environment.TickCount > TickCount_NextUIFlush2)
+            if (!settling && Environment.TickCount > TickCount_NextUIFlush2)
             {
                 AssignedJoystick.Content = "   AWAITING INPUTS";
 
@@ -278,7 +283,7 @@ namespace FalconBMS.Launcher.Windows
                 {
                     if (!MainWindow.deviceControl.GetJoystickMappings()[i].TryGetJoyAxisState(ii, out int value))
                         continue;
-                    if (!Joynum[i].HasNeutralValue[ii])
+                    if (settling || !Joynum[i].HasNeutralValue[ii])
                     {
                         Joynum[i].NeutralValue[ii] = value;
                         Joynum[i].HasNeutralValue[ii] = true;
@@ -286,7 +291,7 @@ namespace FalconBMS.Launcher.Windows
                     int movement = Math.Abs(value - Joynum[i].NeutralValue[ii]);
                     if (DeviceFilter.SelectedIndex > 0)
                         diagnostics.AppendFormat("{0}: {1} (d{2})  ", (AxisNumName)ii, value, movement);
-                    if (movement >= CommonConstants.AXISMAX / 4 && (detectedDevice < 0 || movement > largestMovement))
+                    if (!settling && movement >= CommonConstants.AXISMAX / 4 && (detectedDevice < 0 || movement > largestMovement))
                     {
                         largestMovement = movement;
                         detectedDevice = i;

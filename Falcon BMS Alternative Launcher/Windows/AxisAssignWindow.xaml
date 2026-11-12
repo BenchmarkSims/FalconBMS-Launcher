@@ -9,7 +9,7 @@
         Title="Axis Assign" Height="330" Width="512"
         WindowStartupLocation="CenterScreen"
         Loaded="AssignWindow_Loaded" 
-        ResizeMode="NoResize" SizeToContent="Width" Topmost="True" 
+        ResizeMode="NoResize" SizeToContent="Manual" Topmost="True"
         AllowDrop="False" ShowTitleBar="False" IsWindowDraggable="False" WindowStyle="None" Background="#bfc7cf">
     <Window.Resources>
         <Style TargetType="Label">
