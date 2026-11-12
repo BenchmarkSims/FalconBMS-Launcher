@@ -188,7 +188,7 @@ namespace FalconBMS.Launcher.Windows
             if (status == Status.GetNeutralPosition)
             {
                 status = Status.WaitInput;
-                AssignedJoystick.Content = "   AWAITING INPUTS";
+                AssignedJoystick.Content = "   HOLD CONTROLS STILL";
             }
             return;
         }
@@ -226,7 +226,6 @@ namespace FalconBMS.Launcher.Windows
             phyAxNumTmp = axisAssign.GetPhysicalNumber();
 
             Joynum = new JoyAxisNeutralValue[MainWindow.deviceControl.GetJoystickMappings().Length];
-            neutralTimer.Restart();
             for (int i = 0; i < MainWindow.deviceControl.GetJoystickMappings().Length; i++)
                 Joynum[i] = new JoyAxisNeutralValue();
 
@@ -240,6 +239,8 @@ namespace FalconBMS.Launcher.Windows
                     Joynum[i].HasNeutralValue[ii] = MainWindow.deviceControl.GetJoystickMappings()[i]
                         .TryGetJoyAxisState(ii, out Joynum[i].NeutralValue[ii]);
             }
+            // Start settling on the first sampling tick, after the window is ready.
+            neutralTimer.Reset();
         }
 
         private void GetNeutralPosition()
@@ -247,11 +248,13 @@ namespace FalconBMS.Launcher.Windows
             Reset();
 
             status = Status.WaitInput;
-            AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Content = "   HOLD CONTROLS STILL";
         }
 
         private void WaitInput()
         {
+            if (!neutralTimer.IsRunning)
+                neutralTimer.Start();
             bool settling = neutralTimer.ElapsedMilliseconds < 750;
             if (settling)
                 AssignedJoystick.Content = "   HOLD CONTROLS STILL";
@@ -442,7 +445,7 @@ namespace FalconBMS.Launcher.Windows
         private void Retry_Click(object sender, RoutedEventArgs e)
         {
             status = Status.GetNeutralPosition;
-            AssignedJoystick.Content = "   AWAITING INPUTS";
+            AssignedJoystick.Content = "   HOLD CONTROLS STILL";
 
             AxisValueProgress.Minimum = CommonConstants.AXISMIN;
             AxisValueProgress.Maximum = CommonConstants.AXISMAX;
