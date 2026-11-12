@@ -22,6 +22,10 @@ namespace FalconBMS.Launcher.Windows
     {
         private List<ButtonStateTracker> _buttonTrackers;
         private bool _isShiftButtonPressed = false;
+        private KeyAssgn _lastClickedBinding;
+        private DataGridColumn _lastClickedColumn;
+        private int _lastBindingClickTick;
+        private Point _lastBindingClickPosition;
 
         public void UpdateCategoryHeaders()
         {
@@ -99,9 +103,6 @@ namespace FalconBMS.Launcher.Windows
         /// <param name="e"></param>
         private void DataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount != 2)
-                return;
-
             DependencyObject source = e.OriginalSource as DependencyObject;
             while (source != null && !(source is DataGridCell))
                 source = source is Visual ? VisualTreeHelper.GetParent(source) : (source as FrameworkContentElement)?.Parent;
@@ -109,7 +110,25 @@ namespace FalconBMS.Launcher.Windows
             DataGridCell cell = source as DataGridCell;
             KeyAssgn selectedItem = cell?.DataContext as KeyAssgn;
             if (selectedItem == null)
+            {
+                _lastClickedBinding = null;
                 return;
+            }
+
+            Point position = e.GetPosition(KeyMappingGrid);
+            var doubleClickSize = System.Windows.Forms.SystemInformation.DoubleClickSize;
+            bool isDoubleClick = ReferenceEquals(_lastClickedBinding, selectedItem)
+                && ReferenceEquals(_lastClickedColumn, cell.Column)
+                && unchecked((uint)(Environment.TickCount - _lastBindingClickTick)) <= System.Windows.Forms.SystemInformation.DoubleClickTime
+                && Math.Abs(position.X - _lastBindingClickPosition.X) <= doubleClickSize.Width / 2.0
+                && Math.Abs(position.Y - _lastBindingClickPosition.Y) <= doubleClickSize.Height / 2.0;
+            _lastClickedBinding = selectedItem;
+            _lastClickedColumn = cell.Column;
+            _lastBindingClickTick = Environment.TickCount;
+            _lastBindingClickPosition = position;
+            if (!isDoubleClick)
+                return;
+            _lastClickedBinding = null;
             if (selectedItem.GetVisibility() != "White")
                 return;
             if (selectedItem.GetCallback() == CommonConstants.SIMDONOTHING)
